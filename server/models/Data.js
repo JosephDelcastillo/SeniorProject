@@ -19,7 +19,7 @@ function getAllSubmissions (sendFunc) {
     db.Submissions.rows.forEach(current => {
         let finds = db.Responses.rows.filter(({submission}) => submission === current.id);
         finds.forEach(({submission, question, value}) => { 
-            output.push({user: current.user, submission: submission, question: question, value: value});
+            output.push({user: current.user, submission: submission, date: current.date, question: question, value: value});
         });
     });
     

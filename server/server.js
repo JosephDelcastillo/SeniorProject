@@ -18,7 +18,7 @@ app.use(bodyParser.json());
  * Api Navigation
  */
 // Root Level - Public Access Functions 
-// Menu
+// Data
 app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); })
 
 // Login 
