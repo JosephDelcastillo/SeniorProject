@@ -1,5 +1,12 @@
 import React from 'react'
 
+
+/**
+ *  Logout Page
+ * 
+ *  Manages Logging Out  
+ * @returns {React.Component} 
+ */
 function Logout({ resetToken }) {
     resetToken();
     return (

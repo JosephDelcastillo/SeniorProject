@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Swal from 'sweetalert2';
 
+
 async function getData() {
     return fetch('/api').then(data => data.json());
 }
@@ -25,6 +26,12 @@ function churnInitData(data) {
     return output;
 } 
 
+/**
+ *  Report Page
+ * 
+ *  Renders Final Report Graphics  
+ * @returns {React.Component} 
+ */
 function Report() {
     const [ backendData, setBackendData ] = useState([{}]);
     const [ graphType, setGraphType ] = useState(String);

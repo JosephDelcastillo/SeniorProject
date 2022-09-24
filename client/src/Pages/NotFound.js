@@ -1,5 +1,10 @@
 import React from 'react'
 
+/**
+ *  404 Error Page
+ * 
+ * @returns {React.Component} 
+ */
 function NotFound() {
     return (
         <div className='row'>

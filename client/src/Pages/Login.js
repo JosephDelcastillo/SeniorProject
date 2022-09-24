@@ -8,6 +8,12 @@ async function loginUser(credentials) {
   .then(data => data.json())
 }
 
+/**
+ *  Login Page
+ * 
+ *  Manages Logging In 
+ * @returns {React.Component} 
+ */
 export default function Login({ getToken, setToken }) {
   const [username, setEmail] = useState();
   const [password, setPassword] = useState();

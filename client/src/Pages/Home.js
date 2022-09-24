@@ -1,5 +1,11 @@
 import React from 'react';
 
+/**
+ *  Home Page
+ * 
+ *  Default Landing 
+ * @returns {React.Component} 
+ */
 function Home() {
 
     return (
