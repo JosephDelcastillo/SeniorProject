@@ -24,6 +24,8 @@ app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.
 // Login 
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
 
+// Add New User
+app.post("/api/newUser", (req, res) => { Data_Controller.addUser(req.body, (data) => res.json(data)); });
 
 
 /**
