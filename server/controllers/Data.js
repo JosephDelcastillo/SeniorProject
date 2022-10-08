@@ -17,11 +17,6 @@ function attemptLogin (data, sendFunc) {
     Data_model.attemptLogin(data, sendFunc);
 }
 
-// Add User
-function addUser (data, sendFunc) {
-    Data_model.addUser(data, sendFunc);
-}
-
 module.exports = { 
-    getAllSubmissions, attemptLogin, addUser
+    getAllSubmissions, attemptLogin
 };

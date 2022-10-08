@@ -29,16 +29,6 @@ function getAllSubmissions (sendFunc) {
 
 // **** Add Data **** 
 
-//Will add a new user to the dummy database
-//Does no error handling or anything else rn
-//Currently not fully tested...
-function addUser ({name, username, password, role}, sendFunc) {
-    //TODO have it check to make sure the user doesn't already exist
-
-    db.Users.addEntry({ name: name, email: username, password: password, role: role });
-
-    sendFunc( new Reply ({ data: '', point: 'Add User', success: true }));
-}
 
 // **** Update Data **** 
 // **** Remove Data **** 
@@ -76,5 +66,5 @@ function runAuthorization (token, sendFunc, successAction) {
  * Export Functions For Public Use Here 
  */
 module.exports = {
-    getAllSubmissions, attemptLogin, addUser
+    getAllSubmissions, attemptLogin
 };
