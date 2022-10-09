@@ -48,20 +48,28 @@ function Report() {
     const [ backendData, setBackendData ] = useState([{}]);
     const [ graphType, setGraphType ] = useState(String);
 
+    const genCats = (arr, count) => { if (count > 0) { arr.push('Submission ' + (arr.length + 1)); return genCats(arr, count - 1); } else { return arr; } }
+    let cats = genCats([], 11);
+    console.log(cats);
     const dummyData = [ { 
-            name: 'Installation & Developers',
+            name: 'Employee A',
+            categories: cats,
             data: [43934, 48656, 65165, 81827, 112143, 142383, 171533, 165174, 155157, 161454, 154610]
         }, {
-            name: 'Manufacturing',
+            name: 'Employee B',
+            categories: cats,
             data: [24916, 37941, 29742, 29851, 32490, 30282, 38121, 36885, 33726, 34243, 31050]
         }, {
-            name: 'Sales & Distribution',
+            name: 'Employee C',
+            categories: cats,
             data: [11744, 30000, 16005, 19771, 20185, 24377, 32147, 30912, 29243, 29213, 25663]
         }, {
-            name: 'Operations & Maintenance',
+            name: 'Employee D',
+            categories: cats,
             data: [null, null, null, null, null, null, null, null, 11164, 11218, 10077]
         }, {
-            name: 'Other',
+            name: 'Employee E',
+            categories: cats,
             data: [21908, 5548, 8105, 11248, 8989, 11816, 18274, 17300, 13053, 11906, 10073]
     } ];
 
@@ -107,7 +115,7 @@ function Report() {
                         </div>
                     </div>
                 </form>
-                <HighChart data={dummyData} type="column" yAxis="Response Value" />
+                <HighChart data={dummyData} type="pie" yAxis="Response Value" />
                 <hr />
                 {(graphType && backendData && backendData.length > 0 && backendData[0].user) ? ( 
                     backendData.map(({ user, responses }) => (

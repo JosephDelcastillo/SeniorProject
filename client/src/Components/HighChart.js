@@ -8,6 +8,23 @@ require('highcharts/modules/export-data')(Highcharts);
 
 function HighChart({ data, title, yAxis, type }) {
     const chart = useRef();
+    
+    const MAX = 100;
+    const MIN = 10;
+    const RANGE = (MAX - MIN);
+    const STEPS = data.length + 1; 
+    const GAP = RANGE / STEPS;
+    const CUR = (count) => MAX - (GAP * count);
+    const INNER = (count) => MAX - (GAP * (count + 1));
+
+    // TODO: Test conversion back to line/column/bar 
+
+    let temp = data.forEach((element, count) => {
+        element.size = `${CUR(count)}%`;
+        element.innerSize = `${INNER(count)}%`;
+        console.log('CUR ' + CUR(count) + "|" + INNER(count));
+    });
+    console.log(data);
     const options = {
         chart: {
             type: type ?? 'splice'
@@ -23,16 +40,9 @@ function HighChart({ data, title, yAxis, type }) {
         series: data,
     };
 
-    const downloadCSV = () => {
-        if (chart && chart.current && chart.current.chart) {
-            chart.current.chart.downloadCSV();
-        }
-    };
-
     return (
         <div>
             <HighchartsReact ref={chart} highcharts={Highcharts} options={options} />
-            <button onClick={downloadCSV}>Export</button>
         </div>
     )
 }
