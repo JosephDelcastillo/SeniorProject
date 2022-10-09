@@ -1,5 +1,5 @@
 import React from 'react';
-import { PieChart, Pie, Sector, Tooltip, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Tooltip, ResponsiveContainer } from 'recharts';
 
 function PieGraph({ columns, data, target, xKey }) {
     data.forEach(element => {
