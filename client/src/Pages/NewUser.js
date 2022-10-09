@@ -6,7 +6,6 @@ import React from 'react';
  */
 function NewUser() {
     function setPassword (newPass) { console.log(newPass); } 
-
     return (
         <div className="card m-2 mt-5 border-none">
         <div className="text-center">
