@@ -5,7 +5,6 @@ import React from 'react';
  * @returns {React.Component} 
  */
 function NewUser() {
-
     return (
         <div className="card m-2 mt-5 border-none">
         <div className="text-center">

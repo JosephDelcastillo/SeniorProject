@@ -40,3 +40,7 @@ body {
 /* With JS */
 .spinnable.spin90 { transform: rotate(90deg); }
 .spinnable { transition: transform 0.5s ease 0s; }
+
+.iconButton{border: none; background:none;}
+.iconButton:hover{background-color:rgb(190, 190, 190)}
+.tableHover tr:hover{background-color:rgb(235, 235, 235);}
