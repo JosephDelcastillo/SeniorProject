@@ -17,6 +17,15 @@ function attemptLogin (data, sendFunc) {
     Data_model.attemptLogin(data, sendFunc);
 }
 
+/* Private Functions  */
+// Get Staff Members
+function getStaff(input, sendFunc) {
+    const { token, data } = input;
+    Data_model.runAuthorization(token, sendFunc, (send) => { Data_model.getStaff(data, send) }); 
+}
+
 module.exports = { 
-    getAllSubmissions, attemptLogin
+    getAllSubmissions, 
+    attemptLogin,
+    getStaff
 };

@@ -17,14 +17,10 @@ function HighChart({ data, title, yAxis, type }) {
     const CUR = (count) => MAX - (GAP * count);
     const INNER = (count) => MAX - (GAP * (count + 1));
 
-    // TODO: Test conversion back to line/column/bar 
-
-    let temp = data.forEach((element, count) => {
+    data.forEach((element, count) => {
         element.size = `${CUR(count)}%`;
         element.innerSize = `${INNER(count)}%`;
-        console.log('CUR ' + CUR(count) + "|" + INNER(count));
     });
-    console.log(data);
     const options = {
         chart: {
             type: type ?? 'splice'

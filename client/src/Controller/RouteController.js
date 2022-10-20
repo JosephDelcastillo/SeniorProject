@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Dashboard from '../Pages/Dashboard';
 import Responses from '../Pages/Responses';
-import NotFoud from '../Pages/NotFound';
+import NotFound from '../Pages/NotFound';
 import Logout from '../Pages/Logout';
 import Report from '../Pages/Report';
 import Login from '../Pages/Login';
@@ -24,7 +24,7 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} />} />
-                <Route path="*" element={<NotFoud />} />
+                <Route path="*" element={<NotFound />} />
             </Routes>
             </div>
         );

@@ -5,6 +5,7 @@
  */
 
 // Imports 
+const e = require('express');
 const { DummyDB } = require('../helpers/Development'); // TODO: Remove After Development
 const { Reply } = require('../helpers/Helpers');
 
@@ -25,6 +26,15 @@ function getAllSubmissions (sendFunc) {
     
     output = output.sort((a, b) => (a.user - b.user) + ((a.submission - b.submission)));
     sendFunc(new Reply ({ point: `Get All Submissions`, success: true, data: output }));
+}
+
+function getStaff (search, sendFunc) {
+    // Search DB For Matches  
+    const staff = (search.search) ? db.Users.rows.filter(({ name, email }) => strSearch(name, search.search) || strSearch(email, search.search) ) : db.Users.rows;
+    // Format Data for Security 
+    const output = staff.map(({ id, name, email }) => { return ({ id, name, email }); }); 
+    // Return Data 
+    sendFunc(new Reply ({ point: `Get Staff`, success: true, data: output }));
 }
 
 // **** Add Data **** 
@@ -57,12 +67,24 @@ function attemptLogin ({username, password}, sendFunc) {
 function runAuthorization (token, sendFunc, successAction) {
     // TODO: Fill this in with an actual token processor
     // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
-    return true;
+    if ( token ) {
+        successAction(sendFunc);
+    } else {
+        sendFunc( new Reply({ data: token, point: 'Authorization' }) );
+    }
+}
+
+// *** Helper Funcitons *** 
+function strSearch(haystack, needle) {
+    return (haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0); 
 }
 
 /**
  * Export Functions For Public Use Here 
  */
 module.exports = {
-    getAllSubmissions, attemptLogin
+    getAllSubmissions, 
+    runAuthorization,
+    attemptLogin, 
+    getStaff
 };
