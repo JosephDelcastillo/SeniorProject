@@ -5,9 +5,11 @@
  */
 
 // Imports 
-const e = require('express');
 const { DummyDB } = require('../helpers/Development'); // TODO: Remove After Development
 const { Reply } = require('../helpers/Helpers');
+
+// Constants 
+const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
 // Dummy Data 
 let db = DummyDB(); // TODO: Replace with DB connection
@@ -30,11 +32,37 @@ function getAllSubmissions (sendFunc) {
 
 function getStaff (search, sendFunc) {
     // Search DB For Matches  
-    const staff = (search.search) ? db.Users.rows.filter(({ name, email }) => strSearch(name, search.search) || strSearch(email, search.search) ) : db.Users.rows;
+    const staff = (search) ? db.Users.filter(({ name, email }) => strSearch(name, search) || strSearch(email, search) ) : db.Users.rows;
     // Format Data for Security 
     const output = staff.map(({ id, name, email }) => { return ({ id, name, email }); }); 
     // Return Data 
     sendFunc(new Reply ({ point: `Get Staff`, success: true, data: output }));
+}
+
+function getQuestion (search, sendFunc) {
+    // Search DB For Matches  
+    const question = (search) ? db.Questions.filter( ({ name, is_note }) => (strSearch(name, search) && !(is_note)) ) : db.Questions.filter(({is_note })=>!is_note) ;
+    // Format Data for Security 
+    const output = question.map(({ id, name }) => { return ({ id, name }); }); 
+    // Return Data 
+    sendFunc(new Reply ({ point: `Get Question`, success: true, data: output }));
+}
+
+function getReport (people, questions, dates, sendFunc) {
+    let output = { people, questions, dates };
+    // First Get Submissions Within TimeSpan 
+    const subs = (people[0] === -202) ? db.Submissions.filter(({date}) => (date >= dates.start && date <= dates.end)) : 
+        db.Submissions.filter(({user, date}) => (date >= dates.start && date <= dates.end) && people.includes(user) );
+    // Next Collect Responses Based on Submissions and Questions
+    const questionsFiltered = (questions[0] === -202) ? 
+        db.Questions.filter(({ is_note }) => !is_note).map(({id, name})=>{return {id, name}}) : 
+        db.Questions.filter(({ id, is_note }) => !is_note && questions.includes(id)).map(({id, name})=>{return{id, name}});
+    // Next Get Responses Per the Submissions
+    const resp = db.Responses.filter(({ submission, question }) => (subs.findIndex(({id}) => id === submission) >= 0) && (questionsFiltered.findIndex(q => q.id === question) >= 0));
+    // Then Get Users 
+    const pep = (people[0] === -202) ? db.Users.rows.map(({ id, name }) => { return { id, name } }) : db.Users.rows.filter(({id})=>people.includes(id)).map(({ id, name }) => { return { id, name } });
+    // Finally Return Information 
+    sendFunc(new Reply ({ point: 'Generate Report', success: true, data: { submissions: subs, responses: resp, questions: questionsFiltered, people: pep } }));
 }
 
 // **** Add Data **** 
@@ -64,7 +92,7 @@ function attemptLogin ({username, password}, sendFunc) {
  * @param {Function} sendFunc To Return Data
  * @param {Function} successAction Action to do if authorized
  */
-function runAuthorization (token, sendFunc, successAction) {
+function runAuthorization (token, requirement, sendFunc, successAction) {
     // TODO: Fill this in with an actual token processor
     // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
     if ( token ) {
@@ -83,8 +111,11 @@ function strSearch(haystack, needle) {
  * Export Functions For Public Use Here 
  */
 module.exports = {
+    AUTH_ROLES,
     getAllSubmissions, 
     runAuthorization,
     attemptLogin, 
+    getQuestion,
+    getReport,
     getStaff
 };

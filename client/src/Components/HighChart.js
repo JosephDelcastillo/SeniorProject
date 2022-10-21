@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/export-data')(Highcharts);
 
-function HighChart({ data, title, yAxis, type }) {
+function HighChart({ data, title, yAxis, xAxis, type }) {
     const chart = useRef();
     
     const MAX = 100;
