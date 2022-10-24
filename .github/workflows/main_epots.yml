@@ -65,4 +65,4 @@ jobs:
           app-name: 'epots'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_05122165818D4CC3B6235E3DDF982495 }}
-          package: .
+          package: release.zip
