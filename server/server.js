@@ -6,7 +6,7 @@ const express = require("express");
 const data = require('./controllers/Data')
 
 // Initializations 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const app = express();
 const Data_Controller = data;
 
