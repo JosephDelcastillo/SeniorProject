@@ -1,8 +1,9 @@
 "use strict";
 
 // Imports
+const createHandler = require("azure-function-express").createHandler;
 const bodyParser = require('body-parser');
-const path = require('path');
+// const path = require('path');
 const express = require("express");
 const data = require('./controllers/Data')
 
@@ -13,15 +14,15 @@ const Data_Controller = data;
 
 // Configure App 
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '../client/')));
+// app.use(express.static(path.join(__dirname, '../client/')));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 /** 
  *  App Navigation
  */
-app.get('/*', ( req, res ) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
+// app.get('/*', ( req, res ) => {
+//     res.sendFile(path.join(__dirname, '../client/build/index.html'));
+// });
 
 /**
  * Api Navigation
@@ -40,3 +41,5 @@ app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (da
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
 })
+
+module.exports = createHandler(app);
