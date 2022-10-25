@@ -30,9 +30,8 @@ jobs:
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          npm run build --if-present
-          npm run test --if-present
           popd
+        working-directory: server 
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
