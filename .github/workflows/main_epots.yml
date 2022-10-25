@@ -39,15 +39,14 @@ jobs:
           filename: release.zip
           # path: ./build/*
           # directory: client
-          path: .
-          exclusions: ' *.git* /*node_modules/* .editorconfig /*public/* /*src/*'
+          path: ./server/*
       
       # Return Release Artifact 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
         with:
           name: epots-app
-          path: ./release.zip
+          path: ./server/release.zip
 
   deploy:
     runs-on: ubuntu-latest
