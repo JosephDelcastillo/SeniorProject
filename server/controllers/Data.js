@@ -23,8 +23,8 @@ function addUser (data, sendFunc) {
 }
 
 //Get Users
-function getUsers (data, sendFunc) {
-    Data_model.addUser(data, sendFunc);
+function getUsers (sendFunc) {
+    Data_model.getUsers(sendFunc);
 }
   
  module.exports = {
