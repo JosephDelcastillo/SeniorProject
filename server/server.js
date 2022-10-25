@@ -27,6 +27,9 @@ app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (da
 // Add New User
 app.post("/api/newUser", (req, res) => { Data_Controller.addUser(req.body, (data) => res.json(data)); }); 
 
+// Get User Data
+app.get("/api/getUsers", (req, res) => { Data_Controller.getUsers((data) => res.json(data)); })
+
 
 /**
  * Finally Start the App

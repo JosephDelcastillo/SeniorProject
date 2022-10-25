@@ -26,6 +26,21 @@ function getAllSubmissions (sendFunc) {
     output = output.sort((a, b) => (a.user - b.user) + ((a.submission - b.submission)));
     sendFunc(new Reply ({ point: `Get All Submissions`, success: true, data: output }));
 }
+
+
+//Will grab data for all users
+//Not fully tested!!! No error handling etc!!!!
+function getUsers (sendFunc) {
+    let output = [];
+
+    //TODO: Grab archival status
+    db.Users.rows.forEach(current => {
+        output.push({name: current.name, email: current.email, role: current.role});
+    })
+
+    output = output.sort((a, b) => (a.user - b.user));
+    sendFunc(new Reply ({ point: `Get All Users`, success: true, data: output }));
+}
  
 // **** Add Data ****
  
@@ -77,5 +92,5 @@ function runAuthorization (token, sendFunc, successAction) {
  * Export Functions For Public Use Here
  */
 module.exports = {
-    getAllSubmissions, attemptLogin, addUser
+    getAllSubmissions, attemptLogin, addUser, getUsers
 };

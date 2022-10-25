@@ -21,8 +21,13 @@
 function addUser (data, sendFunc) {
     Data_model.addUser(data, sendFunc);
 }
+
+//Get Users
+function getUsers (data, sendFunc) {
+    Data_model.addUser(data, sendFunc);
+}
   
  module.exports = {
-     getAllSubmissions, attemptLogin, addUser
+     getAllSubmissions, attemptLogin, addUser, getUsers
  };
  
