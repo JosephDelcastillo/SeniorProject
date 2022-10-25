@@ -2,6 +2,7 @@
 
 // Imports
 const bodyParser = require('body-parser');
+const path = require('path');
 const express = require("express");
 const data = require('./controllers/Data')
 
@@ -11,8 +12,16 @@ const app = express();
 const Data_Controller = data;
 
 // Configure App 
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '../client/')));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+/** 
+ *  App Navigation
+ */
+app.get('/*', ( req, res ) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 /**
  * Api Navigation
