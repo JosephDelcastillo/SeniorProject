@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: '18.x'
 
-      # FIRST: Build Client Side App 
       # Build and Test Node 
       - name: npm install, build, and test
         run: |
