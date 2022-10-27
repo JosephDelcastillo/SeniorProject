@@ -6,14 +6,13 @@ async function getUsers() {
     return fetch('/api/getUsers').then(data => data.json());
 }
 
-//Inserts user data into template
-//CURRENTLY A NONFUNCTIONING HOT MESS!!!!
+//Inserts user data into a row and inserts row into table
 function displayUsers(userInfo) {
     const tableUsers = document.getElementById("tableUsers");
     let newRow = document.createElement('tr');
 
-    //Find out why the button isn't showing??????
-    const viewButton = document.createElement('td');
+    //Find out why the icon isn't showing??????
+    let viewButton = document.createElement('td');
     viewButton.innerHTML = "<button class=\"iconButton\"><img src=" + {viewIcon} + "alt='view' height='20px'/></button>";
 
     let userName = document.createElement('td');
@@ -37,6 +36,10 @@ function displayUsers(userInfo) {
 //FIND OUT WHY IT ITERATES TWICE?????
 async function handleGetData() {
     let userInfoList = await getUsers();
+
+    //Test print statements, take out in final version!!
+    console.log("userInfoList: ");
+    console.log(userInfoList);
 
     userInfoList.data.forEach(user => {
         displayUsers(user);
@@ -68,12 +71,16 @@ function Users() {
                         </tr>
                     </thead>
                     <tbody id="tableUsers">
-                    
                     </tbody>
                 </table>
             </div>
- 
+
+            <div className="text-center">
+                <a href='/dashboard/newuser' className='btn btn-outline-primary col-3 mt-5'> Create New User </a>
+            </div>
+
         </div>
+
     )
 }
  

@@ -47,10 +47,10 @@ function getUsers (sendFunc) {
 //Will add a new user to the dummy database
 //Does no error handling or anything else rn
 //Currently not fully tested...
-function addUser ({name, username, password, role}, sendFunc) {
+function addUser ({name, email, password, role}, sendFunc) {
     //TODO have it check to make sure the user doesn't already exist
  
-    db.Users.addEntry({ name: name, email: username, password: password, role: role });
+    db.Users.addEntry({ name: name, email: email, password: password, role: role });
  
     sendFunc( new Reply ({ data: '', point: 'Add User', success: true }));
 }

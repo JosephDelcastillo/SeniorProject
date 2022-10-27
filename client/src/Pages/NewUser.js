@@ -20,11 +20,14 @@ function NewUser() {
     const handleSubmit = async e => {
         e.preventDefault();
  
-        //This statement needs further testing
+        //Triggers the create user function to send data to the server and gets either a success or failure back
         let response = await createUser({name, email, password, role});
  
+        //Checks response for success or failure and displays appropriate confirmation popup
         if(response.success) {
-            Swal.fire({title: "User Created Successfully!", icon: 'success'})
+            Swal.fire({title: "User Created Successfully!", icon: 'success'}).then(function() {
+                window.location = "/dashboard/users";
+            });
             console.log(response);
         } else {
             Swal.fire({title: "Could Not Create User", icon: 'error'})
