@@ -20,20 +20,19 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@v2
 
-      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      - name: Setup Node v18 Environment
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '18.x'
 
       - name: 'Resolve Project Dependencies Using Npm'
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          pushd './api/*'
           npm install
           npm run build --if-present
           npm run test --if-present
           popd
-        working-directory: api
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
@@ -41,5 +40,5 @@ jobs:
         with:
           app-name: 'epots-api'
           slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: './api/*'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_492C19BC56ED45AEBA841631881F347D }}
