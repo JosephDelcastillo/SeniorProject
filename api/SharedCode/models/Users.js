@@ -8,8 +8,8 @@ async function GetTableId() {
 }
 
 function Create (data) {
+    console.log('Create Model')
     const { id } = data;
-    console.log('Create')
     // TODO: Build Create 
     return id; // Replace with New User ID or other reference 
 }
