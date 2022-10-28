@@ -15,7 +15,7 @@ async function Create (data) {
         console.log(id)
 
         // Replace with New User ID or other reference 
-        resolve({ id });
+        resolve({ id, info: 'Hit' });
     });
 }
 
