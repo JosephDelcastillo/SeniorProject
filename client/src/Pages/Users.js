@@ -6,14 +6,23 @@ async function getUsers() {
     return fetch('/api/getUsers').then(data => data.json());
 }
 
-//Inserts user data into a row and inserts row into table
-function displayUsers(userInfo) {
+//Creates a row, inserts user info into row, inserts row into table
+async function displayUsers(userInfo) {
     const tableUsers = document.getElementById("tableUsers");
     let newRow = document.createElement('tr');
 
-    //Find out why the icon isn't showing??????
-    let viewButton = document.createElement('td');
-    viewButton.innerHTML = "<button class=\"iconButton\"><img src=" + {viewIcon} + "alt='view' height='20px'/></button>";
+    //ToDo: Find out why the icon isn't showing??????
+    let viewButtonBox = document.createElement('td');
+    let viewButton = document.createElement('button');
+    viewButton.className = "iconButton";
+
+    let buttonImg = document.createElement('img');
+    buttonImg.setAttribute("src", {viewIcon});
+    buttonImg.setAttribute("alt", "view");
+    buttonImg.setAttribute("height", '20px');
+
+    viewButton.appendChild(buttonImg);
+    viewButtonBox.appendChild(viewButton); 
 
     let userName = document.createElement('td');
     userName.innerText = userInfo.name;
@@ -28,21 +37,16 @@ function displayUsers(userInfo) {
     let userArchive = document.createElement('td');
     userArchive.innerText = "N";
 
-    newRow.append(viewButton, userName, userEmail, userRole, userArchive);
+    newRow.append(viewButtonBox, userName, userEmail, userRole, userArchive);
     tableUsers.append(newRow);
 } 
 
-//iterates through users in table and sends to display function
-//FIND OUT WHY IT ITERATES TWICE?????
+//Iterates through users in table and sends to display function
 async function handleGetData() {
     let userInfoList = await getUsers();
 
-    //Test print statements, take out in final version!!
-    console.log("userInfoList: ");
-    console.log(userInfoList);
-
-    userInfoList.data.forEach(user => {
-        displayUsers(user);
+    userInfoList.data.forEach(async user => {
+        await displayUsers(user);
     });
 }
  
@@ -51,7 +55,7 @@ async function handleGetData() {
  * @returns {React.Component}
  */
 function Users() {
-    handleGetData(); 
+    handleGetData();
 
     return (
         <div className="card m-2 mt-5 border-none">
@@ -59,8 +63,8 @@ function Users() {
         <h1>Users</h1>
         </div>
  
-        <div class="panel">
-                <table class="table tableHover">
+        <div className="panel">
+                <table className="table tableHover">
                     <thead>
                         <tr>
                             <th scope="col" width="60px"></th>

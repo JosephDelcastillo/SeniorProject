@@ -34,11 +34,24 @@ function getUsers (sendFunc) {
     let output = [];
 
     //TODO: Grab archival status
+    //grabs user info by row and puts it into a output array
     db.Users.rows.forEach(current => {
         output.push({name: current.name, email: current.email, role: current.role});
     })
 
-    output = output.sort((a, b) => (a.user - b.user));
+    //sorts users alphabetically by name
+    output = output.sort(function (a, b){
+        let x = a.name.toUpperCase();
+        let y = b.name.toUpperCase();
+        if (x == y) {
+            return 0;
+        } else if (x > y) {
+            return 1;
+        } else {
+            return -1;
+        }
+    });
+
     sendFunc(new Reply ({ point: `Get All Users`, success: true, data: output }));
 }
  

@@ -65,7 +65,7 @@ function NewUser() {
             </div>
  
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Create</button>
-            <button className="btn btn-outline-primary col-3 mt-5" type="reset">Clear</button>
+            <a href='/dashboard/users' type='button' className="btn btn-outline-primary col-3 mt-5"> Cancel </a>
         </form>
         </div>
  
