@@ -14,8 +14,9 @@ module.exports = async function (context, req) {
     if (valid.success) { 
         context.res = {
             status: 200,
-            body: id // service.Create(context, req.query)
+            body: id 
         };
+        // service.Create(context, req.query);
     }
     else {
         context.res = {
