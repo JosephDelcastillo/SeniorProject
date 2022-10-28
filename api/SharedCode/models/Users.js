@@ -7,11 +7,16 @@ async function GetTableId() {
     return i;
 }
 
-function Create (data) {
-    console.log('Create Model')
-    const { id } = data;
-    // TODO: Build Create 
-    return id; // Replace with New User ID or other reference 
+async function Create (data) {
+    return new Promise(resolve => {
+        // TODO: Access Database 
+        console.log('Create Model')
+        const { id } = data;
+        console.log(id)
+
+        // Replace with New User ID or other reference 
+        resolve({ id });
+    });
 }
 
 module.exports = {

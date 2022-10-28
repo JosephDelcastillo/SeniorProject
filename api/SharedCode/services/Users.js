@@ -2,18 +2,25 @@ const model = require('../models/Users');
 const Reply = require('../lib/Reply');
 
 async function GetUsersTableId() {
-    const i = model.GetTableId()
-    return i;
+    try {
+        const i = model.GetTableId()
+        return i;
+    } catch (error) {
+        return error;
+    }
 }
 
-async function Create (context, data) {
+async function Create (data) {
     console.log('Create Service Attempt')
     const { id } = data;
+    console.log(id)
     // TODO: Build this function 
     try {
-        const new_user = await model.Create({ id });
         console.log('Create Service: New User Obtainer')
-        context.res.body = new Reply({ success: true, data: new_user, point: 'Create User' }); 
+        const res = await model.Create({ id });
+        console.log('res')
+        console.log(res)
+        return res;
     } catch(error) {
         console.log('Create Service: Error')
         context.res.status = 500;
