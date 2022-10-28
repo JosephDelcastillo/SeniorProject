@@ -1,5 +1,5 @@
 // Imports 
-// const service = require('../SharedCode/services/Users');
+const service = require('../SharedCode/services/Users');
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
@@ -12,11 +12,11 @@ module.exports = async function (context, req) {
     }
 
     if (valid.success) { 
-        context.res = {
-            status: 200,
-            body: id 
-        };
-        // service.Create(context, req.query);
+        // context.res = {
+        //     status: 200,
+        //     body: req.query.id
+        // };
+        service.Create(context, req.query);
     }
     else {
         context.res = {
