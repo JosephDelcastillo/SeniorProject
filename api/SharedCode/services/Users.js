@@ -1,15 +1,6 @@
 const model = require('../models/Users');
 const Reply = require('../lib/Reply');
 
-async function GetUsersTableId() {
-    try {
-        const i = model.GetTableId()
-        return i;
-    } catch (error) {
-        return error;
-    }
-}
-
 async function Create (data) {
     console.log('Create Service Attempt')
     const { id } = data;
@@ -30,6 +21,5 @@ async function Create (data) {
 }
 
 module.exports = {
-    GetUsersTableId,
     Create
 }
