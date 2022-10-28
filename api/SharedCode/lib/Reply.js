@@ -18,4 +18,5 @@ module.exports = function Reply ({ data, success, point }) {
     this.success = success ?? false;
     this.message = `${(success ?? false) ? 'Succeeded' : 'Failed'} at ${point ?? 'Query'}`;
     this.data = data ?? null;
+    return this;
 }
