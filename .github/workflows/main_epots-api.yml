@@ -22,7 +22,7 @@ jobs:
 
       - name: Setup Node ${{ env.NODE_VERSION }} Environment
         uses: actions/setup-node@v1
-        with: 
+        with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: 'Resolve Project Dependencies Using Npm'
