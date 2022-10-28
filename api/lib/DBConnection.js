@@ -35,16 +35,10 @@ const containerIds = {
     Response: 'Responses' 
 }
 // Todo: Add All Databases 
-const databaseId = 'UserDB';
-const containerId = 'Users';
 
 // Creating References 
 // Creating Client to run everything 
 const client = new CosmosClient({ endpoint, key });
-
-// Create Database And Container 
-// const database = client.database(databaseId);
-// const container = database.container(containerId);
 
 // Create Database References 
 const databases = {
