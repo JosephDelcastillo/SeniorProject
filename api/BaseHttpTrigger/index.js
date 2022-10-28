@@ -7,7 +7,7 @@ module.exports = async function (context, req) {
         : "This HTTP triggered function executed successfully. Welcome to the EPOTS api.";
 
     context.res = {
-        // status: 200, /* Defaults to 200 */
+        status: 200, /* Defaults to 200 */
         body: responseMessage
     };
 }
