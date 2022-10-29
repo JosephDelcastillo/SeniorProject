@@ -6,6 +6,14 @@ async function getUsers() {
     return fetch('/api/getUsers').then(data => data.json());
 }
 
+//Saves user email to session storage and redirects to user page of specified user
+function viewUser(userEmail) {
+    //Maybe not that secure? :(
+    sessionStorage.setItem("userEmail", userEmail);
+
+    window.location = "/dashboard/user";
+}
+
 //Creates a row, inserts user info into row, inserts row into table
 async function displayUsers(userInfo) {
     const tableUsers = document.getElementById("tableUsers");
@@ -14,6 +22,9 @@ async function displayUsers(userInfo) {
     let viewButtonBox = document.createElement('td');
     let viewButton = document.createElement('button');
     viewButton.className = "iconButton";
+    viewButton.addEventListener("click", function(){
+        viewUser(userInfo.email);
+    });
 
     let buttonImg = document.createElement('img');
     buttonImg.setAttribute("src", viewIcon);

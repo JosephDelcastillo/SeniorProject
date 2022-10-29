@@ -45,15 +45,15 @@ function NewUser() {
         <div className="card-body text-center">
         <form onSubmit={handleSubmit}>
             <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplName" className="form-label">Employee Name:</label>
+                <label htmlFor="emplName" className="form-label">Employee Name:</label>
                 <input type="text" id="emplName" name="emplName" placeholder="John Doe" className="form-control" required onChange={e => setName(e.target.value)}></input>
             </div>
             <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplEmail" className="form-label">Employee Email:</label>
+                <label htmlFor="emplEmail" className="form-label">Employee Email:</label>
                 <input type="email" id="emplEmail" name="emplEmail" placeholder="123@email.com" className="form-control" required onChange={e => setEmail(e.target.value)}></input>
             </div>
             <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="accType" className="form-label">Account Type:</label>
+                <label htmlFor="accType" className="form-label">Account Type:</label>
                 <select name="accType" className="form-control" onClick={e => setRole(e.target.value)}>
                     <option value="0" required>Select Account Type</option>
                     <option value="staff">Staff User</option>
@@ -61,7 +61,7 @@ function NewUser() {
                 </select>
             </div>
             <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplPass" className="form-label">Account Password:</label>
+                <label htmlFor="emplPass" className="form-label">Account Password:</label>
                 <input type="text" id="emplPass" name="emplPass" placeholder="DoeJohn" className="form-control" required onChange={e => setPassword(e.target.value)}></input>
             </div>
  
