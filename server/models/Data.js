@@ -31,15 +31,17 @@ function getAllSubmissions (sendFunc) {
 //Will grab data for all users
 //Not fully tested!!! No error handling etc!!!!
 function getUsers (sendFunc) {
+    //TODO: have it check to make sure that the user is logged in and an admin
+
     let output = [];
 
     //TODO: Grab archival status
-    //grabs user info by row and puts it into a output array
+    //Grabs user info by row and puts it into an output array
     db.Users.rows.forEach(current => {
         output.push({name: current.name, email: current.email, role: current.role});
     })
 
-    //sorts users alphabetically by name
+    //Sorts users alphabetically by name
     output = output.sort(function (a, b){
         let x = a.name.toUpperCase();
         let y = b.name.toUpperCase();
@@ -58,14 +60,27 @@ function getUsers (sendFunc) {
 // **** Add Data ****
  
 //Will add a new user to the dummy database
-//Does no error handling or anything else rn
 //Currently not fully tested...
 function addUser ({name, email, password, role}, sendFunc) {
-    //TODO have it check to make sure the user doesn't already exist
+    //TODO: have it check to make sure that the user is logged in and an admin
+
+    let alreadyExists = false;
+
+    //Goes through db and checks to make sure the user doesn't already exist
+    db.Users.rows.forEach(current => {
+        if (current.email == email) {
+            sendFunc( new Reply ({ data: 'user already exists', point: 'Add User', success: false }));
+            alreadyExists = true;
+        }
+    })
+
+    //If user doesn't already exist, this creates the user
+    if (alreadyExists == false) {
+        db.Users.addEntry({ name: name, email: email, password: password, role: role });
  
-    db.Users.addEntry({ name: name, email: email, password: password, role: role });
- 
-    sendFunc( new Reply ({ data: '', point: 'Add User', success: true }));
+        sendFunc( new Reply ({ data: '', point: 'Add User', success: true }));
+    }
+
 }
 
 

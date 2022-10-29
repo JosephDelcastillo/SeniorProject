@@ -11,13 +11,12 @@ async function displayUsers(userInfo) {
     const tableUsers = document.getElementById("tableUsers");
     let newRow = document.createElement('tr');
 
-    //ToDo: Find out why the icon isn't showing??????
     let viewButtonBox = document.createElement('td');
     let viewButton = document.createElement('button');
     viewButton.className = "iconButton";
 
     let buttonImg = document.createElement('img');
-    buttonImg.setAttribute("src", {viewIcon});
+    buttonImg.setAttribute("src", viewIcon);
     buttonImg.setAttribute("alt", "view");
     buttonImg.setAttribute("height", '20px');
 
@@ -25,17 +24,17 @@ async function displayUsers(userInfo) {
     viewButtonBox.appendChild(viewButton); 
 
     let userName = document.createElement('td');
-    userName.innerText = userInfo.name;
+    userName.textContent = userInfo.name;
 
     let userEmail = document.createElement('td');
-    userEmail.innerText = userInfo.email;
+    userEmail.textContent = userInfo.email;
 
     let userRole = document.createElement('td');
-    userRole.innerText = userInfo.role;
+    userRole.textContent = userInfo.role;
 
     //Since we arent tracking archival stuff yet, this marks everyone as active
     let userArchive = document.createElement('td');
-    userArchive.innerText = "N";
+    userArchive.textContent = "N";
 
     newRow.append(viewButtonBox, userName, userEmail, userRole, userArchive);
     tableUsers.append(newRow);
@@ -51,10 +50,11 @@ async function handleGetData() {
 }
  
 /**
- * Create New User Page
+ * Users Page
  * @returns {React.Component}
  */
 function Users() {
+    //Triggers handleGetData function to get user info from server
     handleGetData();
 
     return (
@@ -68,10 +68,10 @@ function Users() {
                     <thead>
                         <tr>
                             <th scope="col" width="60px"></th>
-                            <th scope="col">Name</th>
-                            <th scope="col" >Email</th>
-                            <th scope="col">Account Type</th>
-                            <th scope="col">Archival Status</th>
+                            <th scope="col">Name <button>&#9660;</button></th>
+                            <th scope="col">Email <button>&#9660;</button></th>
+                            <th scope="col">Account Type <button>&#9660;</button></th>
+                            <th scope="col">Archival Status <button>&#9660;</button></th>
                         </tr>
                     </thead>
                     <tbody id="tableUsers">

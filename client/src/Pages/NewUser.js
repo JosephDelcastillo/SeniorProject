@@ -31,6 +31,7 @@ function NewUser() {
             console.log(response);
         } else {
             Swal.fire({title: "Could Not Create User", icon: 'error'})
+            console.log(response);
         }
     }
  
