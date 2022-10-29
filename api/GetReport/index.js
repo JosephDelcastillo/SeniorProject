@@ -1,5 +1,5 @@
 // Imports 
-const service = require('../SharedCode/services/Users');
+const service = require('../SharedCode/services/Reports');
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
@@ -16,11 +16,11 @@ module.exports = async function (context, req) {
         if (!data.data) { 
             return context.res = {
                 status: 400,
-                body: "Please pass data into the request body"
+                body: "Please pass data in the request body"
             };
         }
 
-        const result = await service.GetStaff(data);
+        const result = await service.Get(data);
         if(!result) {
             return context.res = {
                 status: 400,

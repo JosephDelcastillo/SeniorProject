@@ -14,9 +14,12 @@
  * @property {string}   point   - String message to describe where this is called from | Default - Query
  * @property {object}   data    - Data to Reply with 
 */
-module.exports = function Reply ({ data, success, point }) { 
+
+function Reply ({ data, success, point }) { 
     this.success = success ?? false;
     this.message = `${(success ?? false) ? 'Succeeded' : 'Failed'} at ${point ?? 'Query'}`;
     this.data = data ?? null;
     return this;
 }
+
+module.exports = { Reply }
