@@ -8,10 +8,7 @@ const table = db.GetTable(db.TABLES.User);
 
 async function Create (data) {
     return new Promise(resolve => {
-        // TODO: Access Database 
-        console.log('Create Model')
         const { id } = data;
-        console.log(id)
 
         // Replace with New User ID or other reference 
         resolve({ id, table: table.id });
@@ -20,14 +17,10 @@ async function Create (data) {
 
 async function GetStaff (search) {
     return new Promise(resolve => {
-        console.log('Data Get Staff')
         // Search DB For Matches  
         const staff = (search) ? db_dev.Users.filter(({ name, email }) => strSearch(name, search) || strSearch(email, search) ) : db_dev.Users.rows;
-        console.log('Staff:')
-        console.log(staff)
         // Format Data for Security 
         const output = staff.map(({ id, name, email }) => { return ({ id, name, email }); }); 
-        console.log(output)
         // Return Data 
         resolve( output );
     })
@@ -87,8 +80,6 @@ function Login ({username, password}) {
  */
 async function Authorize (token, requirement) {
     return new Promise(resolve => {
-        console.log('Authorize')
-        console.log(token)
         // TODO: Fill this in with an actual token processor
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         if ( token ) resolve(true);

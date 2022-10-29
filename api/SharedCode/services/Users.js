@@ -2,18 +2,11 @@ const model = require('../models/Users');
 const Reply = require('../lib/Reply');
 
 async function Create (data) {
-    console.log('Create Service Attempt')
     const { id } = data;
-    console.log(id)
-    // TODO: Build this function 
     try {
-        console.log('Create Service: New User Obtainer')
         const res = await model.Create({ id });
-        console.log('res')
-        console.log(res)
         return res;
     } catch(error) {
-        console.log('Create Service: Error')
         context.res.status = 500;
         context.res.body = error;
         throw error;
@@ -62,18 +55,12 @@ async function GetReport(input) {
 }
 
 async function GetStaff(input) {
-        const { token, data } = input;
-        console.log(token); 
+    const { token, data } = input;
     try {
-        console.log('Authorizing'); 
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
-        console.log('Authorization'); 
-        console.log(authorized); 
         if(!authorized) return false;
         
-        console.log('Authorized')
         const staff = await model.GetStaff(data.search);
-        console.log('Staff Collected')
         if(staff) return staff;
         return false;
     } catch(error) {

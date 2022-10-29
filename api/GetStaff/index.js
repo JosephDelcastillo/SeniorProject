@@ -11,22 +11,16 @@ module.exports = async function (context, req) {
     } 
 
     try {
-        console.log('Start')
         const data = req.body;
         
-        console.log('Data Obtained')
         if (!data.data) { 
-            console.log('Missing Input')
             return context.res = {
                 status: 400,
                 body: "Please pass id in the request body" + req.body
             };
         }
 
-        console.log('Start Get Staff')
         const result = await service.GetStaff(data);
-        console.log('result: ')
-        console.log(result)
         if(!result) {
             return context.res = {
                 status: 400,
