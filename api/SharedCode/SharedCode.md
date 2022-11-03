@@ -1,4 +1,4 @@
 # Contents 
-- [Library](Library)
-- [Model](Models)
-- [Services](Services)
+- [Library](lib/Library.md)
+- [Model](models/Models.md)
+- [Services](services/Services.md)
