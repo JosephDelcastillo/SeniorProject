@@ -1,6 +1,7 @@
 // Import 
 const db = require('../lib/DBConnection');
 const db_dev = require('../lib/DBDevelopment');
+const Reply = require('../lib/Reply');
 const tb = require('../lib/Helpers');
 
 // Constants 
@@ -28,18 +29,19 @@ async function GetStaff (search) {
 }
 
 // *** Authorization ***
-function Login ({username, password}) {
+function Login ({email, password}) {
     return Promise(resolve => {
-        let search = db.Users.rows.find(({username}) => username == username);
+        let search = db.Users.rows.find(u => tb.strLike(u.email, email));
         if ( typeof search === "undefined" ) {
-            resolve(false)
+            resolve(new Reply({ point: 'Find User' })) 
         }
 
-        let user = db.Users.rows.find(({password}) => password == password);
+        let user = db.Users.rows.find(u => tb.strLike(u.password, password));
         if( typeof user === "undefined" ) {
-            resolve(false)
+            resolve(new Reply({ point: 'Authenticate User' }))
         } 
-        resolve({ data: 'jds8a-AD78B-a79NiP-as89CNj'})
+        // TODO: Add to sessions and return valid key 
+        resolve(new Reply({ data: 'jds8a-AD78B-a79NiP-as89CNj', success: true, point: 'Login'}))
     })
 }
 
@@ -57,6 +59,7 @@ async function Authorize (token, requirement) {
         if ( token ) resolve(true);
         
         // TODO: If invalid Token -> Return false 
+        // TODO: Resolve with Reply 
         resolve(false)
     })
 }

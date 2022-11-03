@@ -26,12 +26,10 @@ async function GetStaff(input) {
     }
 }
 
-async function Login (username, password) {
+async function Login (email, password) {
     try {
-        const login = model.Login({ username, password });
-        
-        if(login) return new Reply({ point: 'Login Generation', success: true, data: login });
-        return new Reply({ point: 'Login Generation' });
+        const login = model.Login({ email, password });
+        return login;
     } catch (error) {
         return new Reply({ point: 'Login Inquiry' });
     }
