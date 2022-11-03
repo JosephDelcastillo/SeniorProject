@@ -20,6 +20,12 @@ This project uses NodeJS for the server functionality, as well as in the React P
 
 # Setup 
 
-## Client App 
+You need to setup each subset of the application differently, but as such you can test them completely independent from the other. 
 
-## [Functions API](api/API.md)
+## [Client App](client/Client.md)
+
+
+## [Functions API](api/api.md)
+
+## [Express Server](server/server.md)
+**NOTE: This will be depreciated soon**
