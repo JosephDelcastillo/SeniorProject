@@ -7,7 +7,7 @@ This folder contains the root page data that the static site will run on top of.
 #### Assets
 These are global site elements that will automatically be downloaded from the static page final build. 
 
-### [Source](src/source.md) 
+### [Source](src/Source.md) 
 The Core React Project Code
 
 
