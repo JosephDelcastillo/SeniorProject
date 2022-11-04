@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import axios from 'axios';
 
 // Constants 
+const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 const GRAPH_TYPES = [
     { name: 'Bar (Horizontal)', value: 'bar'}, 
     { name: 'Column (Vertical)', value: 'column'}, 
@@ -20,7 +21,7 @@ const GRAPH_TYPES = [
 // Helper Functions 
 // Query the Backend
 async function callAPI({ func = '', info, getToken }) {
-    return axios.post('/api' + func, { token: getToken(), data: info }).then(response => response.data);
+    return axios.post(API_URL + func, { token: getToken(), data: info }).then(response => response.data);
 }
 // Shorthand Every-Other
 const EO = (i, r = 2) => (i % r === 0);
@@ -75,6 +76,7 @@ function Report({ getToken }) {
         }
         unfixPeople();
         closePeople();
+        document.getElementById('selectPeople').value = '';
     }
     // Remove Person From Selected 
     function removePerson (id) {
@@ -89,7 +91,7 @@ function Report({ getToken }) {
     }
     // Update People Options 
     const searchPeople = async e => {
-        const { success, data } = await callAPI({ func: '/staff', info: { search: e.target.value }, getToken });
+        const { success, data } = await callAPI({ func: '/GetStaff', info: { search: e.target.value }, getToken });
         if(success) {
             setPeopleOptions(data.filter(d => (peopleSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
         }
@@ -107,6 +109,7 @@ function Report({ getToken }) {
         }
         unfixQuestion();
         closeQuestion();
+        document.getElementById('questions').value = '';
     }
     // Remove Question From Selected 
     function removeQuestion (id) {
@@ -121,7 +124,7 @@ function Report({ getToken }) {
     }
     // Update Question Options 
     const searchQuestion = async e => {
-        const { success, data } = await callAPI({ func: '/question', info: { search: e.target.value }, getToken });
+        const { success, data } = await callAPI({ func: '/GetQuestion', info: { search: e.target.value }, getToken });
         if(success) {
             setQuestionOptions(data.filter(d => (questionSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
         }
@@ -155,7 +158,7 @@ function Report({ getToken }) {
         }
         
         // Then Query the Backend for Report Data 
-        const { success, data } = await callAPI({ func: '/report', info: input, getToken });
+        const { success, data } = await callAPI({ func: '/GetReport', info: input, getToken });
         if(success) { 
             setGraphType(input.graphType)
             // Final Structure [{ question: Question #, data: [{ name: Employee Name, data: [{ name: Submission #, y: Submission Value }] }] }]
@@ -229,8 +232,8 @@ function Report({ getToken }) {
                                         </li>
                                     </ul>
                                 )}
-                                <input type='text' className='form-control' placeholder='Select People for the Report' onChangeCapture={searchPeople} 
-                                    onBlurCapture={closePeople} onFocusCapture={openPeople} autoComplete='off' />
+                                <input type='text' id="selectPeople" className='form-control' placeholder='Select People for the Report' 
+                                    onChangeCapture={searchPeople} onBlurCapture={closePeople} onFocusCapture={openPeople} autoComplete='off' />
                             </div>
                         </div>
                         <div className='col-xl-4 col-lg-8'>
