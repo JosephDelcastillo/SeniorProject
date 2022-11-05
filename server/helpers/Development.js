@@ -18,6 +18,7 @@ function DummyDB () {
     let SUBMIT_TABLE = table.create(['user']);
     let RESPONSE_TABLE = table.create([ 'submission', 'question', 'value' ]);
     let SESSION_TABLE = table.create(['user', 'start']);
+    let ENTRIES_TABLE = table.create(['entryId','email','entryDate','lastEdit','editDate','role'])
 
     // Add Some Initial Data 
     USER_TABLE.addEntry({ name: 'Test User A', email: 'userA@email.com', password: 'passA', role: 'admin' });
@@ -32,7 +33,15 @@ function DummyDB () {
     QUESTION_TABLE.addEntry({ name: 'Students Helped Note', is_note: 'true' });
     QUESTION_TABLE.addEntry({ name: 'Another Value', is_note: 'false' });
     QUESTION_TABLE.addEntry({ name: 'A Fourth Value', is_note: 'false' });
-    
+
+    ENTRIES_TABLE.addEntry({entryId: 1, email: 'userA@email.com', entryDate: '10/23/22', lastEdit: 'userA@email.com', editDate: '10/23/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 2, email: 'userA@email.com', entryDate: '10/20/22', lastEdit: 'adminA@email.com', editDate: '10/22/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 3, email: 'userA@email.com', entryDate: '10/21/22', lastEdit: 'adminA@email.com', editDate: '10/21/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 4, email: 'userA@email.com', entryDate: '10/20/22', lastEdit: 'adminA@email.com', editDate: '10/20/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 5, email: 'userA@email.com', entryDate: '10/19/22', lastEdit: 'adminA@email.com', editDate: '10/19/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 6, email: 'userA@email.com', entryDate: '10/18/22', lastEdit: 'adminA@email.com', editDate: '10/18/22', role: 'staff'});
+
+
     // Build a Bunch of Dummy Responses
     const USER_COUNT = 5;
     const ENTRIES_PER_USER = 2;
