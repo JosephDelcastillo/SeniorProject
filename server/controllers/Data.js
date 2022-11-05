@@ -17,6 +17,10 @@ function attemptLogin (data, sendFunc) {
     Data_model.attemptLogin(data, sendFunc);
 }
 
+//Get all Entries
+function getAllEntries (sendFunc) {
+    Data_model.getAllEntries(sendFunc);
+}
 module.exports = { 
-    getAllSubmissions, attemptLogin
+    getAllSubmissions, attemptLogin, getAllEntries
 };

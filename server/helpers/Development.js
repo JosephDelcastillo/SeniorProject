@@ -17,7 +17,7 @@ function DummyDB () {
     let QUESTION_TABLE = table.create([ 'name', 'is_note' ]);
     let SUBMIT_TABLE = table.create(['user']);
     let RESPONSE_TABLE = table.create([ 'submission', 'question', 'value' ]);
-    let SESSION_TABLE = table.create(['user', 'start']);
+    let SESSION_TABLE = table.create(['user', 'start', 'role']);
     let ENTRIES_TABLE = table.create(['entryId','email','entryDate','lastEdit','editDate','role'])
 
     // Add Some Initial Data 
@@ -36,11 +36,18 @@ function DummyDB () {
 
     ENTRIES_TABLE.addEntry({entryId: 1, email: 'userA@email.com', entryDate: '10/23/22', lastEdit: 'userA@email.com', editDate: '10/23/22', role: 'staff'});
     ENTRIES_TABLE.addEntry({entryId: 2, email: 'userA@email.com', entryDate: '10/20/22', lastEdit: 'adminA@email.com', editDate: '10/22/22', role: 'staff'});
-    ENTRIES_TABLE.addEntry({entryId: 3, email: 'userA@email.com', entryDate: '10/21/22', lastEdit: 'adminA@email.com', editDate: '10/21/22', role: 'staff'});
-    ENTRIES_TABLE.addEntry({entryId: 4, email: 'userA@email.com', entryDate: '10/20/22', lastEdit: 'adminA@email.com', editDate: '10/20/22', role: 'staff'});
-    ENTRIES_TABLE.addEntry({entryId: 5, email: 'userA@email.com', entryDate: '10/19/22', lastEdit: 'adminA@email.com', editDate: '10/19/22', role: 'staff'});
-    ENTRIES_TABLE.addEntry({entryId: 6, email: 'userA@email.com', entryDate: '10/18/22', lastEdit: 'adminA@email.com', editDate: '10/18/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 3, email: 'userA@email.com', entryDate: '10/21/22', lastEdit: 'userA@email.com', editDate: '10/21/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 4, email: 'userA@email.com', entryDate: '10/20/22', lastEdit: 'userA@email.com', editDate: '10/20/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 5, email: 'userA@email.com', entryDate: '10/19/22', lastEdit: 'userA@email.com', editDate: '10/19/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 6, email: 'userA@email.com', entryDate: '10/18/22', lastEdit: 'userA@email.com', editDate: '10/18/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 7, email: 'userB@email.com', entryDate: '10/23/22', lastEdit: 'userB@email.com', editDate: '10/23/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 8, email: 'userB@email.com', entryDate: '10/20/22', lastEdit: 'adminA@email.com', editDate: '10/22/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 9, email: 'userB@email.com', entryDate: '10/21/22', lastEdit: 'userB@email.com', editDate: '10/21/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 10, email: 'userB@email.com', entryDate: '10/20/22', lastEdit: 'userB@email.com', editDate: '10/20/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 11, email: 'userB@email.com', entryDate: '10/19/22', lastEdit: 'userB@email.com', editDate: '10/19/22', role: 'staff'});
+    ENTRIES_TABLE.addEntry({entryId: 12, email: 'userB@email.com', entryDate: '10/18/22', lastEdit: 'userB@email.com', editDate: '10/18/22', role: 'staff'});
 
+    SESSION_TABLE.addEntry({user: 'userA@email.com', start: '11/7/22 14:17', role: 'staff'});
 
     // Build a Bunch of Dummy Responses
     const USER_COUNT = 5;
@@ -71,6 +78,7 @@ function DummyDB () {
         Submissions: SUBMIT_TABLE,
         Responses: RESPONSE_TABLE,
         Sessions: SESSION_TABLE,
+        Entries: ENTRIES_TABLE,
     };
 };
 

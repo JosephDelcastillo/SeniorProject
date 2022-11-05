@@ -21,10 +21,12 @@ app.use(bodyParser.json());
 // Menu
 app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); })
 
+//Entries
+app.get("/api/entries", (req, res) => {Data_Controller.getAllEntries((data)=> res.json(data)); })
+
+
 // Login 
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
-
-
 
 /**
  * Finally Start the App 
