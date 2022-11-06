@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import {useNavigate} from 'react-router-dom'
 import editIcon from '../Media/editicon.png';
 import viewIcon from '../Media/viewicon.png';
 import deleteIcon from '../Media/deleteicon.png';
@@ -28,29 +29,28 @@ function handleDeleteClick(e) {
     console.log('The delete button has been clicked')
 }
 
-function Responses() {
-    var responseClone; // 1
-    fetch('/api/entries')
-        .then(function (response) {
-            responseClone = response.clone(); // 2
-            return response.json();
-        })
-        .then(function (data) {
-            // Do something with data
-        }, function (rejectionReason) { // 3
-            console.log('Error parsing JSON from response:', rejectionReason, responseClone); // 4
-            responseClone.text() // 5
-                .then(function (bodyText) {
-                    console.log('Received the following instead of valid JSON:', bodyText); // 6
-                });
+function filterData(data){
+    let output=[];
+
+        data.filter(e => e.question === 1).forEach(({email, entryDate, lastEdit, editDate, question, submission, value }) => {
+            output.push({email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate, question: question, submission: submission, value: value });
         });
+return output;    
+}
+
+function Responses() {
+//Setup state tracking and pull data
+    let passData = [];
     const [backendData, setBackendData] = useState([])
     const fetchData = async () => {
         const response = await fetch('/api/entries').then(data => data.json());
+        
         if (response.success) {
-            console.log((response.data));
-            setBackendData((response.data));
-            return ((response.data));
+            console.log(filterData(response.data));
+            passData=(response.data);
+            console.log(passData);
+            setBackendData(filterData(response.data));
+            return (filterData(response.data));
         } else {
             console.log("failed");
         }
@@ -64,6 +64,16 @@ function Responses() {
 
             })
     }, [])
+    // const navigate = useNavigate();
+    // const redirToManage = () =>{
+    //     navigate('../Pages/ManageResponse.js', {
+    //         state: {
+                
+    //         }
+    //     });
+    // };
+
+
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -90,9 +100,11 @@ function Responses() {
                                 <tbody key={submission}>
                                     <tr>
                                         <th scope="row">
-                                            <button className="iconButton" onClick={handleViewClick}><img src={viewIcon} alt='view' height='20px' /></button>
-                                            <button className="iconButton" onClick={handleEditClick}><img src={editIcon} alt='view' height='20px' /></button>
-                                            <button className="iconButton" onClick={handleDeleteClick}><img src={deleteIcon} alt='view' height='20px' /></button>
+                                            <button className="iconButton" onClick={() => {
+         
+        }}><img src={editIcon} alt='view' height='20px' /></button>
+                                            {/* <button className="iconButton" onClick={handleEditClick}><img src={editIcon} alt='view' height='20px' /></button>
+                                            <button className="iconButton" onClick={handleDeleteClick}><img src={deleteIcon} alt='view' height='20px' /></button> */}
                                         </th>
 
                                         <td>{item.email}</td>

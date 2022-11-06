@@ -38,15 +38,22 @@ function getAllEntries(sendFunc) {
     var myEntries = [];
 
     //TO DO: USE TOKEN TO GET VERIFY CURRENT USER AND ROLE
+    //TO DO: CHANGE DEFAULT SORTING TO LAST EDIT DATE
+
     let curUser = 'userA@email.com';
     let curUserRole = 'staff';
+    let responseData = [];
+
     db.Entries.rows.forEach(current => {
-        output.push({ email: current.email, entryDate: current.entryDate, lastEdit: current.lastEdit, editDate: current.editDate });
+        let finds = db.Responses.rows.filter(({ submission }) => submission === current.id);
+        finds.forEach(({ submission, question, value }) => {
+        output.push({ email: current.email, entryDate: current.entryDate, lastEdit: current.lastEdit, editDate: current.editDate,submission: submission, question: question, value: value });
     });
+});
     //Set filter to only see appropriate entries
     if (curUserRole == 'staff') {
-        output.filter(entries => entries.email === curUser).forEach(({ email, entryDate, lastEdit, editDate }) => {
-            myEntries.push({ email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate });
+        output.filter(entries => entries.email === curUser).forEach(({ email, entryDate, lastEdit, editDate,submission: submission, question: question, value: value }) => {
+            myEntries.push({ email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate, submission, question, value, responseData });
         });
     }
     else {
@@ -54,6 +61,20 @@ function getAllEntries(sendFunc) {
     }
     sendFunc(new Reply({ point: `Get All Entries`, success: true, data: myEntries }));
 }
+//Get Responses
+function getResponses() {
+    let output = [];
+    db.Submissions.rows.forEach(current => {
+        let finds = db.Responses.rows.filter(({ submission }) => submission === current.id);
+        finds.forEach(({ submission, question, value }) => {
+            output.push({ submission: submission, question: question, value: value });
+        });
+    });
+return output;
+}
+
+
+
 
 // *** Authorization ***
 function attemptLogin({ username, password }, sendFunc) {

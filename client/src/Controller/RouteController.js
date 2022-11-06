@@ -9,6 +9,7 @@ import Report from '../Pages/Report';
 import Login from '../Pages/Login';
 import Home from '../Pages/Home';
 import Form from '../Pages/Form';
+import ManageResponse from '../Pages/ManageResponse';
 
 export default class RouteController extends React.Component {
     render() {
@@ -22,6 +23,7 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} />} />
                     <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} />} />
+                    <Route path="/dashboard/manage_response" element={<ManageResponse getToken={this.props.getToken} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} />} />
                 <Route path="*" element={<NotFoud />} />
