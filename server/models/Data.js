@@ -42,18 +42,17 @@ function getAllEntries(sendFunc) {
 
     let curUser = 'userA@email.com';
     let curUserRole = 'staff';
-    let responseData = [];
 
     db.Entries.rows.forEach(current => {
         let finds = db.Responses.rows.filter(({ submission }) => submission === current.id);
         finds.forEach(({ submission, question, value }) => {
-        output.push({ email: current.email, entryDate: current.entryDate, lastEdit: current.lastEdit, editDate: current.editDate,submission: submission, question: question, value: value });
+        output.push({entryId: current.entryId, email: current.email, entryDate: current.entryDate, lastEdit: current.lastEdit, editDate: current.editDate,submission: submission, question: question, value: value });
     });
 });
     //Set filter to only see appropriate entries
     if (curUserRole == 'staff') {
-        output.filter(entries => entries.email === curUser).forEach(({ email, entryDate, lastEdit, editDate,submission: submission, question: question, value: value }) => {
-            myEntries.push({ email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate, submission, question, value, responseData });
+        output.filter(entries => entries.email === curUser).forEach(({entryId, email, entryDate, lastEdit, editDate,submission: submission, question: question, value: value }) => {
+            myEntries.push({ entryId: entryId, email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate, submission, question, value });
         });
     }
     else {
@@ -61,21 +60,31 @@ function getAllEntries(sendFunc) {
     }
     sendFunc(new Reply({ point: `Get All Entries`, success: true, data: myEntries }));
 }
-//Get Responses
-function getResponses() {
-    let output = [];
-    db.Submissions.rows.forEach(current => {
-        let finds = db.Responses.rows.filter(({ submission }) => submission === current.id);
-        finds.forEach(({ submission, question, value }) => {
-            output.push({ submission: submission, question: question, value: value });
-        });
-    });
-return output;
+// **** REQUEST IS MADE TO EDIT AN ENTRY****//
+function editRequest({entryId} ,sendFunc){
+    let entryID = db.Entries.rows.find(({entryID}) => entryID == entryID);
+     if(typeof seach === "undefined"){
+         sendFunc(new Reply({data: {entryID}, point: 'Attempt Edit'}));
+         return true;
+     }
+       sendFunc(new Reply({ data: {entryId: entryId} , point: 'Allow Edit', success: true }))
+    }
+
+//Get individual entry for manage response page
+//TO DO: UPDATE FILTER TO FILTER ON ENTRYID POSTED TO BACKEND
+function getEntry(sendFunc){
+    let output=[];
+    let entry=[];
+    db.Entries.rows.forEach(current => {
+     let finds = db.Responses.rows.filter(({ submission}) => submission === 1 && current.entryId===1);
+     finds.forEach(({ submission, question, value }) => {
+     output.push({entryId: current.entryId, email: current.email, entryDate: current.entryDate, lastEdit: current.lastEdit, editDate: current.editDate,submission: submission, question: question, value: value });
+    })
+});
+
+    sendFunc(new Reply({data: output, point: 'Allow Edit', success: true}));
+    
 }
-
-
-
-
 // *** Authorization ***
 function attemptLogin({ username, password }, sendFunc) {
     let search = db.Users.rows.find(({ username }) => username == username);
@@ -108,5 +117,5 @@ function runAuthorization(token, sendFunc, successAction) {
  * Export Functions For Public Use Here 
  */
 module.exports = {
-    getAllSubmissions, attemptLogin, getAllEntries
+    getAllSubmissions, attemptLogin, getAllEntries, editRequest, getEntry
 };

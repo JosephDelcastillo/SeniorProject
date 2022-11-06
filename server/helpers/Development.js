@@ -18,7 +18,7 @@ function DummyDB () {
     let SUBMIT_TABLE = table.create(['user']);
     let RESPONSE_TABLE = table.create([ 'submission', 'question', 'value' ]);
     let SESSION_TABLE = table.create(['user', 'start', 'role']);
-    let ENTRIES_TABLE = table.create(['entryId','email','entryDate','lastEdit','editDate','role'])
+    let ENTRIES_TABLE = table.create(['entryId','email','entryDate','lastEdit','editDate','role']);
 
     // Add Some Initial Data 
     USER_TABLE.addEntry({ name: 'Test User A', email: 'userA@email.com', password: 'passA', role: 'admin' });
