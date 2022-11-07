@@ -1,7 +1,31 @@
-# SeniorProject
+# Employee Progress Outcome Management System 
 
-Home For Senior Project 
+Home For the Employee Progress Outcome Management System
 
-## For Developers
+# Terms 
 
-Please read both Client and Server README's in order to set them both up and run them correctly 
+## EPOTS
+Employee Progress Outcome Management System
+
+# Requirements
+
+## VS Code
+This project is setup in VS Code, other editors may work but have not been tested. 
+
+## Azure Tools 
+- VS Code Extension Toolbox 
+
+## NodeJS
+This project uses NodeJS for the server functionality, as well as in the React Project
+
+# Setup 
+
+You need to setup each subset of the application differently, but as such you can test them completely independent from the other. 
+
+## [Client App](client/Client.md)
+
+
+## [Functions API](api/api.md)
+
+## [Express Server](server/server.md)
+**NOTE: This will be depreciated soon**

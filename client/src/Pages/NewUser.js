@@ -5,7 +5,6 @@ import React from 'react';
  * @returns {React.Component} 
  */
 function NewUser() {
-    function setPassword (newPass) { console.log(newPass); } 
     return (
         <div className="card m-2 mt-5 border-none">
         <div className="text-center">
@@ -33,7 +32,7 @@ function NewUser() {
             </div>
             <div className="mb-3 col-4 mx-auto mt-1">
                 <label for="emplPass" className="form-label">Account Password:</label>
-                <input type="text" id="emplPass" name="emplPass" placeholder="DoeJohn" className="form-control" required onChange={e => setPassword(e.target.value)}></input>
+                <input type="text" id="emplPass" name="emplPass" placeholder="DoeJohn" className="form-control" required></input>
             </div>
 
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Create</button>
