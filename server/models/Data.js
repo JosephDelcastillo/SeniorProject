@@ -41,7 +41,7 @@ function getAllEntries(sendFunc) {
     //TO DO: CHANGE DEFAULT SORTING TO LAST EDIT DATE
 
     let curUser = 'userA@email.com';
-    let curUserRole = 'staff';
+    let curUserRole = 'admin';
 
     db.Entries.rows.forEach(current => {
         let finds = db.Responses.rows.filter(({ submission }) => submission === current.id);

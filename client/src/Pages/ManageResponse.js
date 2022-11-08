@@ -75,7 +75,7 @@ const BuildForm = () => {
                 })}
                 <br></br>
                 <br></br>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" className="btn btn-primary">Submit</button>
             </form></>
     )
 }

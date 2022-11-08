@@ -11,7 +11,7 @@ function filterData(data){
         });
 return output;    
 }
-
+//TO DO: ADD ACTUAL FUNCTIONALITY TO DELETE/ARCHIVE FEATURE
 function handleDeleteClick()
 {
     console.log('The delete button has pressed');
