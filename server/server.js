@@ -34,6 +34,11 @@ app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.
 // Login 
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
 
+// Get ALl Entries
+app.get("/api/entries", (req, res) => { Data_Controller.getAllEntries((data) => res.json(data)); })
+
+// Edit Response Post Request 
+app.post("/api/edit", (req, res) => { Data_Controller.editRequest(req.body, (data) => res.json(data)); })
 
 /**
  * Finally Start the App 
