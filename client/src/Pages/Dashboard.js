@@ -21,6 +21,9 @@ function Dashboard({ getToken }) {
                 <p>
                     <a href='/dashboard/report' className='btn btn-light'> Report </a> <br />
                 </p>
+                <p>
+                    <a href='/dashboard/newuser' className='btn btn-light'> New User </a> <br />
+                </p>
             </div>
         </div>
     )
