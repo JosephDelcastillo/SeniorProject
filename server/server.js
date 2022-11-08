@@ -1,19 +1,21 @@
 "use strict";
  
 // Imports
+const createHandler = require("azure-function-express").createHandler;
 const bodyParser = require('body-parser');
+// const path = require('path');
 const express = require("express");
 const data = require('./controllers/Data')
- 
-// Initializations
-const PORT = 5000;
+
+// Initializations 
+const PORT = process.env.PORT || 5000;
 const app = express();
 const Data_Controller = data;
- 
-// Configure App
+
+// Configure App 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
- 
+
 /**
  * Api Navigation
  */
