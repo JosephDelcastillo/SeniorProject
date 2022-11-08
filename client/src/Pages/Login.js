@@ -4,8 +4,9 @@ import { Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 async function loginUser(credentials) {
-  return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
-  .then(data => data.json())
+  return { success: true, data: 'tempToken' }
+  // return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
+  // .then(data => data.json())
 }
 
 /**
@@ -18,7 +19,7 @@ export default function Login({ getToken, setToken }) {
   const [username, setEmail] = useState();
   const [password, setPassword] = useState();
   
-  if(getToken()) {
+  if(getToken && getToken()) {
     return (
       <Navigate to="/dashboard" />
     )
