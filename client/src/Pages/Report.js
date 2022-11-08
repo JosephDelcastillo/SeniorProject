@@ -1,9 +1,19 @@
 import React, { useState } from 'react'
 import Swal from 'sweetalert2';
-
+import BarGraph from '../Components/BarGraph';
+import LineGraph from '../Components/LineGraph';
+import PieGraph from '../Components/PieGraph';
 
 async function getData() {
     return fetch('/api').then(data => data.json());
+}
+
+function randColor (all = true) { 
+    let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    while(!all && (color === '#000000' || color === '#FFFFFF')) {
+        color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    } 
+    return color;
 }
 
 // Churns though data from api and reformats it for my purposes
@@ -16,12 +26,12 @@ function churnInitData(data) {
     USERS.forEach(user => {
         // Re-init Responses
         let responses = [];
-        QUESTIONS.forEach(question => { responses.push({ q: question, r: [] }); })
+        QUESTIONS.forEach(question => { responses.push({ question: question, responses: [] }); })
         
-        data.filter(e => e.user === user).forEach(({ question, submission, value }) => {
-            responses[responses.findIndex(resp => resp.q === question)].r.push({ s: submission, val: value });
+        data.filter(e => e.user === user).forEach(({ question, submission, date, value }) => {
+            responses[responses.findIndex(resp => resp.question === question)].responses.push({ submission: 'Submission ' + submission, date: date, value: value });
         });
-        output.push(responses);
+        output.push({user: user, responses: responses });
     })
     return output;
 } 
@@ -33,19 +43,24 @@ function churnInitData(data) {
  * @returns {React.Component} 
  */
 function Report() {
+    const GRAPH_TYPES = { bar: 'bar', line: 'line', pie: 'pie' };
     const [ backendData, setBackendData ] = useState([{}]);
     const [ graphType, setGraphType ] = useState(String);
+
+    let value_color = randColor();
     
     const handleSubmit = async e => {
         e.preventDefault();
 
-        const response = await getData();
-        if(response.success) { 
-            console.log(response.data);
-            console.log(churnInitData(response.data))
-            setBackendData(churnInitData(response.data));
-        } else {
-            Swal.fire({title: "Data Retrieval Failed", icon: 'error'})
+        if( graphType ) {
+            const response = await getData();
+            if(response.success) { 
+                console.log(response.data);
+                console.log(churnInitData(response.data)); 
+                setBackendData(churnInitData(response.data)); 
+            } else {
+                Swal.fire({title: "Data Retrieval Failed", icon: 'error'})
+            }
         }
     }
 
@@ -55,18 +70,18 @@ function Report() {
                 <h1> Report - All Users </h1>
             </div>
             <div className='card-body'>
+                <hr />
                 <form className='form' onSubmit={handleSubmit}>
-                    <div className='row g-3 align-items-center'>
+                    <div className='row g-3 mx-4 align-items-center'>
                         <div className="col-3">
                             <label className="col-form-label" htmlFor='graphType'>Graph Type ({ graphType }) </label>
                         </div>
                         <div className="col-6">
                             <select className='form-control' id='graphType' onChange={e => (e.target.value) ? setGraphType(e.target.value) : null}>
-                                <option>Select Graph Type</option>
-                                <option value='Line'>Line</option>
-                                <option value='Bar'>Bar</option>
-                                <option value='Pie'>Pie</option>
-                                {/* npm install react-charts@beta --save */}
+                                <option value="">Select Graph Type</option>
+                                <option value={GRAPH_TYPES.line}>Line</option>
+                                <option value={GRAPH_TYPES.bar}>Bar</option>
+                                <option value={GRAPH_TYPES.pie}>Pie</option>
                             </select>
                         </div>
                         <div className='col-3'>
@@ -74,7 +89,34 @@ function Report() {
                         </div>
                     </div>
                 </form>
-                <div id='dataGraphs'></div>
+                <hr />
+                {(graphType && backendData && backendData.length > 0 && backendData[0].user) ? ( 
+                    backendData.map(({ user, responses }) => (
+                        <div className='row'>
+                            {responses.map(({question, responses}) => (
+                                (question === 2 || question === 4) ? (<></>) : (
+                                <div className='col-3'>
+                                    <div className="card m-2 border-none">
+                                        <div className="card-header bg-white text-center">
+                                            <h4> User: {user} - Question {question} </h4>
+                                        </div>
+                                        <div className="card-body text-center">
+                                        {(graphType === GRAPH_TYPES.bar) ? (
+                                                <BarGraph key={`${user}-${question}`} xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
+                                            ) : ( 
+                                                (graphType === GRAPH_TYPES.pie) ? (
+                                                    <PieGraph key={`${user}-${question}`} target='value' xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
+                                                ) : (
+                                                <LineGraph key={`${user}-${question}`} xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
+                                            )
+                                        )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )))}
+                        </div>
+                    ))
+                ) : (<></>)}
             </div>
         </div>
     )

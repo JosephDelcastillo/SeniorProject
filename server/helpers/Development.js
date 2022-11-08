@@ -15,7 +15,7 @@ function DummyDB () {
     // Setup Tables
     let USER_TABLE = table.create(['name', 'email', 'password', 'role']);
     let QUESTION_TABLE = table.create([ 'name', 'is_note' ]);
-    let SUBMIT_TABLE = table.create(['user']);
+    let SUBMIT_TABLE = table.create(['user', 'date']);
     let RESPONSE_TABLE = table.create([ 'submission', 'question', 'value' ]);
     let SESSION_TABLE = table.create(['user', 'start', 'role']);
     let ENTRIES_TABLE = table.create(['entryId','email','entryDate','lastEdit','editDate','role']);
@@ -51,14 +51,14 @@ function DummyDB () {
 
     // Build a Bunch of Dummy Responses
     const USER_COUNT = 5;
-    const ENTRIES_PER_USER = 2;
+    const ENTRIES_PER_USER = 8;
 
     // Loop Through Users
     for (let cur_user = 1; cur_user < (USER_COUNT + 1); cur_user++) {
         // Loop Through Entries
         for (let cur_entry = 1; cur_entry < (ENTRIES_PER_USER + 1); cur_entry++) {
             // FIRST - Add Entry to Log 
-            SUBMIT_TABLE.addEntry({ user: cur_user });
+            SUBMIT_TABLE.addEntry({ user: cur_user, date: genDate() });
             const CUR = SUBMIT_TABLE.incrementPos;
             
             // Fill in Responses with Random Data 
@@ -82,7 +82,11 @@ function DummyDB () {
     };
 };
 
-function genVal () { return `${Math.floor(Math.random() * 100)}`; }
+function genVal (max = 200, min = 90) { return `${genNum(max, min)}`; }
+function genNum (max = 100, min = 0) { return Math.floor((Math.random() * (max - min + 1)) + min) }
+function f(val, len = 2) { return (val > 9) ? `${val}` : `0${val}`; }
+
+function genDate () { return `20${genNum(22, 20)}-${f(genNum(12, 1))}-${f(genNum(30, 1))}`; }
 
 /**
  * @class table
