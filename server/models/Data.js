@@ -43,7 +43,18 @@ function getQuestions (sendFunc) {
     
     sendFunc(new Reply ({ point: `Get All Questions`, success: true, data: output }));
 }
+//***Get Archived Questions***
+function getArchive (sendFunc){
+    let output = [];
 
+    db.Archived.rows.map(current =>{
+        output.push({id: current.name, question: current.question, date: current.date_stored});
+         })
+    
+         sendFunc(new Reply({point:'Get All Archived', success:true,data: output}));
+
+
+}
 // *** Authorization ***
 function attemptLogin ({username, password}, sendFunc) {
     let search = db.Users.rows.find(({username}) => username == username);
@@ -76,5 +87,5 @@ function runAuthorization (token, sendFunc, successAction) {
  * Export Functions For Public Use Here 
  */
 module.exports = {
-    getAllSubmissions, attemptLogin, getQuestions
+    getAllSubmissions, attemptLogin, getQuestions, getArchive
 };

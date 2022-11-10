@@ -15,6 +15,10 @@ function getAllSubmissions (sendFunc) {
 function getQuestions (sendFunc) {
     Data_model.getQuestions(sendFunc);
 }
+//Get Archive
+function getArchive (sendFunc){
+    Data_model.getArchive(sendFunc);
+}
 
 // Attempt Login
 function attemptLogin (data, sendFunc) {
@@ -22,5 +26,5 @@ function attemptLogin (data, sendFunc) {
 }
 
 module.exports = {
-    getAllSubmissions, attemptLogin, getQuestions
+    getAllSubmissions, attemptLogin, getQuestions, getArchive
 };

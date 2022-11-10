@@ -14,10 +14,11 @@
 function DummyDB () {
     // Setup Tables
     let USER_TABLE = table.create(['name', 'email', 'password', 'role']);
-    let QUESTION_TABLE = table.create([ 'name', 'is_note' ]);
+    let QUESTION_TABLE = table.create([ 'name', 'is_note','date_stored' ]);
     let SUBMIT_TABLE = table.create(['user', 'date']);
     let RESPONSE_TABLE = table.create([ 'submission', 'question', 'value' ]);
     let SESSION_TABLE = table.create(['user', 'start']);
+    let ARCHIVED_TABLE = table.create(['name','is_note'])
 
     // Add Some Initial Data 
     USER_TABLE.addEntry({ name: 'Test User A', email: 'userA@email.com', password: 'passA', role: 'admin' });
@@ -25,14 +26,20 @@ function DummyDB () {
     USER_TABLE.addEntry({ name: 'Test User C', email: 'userC@email.com', password: 'passC', role: 'staff' });
     USER_TABLE.addEntry({ name: 'Test User D', email: 'userD@email.com', password: 'passD', role: 'staff' });
     USER_TABLE.addEntry({ name: 'Test User E', email: 'userE@email.com', password: 'passE', role: 'staff' });
-
+    //Dummy Active Questions
     QUESTION_TABLE.addEntry({ id: 1, question: 'How many new Volunteers did you work with this stretch?', is_note: 'false' });
     QUESTION_TABLE.addEntry({ id: 2, question: 'How many new Students did you work with this stretch?', is_note: 'true' });
     QUESTION_TABLE.addEntry({id: 3,  question: 'Question 3', is_note: 'false' });
     QUESTION_TABLE.addEntry({ id: 4, question: 'Question 4', is_note: 'true' });
     QUESTION_TABLE.addEntry({ id: 5, question: 'Question 5', is_note: 'false' });
     QUESTION_TABLE.addEntry({id: 6, question: 'Question 6', is_note: 'false' });
-    
+    //Dummy Archived Quesitons
+    ARCHIVED_TABLE.addEntry({id: 101, question:'How many students mentioned concerned about Y2k?', is_note: "false",date_stored:"1/01/2000"});
+    ARCHIVED_TABLE.addEntry({id: 102, question:'How many students mentioned concern for the 2016 election?', is_note: "false",date_stored:"12/05/2016"});
+    ARCHIVED_TABLE.addEntry({id: 103, question:'Did you see the newest episode of Lost?', is_note: "false",date_stored:"5/01/2010"});
+    ARCHIVED_TABLE.addEntry({id: 104, question:'Fourth Option?', is_note: "false",date_stored:"1/01/2000"});
+    ARCHIVED_TABLE.addEntry({id: 105, question:'Another Option?', is_note: "false",date_stored:"1/01/2000"});
+    ARCHIVED_TABLE.addEntry({id: 106, question:'Is this enough?', is_note: "false",date_stored:"1/01/2000"});
     // Build a Bunch of Dummy Responses
     const USER_COUNT = 5;
     const ENTRIES_PER_USER = 8;
@@ -57,6 +64,7 @@ function DummyDB () {
 
     // Return as object for use 
     return {
+        Archived: ARCHIVED_TABLE,
         Users: USER_TABLE,
         Questions: QUESTION_TABLE,
         Submissions: SUBMIT_TABLE,

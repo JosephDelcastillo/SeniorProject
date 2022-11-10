@@ -38,6 +38,9 @@ app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (da
 app.get("/api/form", (req, res) => { 
     Data_Controller.getQuestions((data) => res.json(data)); 
 })
+app.get("/api/archive", (req, res) => { 
+    Data_Controller.getArchive((data) => res.json(data)); 
+})
 
 
 /**
