@@ -33,6 +33,11 @@ app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.
 
 // Login 
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
+// Login 
+// app.post("/api/questionEdit", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
+app.get("/api/form", (req, res) => { 
+    Data_Controller.getQuestions((data) => res.json(data)); 
+})
 
 
 /**

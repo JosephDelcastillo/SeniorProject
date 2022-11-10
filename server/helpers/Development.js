@@ -26,12 +26,12 @@ function DummyDB () {
     USER_TABLE.addEntry({ name: 'Test User D', email: 'userD@email.com', password: 'passD', role: 'staff' });
     USER_TABLE.addEntry({ name: 'Test User E', email: 'userE@email.com', password: 'passE', role: 'staff' });
 
-    QUESTION_TABLE.addEntry({ name: 'Students Reached', is_note: 'false' });
-    QUESTION_TABLE.addEntry({ name: 'Students Reached Note', is_note: 'true' });
-    QUESTION_TABLE.addEntry({ name: 'Students Helped', is_note: 'false' });
-    QUESTION_TABLE.addEntry({ name: 'Students Helped Note', is_note: 'true' });
-    QUESTION_TABLE.addEntry({ name: 'Another Value', is_note: 'false' });
-    QUESTION_TABLE.addEntry({ name: 'A Fourth Value', is_note: 'false' });
+    QUESTION_TABLE.addEntry({ id: 1, question: 'How many new Volunteers did you work with this stretch?', is_note: 'false' });
+    QUESTION_TABLE.addEntry({ id: 2, question: 'How many new Students did you work with this stretch?', is_note: 'true' });
+    QUESTION_TABLE.addEntry({id: 3,  question: 'Question 3', is_note: 'false' });
+    QUESTION_TABLE.addEntry({ id: 4, question: 'Question 4', is_note: 'true' });
+    QUESTION_TABLE.addEntry({ id: 5, question: 'Question 5', is_note: 'false' });
+    QUESTION_TABLE.addEntry({id: 6, question: 'Question 6', is_note: 'false' });
     
     // Build a Bunch of Dummy Responses
     const USER_COUNT = 5;

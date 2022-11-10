@@ -14,6 +14,7 @@ let db = DummyDB(); // TODO: Replace with DB connection
 // **** Load Data ****
 function getAllSubmissions (sendFunc) {
     let output = [];
+
     
     // First Get Submissions 
     db.Submissions.rows.forEach(current => {
@@ -33,6 +34,15 @@ function getAllSubmissions (sendFunc) {
 // **** Update Data **** 
 // **** Remove Data **** 
 
+function getQuestions (sendFunc) {
+    let output = [];
+    
+    db.Questions.rows.forEach(current => {
+            output.push({id: current.name, question: current.question});
+        });
+    
+    sendFunc(new Reply ({ point: `Get All Questions`, success: true, data: output }));
+}
 
 // *** Authorization ***
 function attemptLogin ({username, password}, sendFunc) {
@@ -66,5 +76,5 @@ function runAuthorization (token, sendFunc, successAction) {
  * Export Functions For Public Use Here 
  */
 module.exports = {
-    getAllSubmissions, attemptLogin
+    getAllSubmissions, attemptLogin, getQuestions
 };

@@ -11,12 +11,16 @@ const Data_model = require('../models/Data');
 function getAllSubmissions (sendFunc) { 
     Data_model.getAllSubmissions(sendFunc); 
 }
+ //Get Questions
+function getQuestions (sendFunc) {
+    Data_model.getQuestions(sendFunc);
+}
 
 // Attempt Login
 function attemptLogin (data, sendFunc) {
     Data_model.attemptLogin(data, sendFunc);
 }
 
-module.exports = { 
-    getAllSubmissions, attemptLogin
+module.exports = {
+    getAllSubmissions, attemptLogin, getQuestions
 };
