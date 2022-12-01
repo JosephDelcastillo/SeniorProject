@@ -19,6 +19,8 @@ const TABLES = {
     Response: 'Response' 
 };
 // IDs for the Databases 
+// TODO: START HERE TO UPDATE THE DB SETUP, if err check .env 
+const DATABASE_ID = "EPOTS";
 const databaseIds = {
     User: 'UserDB', 
     Session: 'SessionDB', 
@@ -41,6 +43,7 @@ const containerIds = {
 const client = new CosmosClient({ endpoint, key });
 
 // Create Database References 
+const DATABASE = client.database(DATABASE_ID);
 const databases = {
     User: client.database(databaseIds.User), 
     // Session: client.database(databaseIds.Session), 
@@ -50,11 +53,11 @@ const databases = {
 }
 // Create Container References 
 const containers = {
-    User: databases.User.container(containerIds.User), 
-    // Session: databases.Session.container(containerIds.Session), 
-    // Question: databases.Question.container(containerIds.Question), 
-    // Submit: databases.Submit.container(containerIds.Submit), 
-    // Response: databases.Response.container(containerIds.Response) 
+    Users: DATABASE.container(containerIds.User), 
+    Sessions: DATABASE.container(containerIds.Session), 
+    Questions: DATABASE.container(containerIds.Question), 
+    Submits: DATABASE.container(containerIds.Submit), 
+    Responses: DATABASE.container(containerIds.Response) 
 }
 
 /**
@@ -63,6 +66,7 @@ const containers = {
  * @returns {Container}
  */
 const GetTable = container => {
+    
     switch(container){
         case TABLES.User: 
             return containers.User;
@@ -82,7 +86,4 @@ const GetTable = container => {
     }
 }
 
-module.exports = {
-    TABLES, 
-    GetTable
-}
+module.exports = containers
