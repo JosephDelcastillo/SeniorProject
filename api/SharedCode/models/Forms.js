@@ -1,19 +1,20 @@
 // Import 
-// const db = require('../lib/DBConnection');
-const db_dev = require('../lib/DBDevelopment');
+const { Questions } = require('../lib/DBConnection');
 const tb = require('../lib/Helpers');
 
-// Constants 
-// const table = db.GetTable(db.TABLES.User);
-
 async function GetQuestion (search) {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        // Build Query 
+        const query = `SELECT q.id, q.archived, q.text, q.type
+            FROM q 
+            WHERE q.text LIKE "%${search}%"
+            ORDER BY q.text`
+
         // Search DB For Matches  
-        const question = (search) ? db_dev.Questions.filter( ({ name, is_note }) => (tb.strLike(name, search) && !(is_note)) ) : db_dev.Questions.filter(({ is_note })=> !is_note) ;
-        // Format Data for Security 
-        const output = question.map(({ id, name }) => { return ({ id, name }); }); 
-        // Return Data 
-        resolve( output );
+        const { resources } = await Questions.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
     })
 }
 

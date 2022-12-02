@@ -25,9 +25,7 @@ async function GetStaff (search) {
             ORDER BY u.name`
 
         // Search DB For Matches  
-        const { resources } = await Users.items
-            .query(query)
-            .fetchAll(); 
+        const { resources } = await Users.items.query(query).fetchAll(); 
         
         // Return Result 
         resolve( resources );
