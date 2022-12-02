@@ -4,10 +4,8 @@
 import React, { useState } from 'react'
 import HighChart from '../Components/HighChart'
 import Swal from 'sweetalert2'
-import axios from 'axios';
 
 // Constants 
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 const GRAPH_TYPES = [
     { name: 'Bar (Horizontal)', value: 'bar'}, 
     { name: 'Column (Vertical)', value: 'column'}, 
@@ -19,10 +17,6 @@ const GRAPH_TYPES = [
 ];
 
 // Helper Functions 
-// Query the Backend
-async function callAPI({ func = '', info, getToken }) {
-    return axios.post(API_URL + func, { token: getToken(), data: info }).then(response => response.data);
-}
 // Shorthand Every-Other
 const EO = (i, r = 2) => (i % r === 0);
 // Shorthand for Input Value gain  
@@ -39,7 +33,7 @@ const openDropDown = id => document.getElementById(id).classList.add('show');
  *  Renders Final Report Graphics  
  * @returns {React.Component} 
  */
-function Report({ getToken }) {
+function Report({ getToken, api }) {
     const [ graphType, setGraphType ] = useState([{}]);
     const [ backendData, setBackendData ] = useState([{}]);
     const [ peopleOptions, setPeopleOptions ] = useState([{}]);
@@ -91,7 +85,7 @@ function Report({ getToken }) {
     }
     // Update People Options 
     const searchPeople = async e => {
-        const { success, data } = await callAPI({ func: '/GetStaff', info: { search: e.target.value }, getToken });
+        const { success, data } = await api({ func: 'GetStaff', data: { search: e.target.value } });
         if(success) {
             setPeopleOptions(data.filter(d => (peopleSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
         }
@@ -123,8 +117,8 @@ function Report({ getToken }) {
         closeQuestion();
     }
     // Update Question Options 
-    const searchQuestion = async e => {
-        const { success, data } = await callAPI({ func: '/GetQuestion', info: { search: e.target.value }, getToken });
+    const searchQuestion = async e => { // TODO: Fix Get Question 
+        const { success, data } = await api({ func: 'GetQuestion', data: { search: e.target.value, "no_notes": true } });
         if(success) {
             setQuestionOptions(data.filter(d => (questionSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
         }
@@ -158,7 +152,7 @@ function Report({ getToken }) {
         }
         
         // Then Query the Backend for Report Data 
-        const { success, data } = await callAPI({ func: '/GetReport', info: input, getToken });
+        const { success, data } = await api({ func: 'GetReport', data: input });
         if(success) { 
             setGraphType(input.graphType)
             // Final Structure [{ question: Question #, data: [{ name: Employee Name, data: [{ name: Submission #, y: Submission Value }] }] }]
@@ -169,7 +163,7 @@ function Report({ getToken }) {
             // Then Add Submission to Each Question/Employee 
             prep.map(q => q.data.map(p => p.data = data.submissions.filter(s => s.user === p.person).map(s => {return { name: 'Submission ' + s.id, submission: s.id }})) )
             // Then Add Responses to Each Submission
-            prep.map(q => q.data.map(p => p.data.map(s => s.y = data.responses.find(r => (r.submission === s.submission && r.question === q.question)).value ?? -1)) )
+            prep.map(q => q.data.map(p => p.data.map(s => s.y = data.responses.find(r => (r.submission === s.submission && r.question === q.question)).response ?? -1)) )
             // Finally Remove all the helper values from the object
             let output = prep.map(({ name, data }) => { 
                 return { name, data: data.map(({ name, data }) => {
@@ -227,7 +221,7 @@ function Report({ getToken }) {
                                         <li>
                                             <button className="dropdown-item" type="button" onClickCapture={() => { addPerson(-202, 'All'); }} 
                                                 onMouseEnter={fixPeople} onMouseLeave={unfixPeople} onBlurCapture={closePeople}>
-                                                .....
+                                                All
                                             </button>
                                         </li>
                                     </ul>
@@ -268,7 +262,7 @@ function Report({ getToken }) {
                     <div className='row mb-2 align-items-center'>
                         <div className='col-lg-10 col-md-12'>
                             <div className="btn-group w-100">
-                                {(questionOptions && questionOptions.length > 0 && questionOptions[0].name) ? (
+                                {(questionOptions && questionOptions.length > 0 && questionOptions[0].text) ? (
                                     <ul className="dropdown-menu mt-5" id='questionDD'>
                                         {(questionSelected.findIndex(({id}) => id === -202) >= 0)?(<></>):(
                                             <li key="AllQuestions">
@@ -278,11 +272,11 @@ function Report({ getToken }) {
                                                 </button>
                                             </li>
                                         )}
-                                        {questionOptions.map(({ id, name }) => (questionSelected.findIndex((s) => s.id === id) >= 0)?(<></>):( 
+                                        {questionOptions.map(({ id, text }) => (questionSelected.findIndex((s) => s.id === id) >= 0)?(<></>):( 
                                             <li key={'questionOption'+id}>
-                                                <button className="dropdown-item" type="button" onClickCapture={() => { addQuestion(id, name); }} 
+                                                <button className="dropdown-item" type="button" onClickCapture={() => { addQuestion(id, text); }} 
                                                     onMouseEnter={fixQuestion} onMouseLeave={unfixQuestion} onBlurCapture={closeQuestion}>
-                                                    {name}
+                                                    {text}
                                                 </button>
                                             </li>
                                         ))}
@@ -292,7 +286,7 @@ function Report({ getToken }) {
                                         <li>
                                             <button className="dropdown-item" type="button" onClickCapture={() => { addQuestion(-202, 'All'); }} 
                                                 onMouseEnter={fixQuestion} onMouseLeave={unfixQuestion} onBlurCapture={closeQuestion}>
-                                                .....
+                                                All
                                             </button>
                                         </li>
                                     </ul>

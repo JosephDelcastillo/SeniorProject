@@ -22,7 +22,7 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard" element={<Dashboard getToken={this.props.getToken} />} />
                     <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} />} />
-                    <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} />} />
+                    <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} />} />
