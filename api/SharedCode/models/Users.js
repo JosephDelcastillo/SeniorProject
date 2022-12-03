@@ -1,12 +1,11 @@
 // Import 
-const db = require('../lib/DBConnection');
+const { Users, Sessions } = require('../lib/DBConnection');
 const db_dev = require('../lib/DBDevelopment');
 const Reply = require('../lib/Reply');
 const tb = require('../lib/Helpers');
 
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
-const table = db.GetTable(db.TABLES.User);
 
 async function Create (data) {
     return new Promise(resolve => {
@@ -18,25 +17,30 @@ async function Create (data) {
 }
 
 async function GetStaff (search) {
-    return new Promise(resolve => {
+    return new Promise(async resolve => {
+        // Build Query 
+        const query = `SELECT u.id, u.archived, u.name, u.email
+            FROM u 
+            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )
+            ORDER BY u.name`
+
         // Search DB For Matches  
-        const staff = (search) ? db_dev.Users.filter(({ name, email }) => tb.strLike(name, search) || tb.strLike(email, search) ) : db_dev.Users.rows;
-        // Format Data for Security 
-        const output = staff.map(({ id, name, email }) => { return ({ id, name, email }); }); 
-        // Return Data 
-        resolve( output );
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
     })
 }
 
 // *** Authorization ***
 function Login ({email, password}) {
     return Promise(resolve => {
-        let search = db.Users.rows.find(u => tb.strLike(u.email, email));
+        let search = db_dev.Users.rows.find(u => tb.strLike(u.email, email));
         if ( typeof search === "undefined" ) {
             resolve(new Reply({ point: 'Find User' })) 
         }
 
-        let user = db.Users.rows.find(u => tb.strLike(u.password, password));
+        let user = db_dev.Users.rows.find(u => tb.strLike(u.password, password));
         if( typeof user === "undefined" ) {
             resolve(new Reply({ point: 'Authenticate User' }))
         } 
