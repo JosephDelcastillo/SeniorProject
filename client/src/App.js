@@ -9,7 +9,7 @@ function setToken(userToken) { sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.st
 function getToken() { return sessionStorage.getItem(LOCAL_STORAGE_KEY); }
 function resetToken () { sessionStorage.removeItem(LOCAL_STORAGE_KEY); }
 
-const API_URL = true ? "/api" : "https://epots-api.azurewebsites.net/api";
+const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
 
 /**
   *  Ajax Helper Function <br>
