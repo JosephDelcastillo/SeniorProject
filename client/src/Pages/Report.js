@@ -1,4 +1,4 @@
-/**
+ /**
  * Report Generation Form 
  */
 import React, { useState } from 'react'
@@ -6,6 +6,7 @@ import HighChart from '../Components/HighChart'
 import Swal from 'sweetalert2'
 
 // Constants 
+const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 const GRAPH_TYPES = [
     { name: 'Bar (Horizontal)', value: 'bar'}, 
     { name: 'Column (Vertical)', value: 'column'}, 
