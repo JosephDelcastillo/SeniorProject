@@ -9,6 +9,13 @@ function setToken(userToken) { sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.st
 function getToken() { return sessionStorage.getItem(LOCAL_STORAGE_KEY); }
 function resetToken () { sessionStorage.removeItem(LOCAL_STORAGE_KEY); }
 
+function isAdmin () {
+  const token = getToken();
+  if(!token || !JSON.parse(token)) return false;
+  const obj = JSON.parse(token)
+  return typeof obj.attr === "string" && obj.attr.toLowerCase() === "administrator"
+}
+
 const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
 
 /**
@@ -37,7 +44,7 @@ async function api({ func, data, action }) {
   }
 
   // Setup Data (With Token Possible)
-  const DATA = getToken() ? { token: getToken(), data } : data;
+  const DATA = getToken() ? { token: JSON.parse(getToken()), data } : data;
 
   if(IS_POST){
     return await axios.post(API_URL + url, DATA).then(response => response.data)
@@ -49,9 +56,9 @@ async function api({ func, data, action }) {
 function App() { 
   return ( 
     <div>
-      <NavBar getToken={getToken} />
+      <NavBar getToken={getToken} isAdmin={isAdmin} />
       <div className='container'>
-        <RouteController getToken={getToken} setToken={setToken} resetToken={resetToken} api={api}  />
+        <RouteController getToken={getToken} setToken={setToken} resetToken={resetToken} api={api} isAdmin={isAdmin} />
       </div> 
     </div> 
   ) 

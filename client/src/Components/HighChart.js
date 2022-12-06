@@ -6,7 +6,7 @@ import HighchartsReact from 'highcharts-react-official';
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/export-data')(Highcharts);
 
-function HighChart({ data, title, yAxis, xAxis, type }) {
+function HighChart({ data, title, yAxis, axisMax, type }) {
     const chart = useRef();
     
     const MAX = 100;
@@ -28,12 +28,26 @@ function HighChart({ data, title, yAxis, xAxis, type }) {
         yAxis: {
             title: {
                 text: yAxis ?? ''
-            }
+            },
+            max: axisMax
         },
         title: {
             text: title ?? ''
         },
         series: data,
+        exporting: {
+            buttons: {
+                contextButton: {
+                    menuItems: [
+                        "viewFullscreen", "printChart",
+                        "separator",
+                        "downloadPNG", "downloadJPEG", "downloadSVG", "downloadPDF",
+                        "separator",
+                        "downloadCSV", "downloadXLS"
+                    ]
+                }
+            }
+        }
     };
 
     return (
