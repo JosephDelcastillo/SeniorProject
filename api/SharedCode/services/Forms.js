@@ -9,7 +9,7 @@ async function GetQuestion(input) {
         const authorized = await Authorize(token, AUTH_ROLES.Staff); 
         if(!authorized) return new Reply({ point: 'Authorization' });
         
-        const q = await model.GetQuestion(data.search);
+        const q = await model.GetQuestion(data.search, data.no_notes || false);
         if(q) return new Reply({ point: 'Question Generation', success: true, data: q });
         return new Reply({ point: 'Question Generation' });
     } catch (error) {

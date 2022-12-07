@@ -26,8 +26,39 @@ function addUser (data, sendFunc) {
 function getUsers (sendFunc) {
     Data_model.getUsers(sendFunc);
 }
+
+/* Private Functions  */
+// Staff Access 
+// Get Questions
+function getQuestion(input, sendFunc) {
+    const { token, data } = input;
+    Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Staff, sendFunc, (send) => { Data_model.getQuestion(data.search, send) }); 
+}
+
+function getReport({ data, token }, sendFunc) {
+    const { people, questions, dates } = data;
+    if (Array.isArray(people)) {
+        Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Admin, sendFunc, (send) => { Data_model.getReport(people, questions, dates, send) }); 
+    } else {
+        Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Staff, sendFunc, (send) => { Data_model.getReport(people, questions, dates, send) }); 
+    }
+}
+
+// Admin Access 
+// Get Staff Members
+function getStaff(input, sendFunc) {
+    const { token, data } = input;
+    Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Admin, sendFunc, (send) => { Data_model.getStaff(data.search, send) }); 
+}
+
+module.exports = { 
+    getAllSubmissions, 
+    attemptLogin,
+    getQuestion,
+    getReport,
+    getStaff
+};
   
  module.exports = {
      getAllSubmissions, attemptLogin, addUser, getUsers
  };
- 

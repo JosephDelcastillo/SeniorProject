@@ -21,7 +21,7 @@ app.use(bodyParser.json());
  */
 // Root Level - Public Access Functions 
 // Data
-app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); })
+app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); }) 
  
 // Login
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
@@ -32,6 +32,12 @@ app.post("/api/newUser", (req, res) => { Data_Controller.addUser(req.body, (data
 // Get User Data
 app.get("/api/getUsers", (req, res) => { Data_Controller.getUsers((data) => res.json(data)); })
 
+// Staff Level - Private Access Functions 
+app.post("/api/report", (req, res) => {  Data_Controller.getReport(req.body, (data) => res.json(data)); })
+app.post("/api/question", (req, res) => {  Data_Controller.getQuestion(req.body, (data) => res.json(data)); })
+
+// Admin Level - Private Access Functions 
+app.post("/api/staff", (req, res) => {  Data_Controller.getStaff(req.body, (data) => res.json(data)); })
 
 /**
  * Finally Start the App
