@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React from 'react';
 import NavBar from './Components/NavBar';
 import RouteController from "./Controller/RouteController";
@@ -8,12 +9,49 @@ function setToken(userToken) { sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.st
 function getToken() { return sessionStorage.getItem(LOCAL_STORAGE_KEY); }
 function resetToken () { sessionStorage.removeItem(LOCAL_STORAGE_KEY); }
 
+const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
+
+/**
+  *  Ajax Helper Function <br>
+  * 
+  *  Runs ajax call based on parameters and handles the errors
+  * @param {string} func    The URL part of the api function name (api/{func})
+  * @param {object} data    The data to pass, TOKEN is auto-amendend if it exists
+  * @param {string} action  POST or GET | Defaults to POST
+ */
+async function api({ func, data, action }) {
+  //********  Step 1: Initialize Data  ********
+  // Get Post vs Get
+  const IS_POST = action ? (action.toLowerCase() !== 'get') : true ; // Default to POST 
+
+  // Setup Url
+  let url = `/${func}`;
+  if(!IS_POST){
+      url += "?";
+      // Cycle through all key value pairs of data and converting them into a GET query
+      for(const [key, value] of Object.entries(data)){
+          url += `${key}=${value}&`;
+      }
+      // Remove Last '&'
+      url = url.slice(0, -1);
+  }
+
+  // Setup Data (With Token Possible)
+  const DATA = getToken() ? { token: getToken(), data } : data;
+
+  if(IS_POST){
+    return await axios.post(API_URL + url, DATA).then(response => response.data)
+  } else {
+    return await axios.get(API_URL + url).then(response => response.data)
+  }
+}
+
 function App() { 
   return ( 
     <div>
       <NavBar getToken={getToken} />
       <div className='container'>
-        <RouteController getToken={getToken} setToken={setToken} resetToken={resetToken}  />
+        <RouteController getToken={getToken} setToken={setToken} resetToken={resetToken} api={api}  />
       </div> 
     </div> 
   ) 

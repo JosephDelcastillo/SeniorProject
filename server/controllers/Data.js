@@ -3,7 +3,6 @@
  * 
  * Manages Database Data
  */
-const { Reply } = require('../helpers/Helpers');
 const Data_model = require('../models/Data');
 
 /* Public Functions  */
@@ -16,19 +15,35 @@ function getAllSubmissions (sendFunc) {
 function attemptLogin (data, sendFunc) {
     Data_model.attemptLogin(data, sendFunc);
 }
-//Attempt Edit
-function editRequest(data, sendFunc){
-    Data_model.editRequest(data, sendFunc);
+
+/* Private Functions  */
+// Staff Access 
+// Get Questions
+function getQuestion(input, sendFunc) {
+    const { token, data } = input;
+    Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Staff, sendFunc, (send) => { Data_model.getQuestion(data.search, send) }); 
 }
 
-//Get all Entries
-function getAllEntries (sendFunc) {
-    Data_model.getAllEntries(sendFunc);
+function getReport({ data, token }, sendFunc) {
+    const { people, questions, dates } = data;
+    if (Array.isArray(people)) {
+        Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Admin, sendFunc, (send) => { Data_model.getReport(people, questions, dates, send) }); 
+    } else {
+        Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Staff, sendFunc, (send) => { Data_model.getReport(people, questions, dates, send) }); 
+    }
 }
-//Get Single Entry to Manage
-function getEntry (sendFunc) {
-    Data_model.getEntry(sendFunc);
+
+// Admin Access 
+// Get Staff Members
+function getStaff(input, sendFunc) {
+    const { token, data } = input;
+    Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Admin, sendFunc, (send) => { Data_model.getStaff(data.search, send) }); 
 }
+
 module.exports = { 
-    getAllSubmissions, attemptLogin, getAllEntries, editRequest, getEntry
+    getAllSubmissions, 
+    attemptLogin,
+    getQuestion,
+    getReport,
+    getStaff
 };

@@ -29,16 +29,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 // Root Level - Public Access Functions 
 // Data
-app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); })
+app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.json(data)); }) 
 
 // Login 
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
 
-// Get ALl Entries
-app.get("/api/entries", (req, res) => { Data_Controller.getAllEntries((data) => res.json(data)); })
+// Staff Level - Private Access Functions 
+app.post("/api/report", (req, res) => {  Data_Controller.getReport(req.body, (data) => res.json(data)); })
+app.post("/api/question", (req, res) => {  Data_Controller.getQuestion(req.body, (data) => res.json(data)); })
 
-// Edit Response Post Request 
-app.post("/api/edit", (req, res) => { Data_Controller.editRequest(req.body, (data) => res.json(data)); })
+// Admin Level - Private Access Functions 
+app.post("/api/staff", (req, res) => {  Data_Controller.getStaff(req.body, (data) => res.json(data)); })
 
 /**
  * Finally Start the App 
