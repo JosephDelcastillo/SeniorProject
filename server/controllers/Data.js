@@ -1,19 +1,30 @@
 /**
  * Data Controller
- * 
+ *
  * Manages Database Data
  */
-const Data_model = require('../models/Data');
+ const { Reply } = require('../helpers/Helpers');
+ const Data_model = require('../models/Data');
+  
+ /* Public Functions  */
+ // Get Menu
+ function getAllSubmissions (sendFunc) {
+     Data_model.getAllSubmissions(sendFunc);
+ }
+  
+ // Attempt Login
+ function attemptLogin (data, sendFunc) {
+     Data_model.attemptLogin(data, sendFunc);
+ }
 
-/* Public Functions  */
-// Get Menu
-function getAllSubmissions (sendFunc) { 
-    Data_model.getAllSubmissions(sendFunc); 
+ // Add User
+function addUser (data, sendFunc) {
+    Data_model.addUser(data, sendFunc);
 }
 
-// Attempt Login
-function attemptLogin (data, sendFunc) {
-    Data_model.attemptLogin(data, sendFunc);
+//Get Users
+function getUsers (sendFunc) {
+    Data_model.getUsers(sendFunc);
 }
 
 /* Private Functions  */
@@ -47,3 +58,7 @@ module.exports = {
     getReport,
     getStaff
 };
+  
+ module.exports = {
+     getAllSubmissions, attemptLogin, addUser, getUsers
+ };
