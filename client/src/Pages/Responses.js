@@ -52,15 +52,15 @@ function Responses({api}) {
                     </thead>
                     <tbody>
                         {entryData.submissions.map(submit => (
-                            <tr key={submit.id} scope = "row">
+                            <tr key={submit.id}>
                                 <td>
                                     <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {window.location.pathname = "/dashboard/response/"+ submit.id}}></i>
                                     <i className="fa-regular fa-trash-can text-danger pe-1 c-pointer" onClick={()=>deleteSubmission(submit.id)}></i>
                                 </td>
-                                <td>{entryData.users.find(u => (u.id == submit.user)).email}</td>
+                                <td>{entryData.users.find(u => (u.id === submit.user)).email}</td>
                                 <td>{submit.created}</td>
-                                <td>{(submit.modified_by)?(entryData.users.find(u => (u.id == submit.modified_by)).email):("Not Modified")}</td>
-                                <td>{submit.modified?(entryData.users.find(u => (u.id == submit.modified_by)).email):("Not Modified")}</td>
+                                <td>{(submit.modified_by)?(entryData.users.find(u => (u.id === submit.modified_by)).email):("Not Modified")}</td>
+                                <td>{submit.modified?(entryData.users.find(u => (u.id === submit.modified_by)).email):("Not Modified")}</td>
                             </tr>
                         ))}
                     </tbody>

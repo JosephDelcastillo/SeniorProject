@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useState, useEffect }  from 'react'
 import { useParams} from "react-router-dom";
+
 //import { Submissions } from '../../../api/SharedCode/lib/DBDevelopment';
-function Response({api}) {
-    const params = useParams();
+
     //get from api
     //current submission data
     //questions
@@ -12,6 +12,8 @@ function Response({api}) {
     //if I have an ID parameter, check for backend data
     //if I do have backend data, generate it out.
     //include an edit button somewhere
+    function Response({api}) {
+
   return (
     <div>Response</div>
 
