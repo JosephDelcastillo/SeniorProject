@@ -85,32 +85,24 @@ function genDate () { return `20${genNum(22, 20)}-${f(genNum(12, 1))}-${f(genNum
  * @property {array}    columns - String of Column Names, ID is added automatically 
  * @property {array}    rows - Table Data 
  */
-let table = {
-    create: function (columns) {
-        let obj = Object.create(this);
-        obj.init(columns)
-        return obj;
-    },
+function Table(columns) {
+    this.incrementPos = 0;
+    this.columns = [ 'id', ...columns ];
+    this.rows = [];
 
-    init: function (columns) {
-        this.incrementPos = 0;
-        this.columns = [ 'id', ...columns ];
-        this.rows = [];
-    },
+    this.getEntryByID = ( id ) => this.rows.find(e => e.id === id);
 
-    getEntryByID: function ( id ) { return this.rows.find(e => e.id === id); }, 
-
-    addEntry: function ( data ) {
+    this.addEntry = ( data ) => {
         this.incrementPos++;
         this.rows.push({ id: this.incrementPos, ...data });
-    },
+    };
 
-    removeEntryByID: function ( id ) {
+    this.removeEntryByID = ( id ) => {
         const I = this.rows.findIndex(e => e.id === id);
         return (I >= 0) ? this.rows.splice(I, 1) : false; 
-    },
+    }
 
-    updateEntry: function ({ id, column, value }) {
+    this.updateEntry = ({ id, column, value }) => {
         const I = this.rows.findIndex(e => e.id === id && column in e);
         if (I >= 0) {
             this.rows[I][column] = value;
@@ -118,6 +110,8 @@ let table = {
         } 
         return false;
     }
+
+    this.filter = (pred) => this.rows.filter(pred); 
 }
 
 module.exports = {
