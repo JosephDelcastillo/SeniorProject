@@ -22,11 +22,11 @@ async function displayUser(user) {
 
         let userAccount = document.createElement('h3');
         userAccount.setAttribute("class", "card-body bg-white text-center");
-        userAccount.textContent = "Account Type: " + "NA";
+        userAccount.textContent = "Account Type: " + "Staff";
 
         let userArchive = document.createElement('h3');
         userArchive.setAttribute("class", "card-body bg-white text-center");
-        userArchive.textContent = "Archive Statue: " + user.archived;
+        userArchive.textContent = "Archive Status: " + user.archived;
 
         userInfo.append(userHeader, userEmail, userAccount, userArchive);  
 

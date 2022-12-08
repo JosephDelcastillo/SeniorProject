@@ -1,4 +1,5 @@
-
+const {v4:uuidv4} = require('uuid');
+const bcrypt = require ('bcrypt');
 // *** Helper Funcitons *** 
 /**
  * String Like?
@@ -8,6 +9,23 @@
  */
 const strLike = (haystack, needle) => (haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0); 
 
+async function genId () {
+    return await uuidv4();
+}
+
+async function hashing (password, salt) {
+    return await bcrypt.hash(password, salt); 
+} 
+
+async function genSalt () {
+    return await bcrypt.genSalt(10);
+}
+
+async function compareHashes (password, hash) {
+    return await bcrypt.compare(password, hash);
+}
+
+
 module.exports = {
-    strLike,
+    strLike, genSalt, hashing, genId, compareHashes
 }

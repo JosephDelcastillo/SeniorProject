@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+//import PropTypes from 'prop-types';
 import { Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-async function loginUser(credentials) {
-  return { success: true, data: 'tempToken' }
-  // return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
-  // .then(data => data.json())
-}
+// Constants 
+const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 
 /**
  *  Login Page
@@ -15,9 +12,18 @@ async function loginUser(credentials) {
  *  Manages Logging In 
  * @returns {React.Component} 
  */
-export default function Login({ getToken, setToken }) {
+export default function Login({ getToken, setToken, api}) {
   const [username, setEmail] = useState();
   const [password, setPassword] = useState();
+
+  async function loginUser({username, password}) {
+    const { success, data } = await api({ func: 'Login', data: {"username": username, "password": password}});
+    //return { success: true, data: 'tempToken' }
+    // return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
+    // .then(data => data.json())
+    
+    return {success, data};
+  }
   
   if(getToken && getToken()) {
     return (
@@ -30,7 +36,7 @@ export default function Login({ getToken, setToken }) {
     const token = await loginUser({ username, password });
     console.log(token);
     if(token.success) { 
-      setToken(token.data);
+      //setToken(token.data);
       window.location.pathname = "dashboard";
     } else {
       Swal.fire({title: "Login Failed", icon: 'error'})
@@ -62,6 +68,6 @@ export default function Login({ getToken, setToken }) {
   )
 }
 
-Login.propTypes = {
+/* Login.propTypes = {
   setToken: PropTypes.func.isRequired
-};
+}; */
