@@ -25,9 +25,9 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} />} />
                     <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} api={this.props.api} />} />
-                    <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} />} />
-                    <Route path="/dashboard/users" element={<Users getToken={this.props.getToken} />} />
-                    <Route path="/dashboard/user" element={<UserPage getToken={this.props.getToken} />} />
+                    <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} api={this.props.api} />} />
+                    <Route path="/dashboard/users" element={<Users getToken={this.props.getToken} api={this.props.api} />} />
+                    <Route path="/dashboard/user" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} />} />
                 <Route path="*" element={<NotFound />} />
