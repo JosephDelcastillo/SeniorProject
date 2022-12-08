@@ -32,6 +32,22 @@ async function GetStaff (search) {
     })
 }
 
+
+async function GetAllUsers(){
+    return new Promise(async resolve => {
+        const query = `SELECT u.id, u.email
+        FROM u 
+        ORDER BY u.email`
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+
 // *** Authorization ***
 function Login ({email, password}) {
     return Promise(resolve => {
@@ -60,7 +76,17 @@ async function Authorize (token, requirement) {
         // TODO: Fill this in with an actual token processor 
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve(true);
+        if ( token ){
+            if(token==AUTH_ROLES.Admin && requirement==AUTH_ROLES.Admin)
+            {
+              resolve("f3bd7d22-882b-4ecb-b071-8ee7f6424be2");  
+            }
+            else if(token==AUTH_ROLES.Staff && requirement==AUTH_ROLES.Staff)
+            {
+                resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f");
+            }
+
+        }
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 
@@ -73,5 +99,6 @@ module.exports = {
     Authorize,
     GetStaff,
     Login,
-    Create
+    Create,
+    GetAllUsers
 }

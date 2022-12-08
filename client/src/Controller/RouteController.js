@@ -1,7 +1,8 @@
 import React from 'react';
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route} from "react-router-dom";
 
 import Dashboard from '../Pages/Dashboard';
+import Response from '../Pages/Response';
 import Responses from '../Pages/Responses';
 import NotFound from '../Pages/NotFound';
 import Logout from '../Pages/Logout';
@@ -21,7 +22,8 @@ export default class RouteController extends React.Component {
                     <Route path="/logout" element={<Logout resetToken={this.props.resetToken} />} />
                     <Route path="/dashboard" element={<Dashboard getToken={this.props.getToken} />} />
                     <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} />
-                    <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} />} />
+                    <Route path="/dashboard/response/:id" element={<Response getToken={this.props.getToken} api={this.props.api} />} />
+                    <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/report" element={<Report getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} />} />
                 </>):(<></>)}

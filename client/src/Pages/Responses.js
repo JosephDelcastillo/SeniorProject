@@ -3,94 +3,7 @@ import editIcon from '../Media/editicon.png'
 import deleteIcon from '../Media/deleteicon.png'
 import axios from 'axios'
 
-const API_URL =  '/api/edit';
-function filterData(data){
-    let output=[];
-        data.filter(e => e.question === 1).forEach(({entryId, email, entryDate, lastEdit, editDate, question, submission, value }) => {
-            output.push({entryId: entryId, email: email, entryDate: entryDate, lastEdit: lastEdit, editDate: editDate, question: question, submission: submission, value: value });
-        });
-return output;    
-}
-//TO DO: ADD ACTUAL FUNCTIONALITY TO DELETE/ARCHIVE FEATURE
-function handleDeleteClick()
-{
-    console.log('The delete button has pressed');
-}
-
-const BuildTable = () =>{
-    //Setup state tracking and pull data
-    const [entryData, setEntryData] = useState([{}]);
-
-
-    const fetchData = async () => {
-    const response = await fetch('/api/entries').then(data => data.json());
-        
-        if (response.success) {
-
-            setEntryData(filterData(response.data));
-            return (filterData(response.data));
-        } else {
-            console.log("failed");
-        }
-    }
-    useEffect(() => {
-        fetchData()
-            .then((res) => {
-                setEntryData(res)
-            })
-            .catch((e) => {
-
-            })
-    }, []);
-
-
-
-    return (
-    <div className="panel">
-    <table className="table tableHover">
-        <thead>
-            <tr>
-                <th scope="col" width="100px"></th>
-                <th scope="col">Email</th>
-                <th scope="col" >Entry Date</th>
-                <th scope="col">Last Editted</th>
-                <th scope="col">Edit Date</th>
-
-            </tr>
-        </thead>
-        
-        {entryData.map((item, submission) => {
-                
-                const handleSubmit = (e) => {
-                    e.preventDefault();
-                    const entryId = {
-                    entryId: item.entryId
-                    };
-                    console.log(entryId);
-                    axios.post(API_URL, entryId).then((response)=> {
-                        console.log(response.status)
-                        window.open('/dashboard/manage_response')
-                    });
-                  };
-            return (
-                <tbody key={submission}>
-                    <tr>
-                        <th scope="row">
-                            <button className="iconButton" onClick={(handleSubmit)} alt='Edit'><img src={editIcon} alt='view' height='20px' /></button>
-                            <button className="iconButton" onClick={handleDeleteClick} alt='Delete'><img src={deleteIcon} alt='delete' height='20px' /></button>
-                        </th>
-
-                        <td>{item.email}</td>
-                        <td>{item.entryDate}</td>
-                        <td>{item.lastEdit}</td>
-                        <td>{item.editDate}</td>
-                    </tr>
-                </tbody>
-            )
-        })}
-    </table>
-</div>
-)}
+const API_URL =  'GetAllSubmissions';
 
 /**
  *  Responses Page
@@ -100,7 +13,24 @@ const BuildTable = () =>{
  */
 
 
-function Responses() {
+function Responses({api}) {
+    const [entryData, setEntryData] = useState([{}]);
+
+    const deleteSubmission = id => {
+        const newEntryData = {users: entryData.users, submissions: entryData.submissions.filter(s => s.id !== id)};
+        setEntryData(newEntryData);
+        //TO DO: TRIGGER API CALL, IF SUCCESSFUL SET ENTRYDATA TO API RESULT
+    }
+
+    useEffect(() => {
+        api({func: "GetAllSubmissions", data: "test"}).then(({success, data}) => {
+            if(success){
+                setEntryData(data);
+            }
+            
+        })
+    }, [api,setEntryData]);
+
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -108,7 +38,35 @@ function Responses() {
             </div>
             <div className='card-body'>
                 <hr />
-                {BuildTable()}
+               {(entryData && entryData.submissions && entryData.users)? (
+                <div className="panel">
+                <table className="table tableHover">
+                    <thead>
+                        <tr>
+                            <th scope ="col" width="180px">&nbsp;</th>
+                            <th scope = "col">Email</th>
+                            <th scope = "col">Date</th>
+                            <th scope = "col">Modified By</th>
+                            <th scope = "col">Modified Date</th>
+                        </tr>                        
+                    </thead>
+                    <tbody>
+                        {entryData.submissions.map(submit => (
+                            <tr key={submit.id} scope = "row">
+                                <td>
+                                    <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {window.location.pathname = "/dashboard/response/"+ submit.id}}></i>
+                                    <i className="fa-regular fa-trash-can text-danger pe-1 c-pointer" onClick={()=>deleteSubmission(submit.id)}></i>
+                                </td>
+                                <td>{entryData.users.find(u => (u.id == submit.user)).email}</td>
+                                <td>{submit.created}</td>
+                                <td>{(submit.modified_by)?(entryData.users.find(u => (u.id == submit.modified_by)).email):("Not Modified")}</td>
+                                <td>{submit.modified?(entryData.users.find(u => (u.id == submit.modified_by)).email):("Not Modified")}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                </div>
+               ):(<></>)}
             </div>
         </div>
     )
