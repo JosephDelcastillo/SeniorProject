@@ -15,7 +15,6 @@ async function Get (people, questions, dates) {
         query += `( s.created > "${dates.start}" AND s.created < "${dates.end}" )`;
 
         //******** 2: Get the Submissions ********
-        console.log(query)
         // Search DB For Matches  
         const submissionData = await Submits.items.query(query).fetchAll();
 
@@ -36,18 +35,16 @@ async function Get (people, questions, dates) {
         query = query.substring(0, query.length - 3) + ")";
 
         //******** 4: Get the Responses ********
-        console.log(query)
         // Search DB For Matches  
         const responseData = await Responses.items.query(query).fetchAll();
 
         //******** 5: Get the Questions ********
-        query = `SELECT q.id, q.text, q.created, q.type FROM q `;
+        query = `SELECT q.id, q.text, q.created, q.goal, q.type FROM q `;
         if(!questions.includes(-202)) {
             query += "WHERE "
             questions.forEach(q => query += `q.id LIKE "%${q}%" OR `);
             query = query.substring(0, query.length - 3);
         }
-        console.log(query)
         const questionData = await Questions.items.query(query).fetchAll();
         
         //******** 6: Filter out the Note Questions ********
@@ -62,7 +59,6 @@ async function Get (people, questions, dates) {
             people.forEach(p => query += `u.id LIKE "%${p}%" OR `);
             query = query.substring(0, query.length - 3);
         }
-        console.log(query)
         const userData = await Users.items.query(query).fetchAll();
         
         // Finally Return Information 

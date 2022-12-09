@@ -17,6 +17,7 @@ let db = DummyDB(); // TODO: Replace with DB connection
 // **** Load Data ****
 function getAllSubmissions (sendFunc) {
     let output = [];
+
     
     // First Get Submissions 
     db.Submissions.rows.forEach(current => {
@@ -71,7 +72,27 @@ function getReport (people, questions, dates, sendFunc) {
 // **** Update Data **** 
 // **** Remove Data **** 
 
+function getQuestions (sendFunc) {
+    let output = [];
+    
+    db.Questions.rows.forEach(current => {
+            output.push({id: current.name, question: current.question});
+        });
+    
+    sendFunc(new Reply ({ point: `Get All Questions`, success: true, data: output }));
+}
+//***Get Archived Questions***
+function getArchive (sendFunc){
+    let output = [];
 
+    db.Archived.rows.map(current =>{
+        output.push({id: current.name, question: current.question, date: current.date_stored});
+         })
+    
+         sendFunc(new Reply({point:'Get All Archived', success:true,data: output}));
+
+
+}
 // *** Authorization ***
 function attemptLogin ({username, password}, sendFunc) {
     let search = db.Users.rows.find(({username}) => username == username);

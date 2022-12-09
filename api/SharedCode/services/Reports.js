@@ -7,7 +7,7 @@ async function Get(input) {
     try {
         const { token, data } = input;
         const { people, questions, dates } = data;
-        if (Array.isArray(people)) { // TODO: Add Additional Check if this is the same user thats logged in 
+        if (Array.isArray(people)) {
             const authorized = await Authorize( token, AUTH_ROLES.Admin); 
             if(!authorized) return new Reply({ point: 'Authorization' });
             
@@ -18,7 +18,8 @@ async function Get(input) {
             const authorized = await Authorize( token, AUTH_ROLES.Staff); 
             if(!authorized) return new Reply({ point: 'Authorization' });
             
-            const report = await model.Get([ people ], questions, dates );
+            // Note: Since Authorized returns the user id, it can be substituted here 
+            const report = await model.Get([ authorized ], questions, dates );
             if(report) return new Reply({ point: 'Get Report', data: report, success: true });
             return new Reply({ point: 'Report Generation' });
         }
