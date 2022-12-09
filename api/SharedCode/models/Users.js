@@ -89,6 +89,38 @@ async function GetStaff (search) {
     })
 }
 
+
+async function GetAllUsers(){
+    return new Promise(async resolve => {
+        const query = `SELECT u.id, u.email
+        FROM u 
+        ORDER BY u.email`
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+async function GetUsersFromArray(array = []){
+    return new Promise(async resolve => {
+        if(array.length < 1) resolve(false);
+
+        let query = `SELECT u.id, u.name, u.email FROM u WHERE `
+        array.forEach((id, i) => query+=`"${id}" = u.id ${(i<(array.length-1))? "OR ":" "}`);
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -166,5 +198,7 @@ module.exports = {
     Authorize,
     GetStaff,
     Login,
-    Create
+    Create,
+    GetAllUsers,
+    GetUsersFromArray
 }

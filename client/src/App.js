@@ -16,7 +16,7 @@ function isAdmin () {
   return typeof obj.attr === "string" && obj.attr.toLowerCase() === "admin"
 }
 
-const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
+const API_URL = true ? "/api" : "https://epots-api.azurewebsites.net/api";
 
 /**
   *  Ajax Helper Function <br>
@@ -42,7 +42,6 @@ async function api({ func, data, action }) {
       // Remove Last '&'
       url = url.slice(0, -1);
   }
-
   // Setup Data (With Token Possible)
   const DATA = getToken() ? { token: JSON.parse(getToken()), data } : data;
 
