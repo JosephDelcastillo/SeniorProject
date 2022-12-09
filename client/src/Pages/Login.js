@@ -4,7 +4,7 @@ import { Navigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 // Constants 
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
+const inputById = id => document.getElementById(id).value;
 
 /**
  *  Login Page
@@ -13,34 +13,25 @@ const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
  * @returns {React.Component} 
  */
 export default function Login({ getToken, setToken, api}) {
-  let username = "";
-  let password = "";
-
-  async function loginUser({username, password}) {
-    const { success, data } = await api({ func: 'Login', data: {"email": username, "password": password}});
-    //return { success: true, data: 'tempToken' }
-    // return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
-    // .then(data => data.json())
-    
-    return {success, data};
-  }
-  
-  if(getToken && getToken()) {
-    return (
-      <Navigate to="/dashboard" />
-    )
-  }
-
   const handleSubmit = async e => {
     e.preventDefault();
-    const token = await loginUser({ username, password });
-    console.log(token);
-    if(token.success) { 
-      //setToken(token.data);
-      window.location.pathname = "dashboard";
-    } else {
-      Swal.fire({title: "Login Failed", icon: 'error'})
+
+    const data = {
+      email: inputById('email'),
+      password: inputById('password')
     }
+
+    if(!data.email) Swal.fire({ title: 'Missing Email', text: 'Email Is required', icon: 'error' });
+    if(!data.password) Swal.fire({ title: 'Missing Password', text: 'Password Is required', icon: 'error' });
+
+    if(!data.email || !data.password) return false;
+    const token = await api({ func: 'Login', data: { data } });
+    if(!token.success) { 
+      Swal.fire({title: "Login Failed", text: 'Check Your Email/Password', icon: 'error'});
+      return false;
+    }
+    setToken(token.data);
+    window.location.pathname = "dashboard";
   }
 
   return(
@@ -53,11 +44,11 @@ export default function Login({ getToken, setToken, api}) {
         <form onSubmit={handleSubmit}>
           <div className="mb-3 col-4 mx-auto mt-2">
             <label className="form-label">Email</label>
-            <input className="form-control" autoComplete="off" type="text" onChange={e => username = e.target.value} />
+            <input className="form-control" id='email' autoComplete="off" type="text" />
           </div>
           <div className="mb-3 col-4 mx-auto mt-5">
             <label className="form-label">Password</label>
-            <input className="form-control" autoComplete="off" type="password" onChange={e => password = e.target.value} />
+            <input className="form-control" id='password' autoComplete="off" type="password" />
           </div>
           <div>
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Submit</button>
@@ -68,6 +59,6 @@ export default function Login({ getToken, setToken, api}) {
   )
 }
 
- Login.propTypes = {
+/*  Login.propTypes = {
   setToken: PropTypes.func.isRequired
-}; 
+};  */

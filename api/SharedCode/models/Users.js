@@ -108,15 +108,19 @@ async function Login ({email, password}) {
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
         FROM u WHERE u.email = "${email.toLowerCase()}"`;
         
+        console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
         if (search && search.length <= 0) {
+            console.log(search)
             resolve(false);
+            return;
         }
         
         /******** Step 2: Authorize Password ********/
         const isAuthorized = search[0].pass === await tb.hashing(password, search[0].salt);
         if (!isAuthorized) {
             resolve(false);
+            return;
         } else {
             
             /******** Step 3: Check Session ********/
