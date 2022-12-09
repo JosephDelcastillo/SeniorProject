@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 
 // *** Helper Funcitons *** 
 /**
@@ -8,6 +9,8 @@
  */
 const strLike = (haystack, needle) => (haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0); 
 
+function genId() { return uuidv4(); }
+
 module.exports = {
-    strLike,
+    strLike, genId
 }

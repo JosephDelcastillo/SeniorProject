@@ -13,7 +13,7 @@ async function handleGetData() {
 
     //Goes through user list until user is found, then displays data
     userInfoList.data.every(async user => {
-        if (user.email == userEmail){
+        if (user.email === userEmail){
             
             const userInfo = document.getElementById("userInfo");
 
@@ -36,7 +36,7 @@ async function handleGetData() {
             //Since we arent tracking archival stuff yet, this marks everyone as active
             let userArchive = document.createElement('h3');
             userArchive.setAttribute("class", "card-body bg-white text-center");
-            userArchive.textContent = "Archive Statue: " + "Active";
+            userArchive.textContent = "Archive Statue: Active";
 
             userInfo.append(userHeader, userEmail, userAccount, userArchive);  
 

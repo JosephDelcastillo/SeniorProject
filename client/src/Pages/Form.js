@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react'
-import 'bootstrap/dist/css/bootstrap.min.css'
+import Question from '../Components/Question'
+import Swal from 'sweetalert2';
+//import 'bootstrap/dist/css/bootstrap.min.css'
 
 
 
@@ -67,8 +69,30 @@ const BuildForm = () => {
     )
 }
 
+
+const inputByID = (id) => document.getElementById(id).value;
+
 //Display Page
-function Form() {
+function Form({api}) {
+    const [serverQuestionData, setServerQuestionData] = useState([{}]);
+
+    useEffect(() => {
+        api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
+    },[setServerQuestionData,api])
+
+
+    const formSubmit = e => {
+        let input = [];
+        serverQuestionData.forEach(({id}) => input.push({ id, value: inputByID(id) }));
+        
+        api({ func: 'AddSubmission', data: input }).then(({ success, message, data }) => {
+            console.log(success);
+            console.log(data); 
+            if(!success) Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
+            if(success) Swal.fire({ title: 'Successfull Submitted', icon: 'success'}).then(e => window.location.pathname = '/dashboard/response/' + data)
+        })
+    }
+
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -76,8 +100,12 @@ function Form() {
             </div>
             <div className='card-body'>
                 <div className="panel">
-                    <hr />
-                    {BuildForm()}
+                    {(serverQuestionData && serverQuestionData.length > 0)?
+                    (<form>
+                        {serverQuestionData.map(({id, type, text}, i) => (<Question key={id} number={i} id={id} type={type} text={text}/>))}
+
+                        <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
+                    </form>):(<></>)}
                 </div>
             </div>
         </div>
