@@ -21,6 +21,14 @@
 function addUser (data, sendFunc) {
     Data_model.addUser(data, sendFunc);
 }
+ //Get Questions
+function getQuestions (sendFunc) {
+    Data_model.getQuestions(sendFunc);
+}
+//Get Archive
+function getArchive (sendFunc){
+    Data_model.getArchive(sendFunc);
+}
 
 //Get Users
 function getUsers (sendFunc) {
@@ -51,14 +59,14 @@ function getStaff(input, sendFunc) {
     Data_model.runAuthorization(token, Data_model.AUTH_ROLES.Admin, sendFunc, (send) => { Data_model.getStaff(data.search, send) }); 
 }
 
-module.exports = { 
+module.exports = {
     getAllSubmissions, 
-    attemptLogin,
+    getQuestions, 
+    attemptLogin, 
     getQuestion,
+    getArchive, 
     getReport,
-    getStaff
+    getUsers,
+    getStaff,
+    addUser
 };
-  
- module.exports = {
-     getAllSubmissions, attemptLogin, addUser, getUsers
- };

@@ -25,6 +25,14 @@ app.get("/api", (req, res) => { Data_Controller.getAllSubmissions((data) => res.
  
 // Login
 app.post("/api/user", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
+// Login 
+// app.post("/api/questionEdit", (req, res) => { Data_Controller.attemptLogin(req.body, (data) => res.json(data)); })
+app.get("/api/form", (req, res) => { 
+    Data_Controller.getQuestions((data) => res.json(data)); 
+})
+app.get("/api/archive", (req, res) => { 
+    Data_Controller.getArchive((data) => res.json(data)); 
+})
   
 // Add New User
 app.post("/api/newUser", (req, res) => { Data_Controller.addUser(req.body, (data) => res.json(data)); }); 

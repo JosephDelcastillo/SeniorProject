@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Swal from 'sweetalert2';
-
-//constants
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 
  
 /**
@@ -19,21 +16,16 @@ function NewUser({ getToken, api }) {
         e.preventDefault();
 
         //Sends info to database to create user
-        async function createUser({name, password, role, email}) {
-            const { success, data } = await api({ func: 'UserCreate', data: {"name": name, "password": password, "type": role, "email": email}});
-            if(success) {
-                Swal.fire({title: "User Created Successfully!", icon: 'success'}).then(function() {
-                    window.location = "/dashboard/users";
-                });
-                console.log(success);
-            } else {
-                Swal.fire({title: "Could Not Create User", icon: 'error'})
-                console.log(response);
-            }
+        const { success, data } = await api({ func: 'UserCreate', data: {"name": name, "password": password, "type": role, "email": email}});
+        if(success) {
+            console.log(data);
+            Swal.fire({title: "User Created Successfully!", icon: 'success'}).then(function() {
+                window.location = "/dashboard/users";
+            });
+        } else {
+            Swal.fire({title: "Could Not Create User", icon: 'error'})
+            console.log(data);
         }
-
-        //Triggers the create user function to send data to the server and gets either a success or failure back
-        let response = await createUser({name, email, password, role});
  
     }
  

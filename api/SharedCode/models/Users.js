@@ -92,7 +92,7 @@ async function GetStaff (search) {
 
 async function GetAllUsers(){
     return new Promise(async resolve => {
-        const query = `SELECT u.id, u.email
+        const query = `SELECT u.id, u.email, u.name
         FROM u 
         ORDER BY u.email`
 
@@ -180,12 +180,12 @@ async function Login ({email, password}) {
  * @param {Function} sendFunc To Return Data
  * @param {Function} successAction Action to do if authorized
  */
-async function Authorize (token, requirement) {
+async function Authorize (token, requirement = false) {
     return new Promise(resolve => {
         // TODO: Fill this in with an actual token processor 
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve('ASD8-ASDc-aaAScds');
+        if ( token ) resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f");
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 

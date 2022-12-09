@@ -1,6 +1,4 @@
-//import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
 import Swal from 'sweetalert2';
 
 // Constants 
@@ -58,7 +56,3 @@ export default function Login({ getToken, setToken, api}) {
     </div>
   )
 }
-
-/*  Login.propTypes = {
-  setToken: PropTypes.func.isRequired
-};  */

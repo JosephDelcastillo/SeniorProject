@@ -1,8 +1,5 @@
 import React from 'react';
 
-//constants
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
-
 //Displays user info
 async function displayUser(user) {
             
@@ -22,7 +19,7 @@ async function displayUser(user) {
 
         let userAccount = document.createElement('h3');
         userAccount.setAttribute("class", "card-body bg-white text-center");
-        userAccount.textContent = "Account Type: " + "Staff";
+        userAccount.textContent = "Account Type: Staff";
 
         let userArchive = document.createElement('h3');
         userArchive.setAttribute("class", "card-body bg-white text-center");
@@ -58,9 +55,9 @@ function UserPage({ getToken, api }) {
             <div id="userInfo"></div>
 
             <div className="text-center">
-                    <a className='btn btn-outline-primary col-3 mt-5'> Edit </a>
-                    <a className='btn btn-outline-primary col-3 mt-5'> Archive Account </a>
-                    <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
+                    <button className='btn btn-outline-primary col-3 mt-5'> Edit </button>
+                    <button className='btn btn-outline-primary col-3 mt-5'> Archive Account </button>
+                    <button className='btn btn-outline-primary col-3 mt-5'> Reset Password </button>
             </div>
 
         </div>
