@@ -60,7 +60,7 @@ async function Authorize (token, requirement) {
         // TODO: Fill this in with an actual token processor 
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve(true);
+        if ( token ) resolve('ASD8-ASDc-aaAScds');
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 

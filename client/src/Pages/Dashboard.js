@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 /**
  * Dashboard Page 
@@ -6,27 +7,29 @@ import React from 'react';
  * @returns {React.Component} 
  */
 function Dashboard({ getToken }) {
+    const [quote, setQuote] = new useState({})
+    
+    useEffect(() => {
+        axios.get('https://seussology.info/api/quotes/random/1').then(response => setQuote({text: response.data[0].text, book: response.data[0].book.title}));
+    }, [setQuote])
+
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
                 <h1> Dashboard </h1>
             </div>
             <div className="card-body text-center">
-                <p>
-                    <a href='/dashboard/form' className='btn btn-light'> Form </a> <br />
-                </p>
-                <p>
-                    <a href='/dashboard/responses' className='btn btn-light'> Responses </a> <br />
-                </p>
-                <p>
-                    <a href='/dashboard/report' className='btn btn-light'> Report </a> <br />
-                </p>
-                <p>
-                    <a href='/dashboard/newuser' className='btn btn-light'> New User </a> <br />
-                </p>
-                <p>
-                    <a href='/dashboard/users' className='btn btn-light'> Users </a> <br />
-                </p>
+                {(quote && quote.text && quote.book) && (
+                    <figure>
+                        <blockquote className="blockquote">
+                            <p>{quote.text}</p>
+                        </blockquote>
+                        <figcaption className="blockquote-footer">
+                            Dr. Suess, <cite title="Source Title">{quote.book}</cite>
+                        </figcaption>
+                    </figure>
+                )}
+                <img src='https://via.placeholder.com/500/0000FF/png?text=PlaceHolder' alt='PlaceHolder' />
             </div>
         </div>
     )
