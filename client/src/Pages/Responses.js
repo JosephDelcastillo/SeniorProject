@@ -1,9 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import editIcon from '../Media/editicon.png'
-import deleteIcon from '../Media/deleteicon.png'
-import axios from 'axios'
-
-const API_URL =  'GetAllSubmissions';
 
 /**
  *  Responses Page

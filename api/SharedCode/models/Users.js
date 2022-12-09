@@ -47,6 +47,22 @@ async function GetAllUsers(){
     })
 }
 
+async function GetUsersFromArray(array = []){
+    return new Promise(async resolve => {
+        if(array.length < 1) resolve(false);
+
+        let query = `SELECT u.id, u.name, u.email FROM u WHERE `
+        array.forEach((id, i) => query+=`"${id}" = u.id ${(i<(array.length-1))? "OR ":" "}`);
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+
 
 // *** Authorization ***
 function Login ({email, password}) {
@@ -100,5 +116,6 @@ module.exports = {
     GetStaff,
     Login,
     Create,
-    GetAllUsers
+    GetAllUsers,
+    GetUsersFromArray
 }
