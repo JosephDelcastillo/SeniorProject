@@ -21,7 +21,7 @@ export default class RouteController extends React.Component {
             <Routes>
                 <Route path="/" element={<Home />} />
                 {(this.props.getToken())?(<>
-                    <Route path="/logout" element={<Logout resetToken={this.props.resetToken} />} />
+                    <Route path="/logout" element={<Logout resetToken={this.props.resetToken}  />} />
                     <Route path="/dashboard" element={<Dashboard getToken={this.props.getToken} />} />
                     <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} />} />
@@ -31,7 +31,7 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/user" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/profile" element={<Profile getToken={this.props.getToken} api={this.props.api} />} />
                 </>):(<></>)}
-                <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} />} />
+                <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             </div>

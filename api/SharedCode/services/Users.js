@@ -32,11 +32,23 @@ async function GetStaff(input) {
     }
 }
 
-async function Login (email, password) {
+//async function Login (email, password) {
+async function Login (input) {
+    console.log("Made it to service!!");
+    const { email, password } = input.data;
+
+    console.log("email: " + email);
+    console.log("password: " + password);
     try {
-        const login = model.Login({ email, password });
-        return login;
+        console.log('Attempt Login')
+        const login = await model.Login({ email, password });
+        console.log('Login Complete')
+        console.log(login)
+        if(login === false) return new Reply({point: 'Login' });
+
+        return new Reply({ point: 'Login', data: login, success: true });
     } catch (error) {
+        console.log("Error in services triggered");
         return new Reply({ point: 'Login Inquiry' });
     }
 }

@@ -94,52 +94,50 @@ async function GetStaff (search) {
 
 // *** Authorization ***
 async function Login ({email, password}) {
-    return Promise(async resolve => {
-        let search = db_dev.Users.rows.find(u => tb.strLike(u.email, email));
-        if ( typeof search === "undefined" ) {
-            resolve(new Reply({ point: 'Find User' })) 
+    return new Promise(async resolve => {
+        /**
+         * Login Process
+         * 
+         * 1) Query for Matching Email
+         * 2) Authorize Pass 
+         *      *3) Query Matching Session
+         * 4) Create Session 
+         * 5) Return Token and Attr: User Type  
+         */
+        /******** Step 1: Query for Matching Email ********/
+        let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
+        FROM u WHERE u.email = "${email.toLowerCase()}"`;
+        
+        const { resources: search } = await Users.items.query(query).fetchAll();
+        if (search && search.length <= 0) {
+            resolve(false);
         }
-
-        /*  //Checks password against hash
-        const auth = tb.compareHashes(password, search.hash);
-        if (auth) {
-            let todayDate = new Date();
-            //Make token with found user and user salt
-            //TODO: Figure out what actually needs to be in the token
-            const token = jwt.sign({search}, 'salt???', { expiresIn: '48h' });
-
-            //TODO: insert into user table
-            const query = `UPDATE u
-            SET (f_token = "%${token}%", f_salt = "%${search}%", f_created = "%${todayDate}%")
-            WHERE u.id LIKE "%${search.id}%" `
-
-            //Put in DB  
-            const result = await Users.items.query(query);
-
-            const sessionId = tb.genId();
-
-            //TODO: insert into session table
-                const querys = {
-                    id: sessionId,
-                    user: search.id,
-                    token: token,
-                    created: todayDate
-                };
-
-                const success = await Sessions.items.create(querys);
-
-            resolve(new Reply({ data: token, success: true, point: 'Login'}))
+        
+        /******** Step 2: Authorize Password ********/
+        const isAuthorized = search[0].pass === await tb.hashing(password, search[0].salt);
+        if (!isAuthorized) {
+            resolve(false);
         } else {
-            resolve(new Reply({ point: 'Authenticate User' }))
-        } */
-
-         let user = db_dev.Users.rows.find(u => tb.strLike(u.password, password));
-        if( typeof user === "undefined" ) {
-            resolve(new Reply({ point: 'Authenticate User' }))
-        }  
-        //TODO: Add to sessions and return valid key 
-        //resolve(new Reply({ data: 'jds8a-AD78B-a79NiP-as89CNj', success: true, point: 'Login'}))
-        //resolve(new Reply({ data: token, success: true, point: 'Login'}))
+            
+            /******** Step 3: Check Session ********/
+            // TODO: Fill this Out 
+            
+            /******** Step 4: Creation Session ********/
+            const CurrentUser = search[0];
+            
+            const now = new Date();
+            const session = {
+                id: await tb.genId(),
+                user: CurrentUser.id,
+                token: await tb.genId(),
+                created: now.toISOString()
+            }
+            
+            const { resource: newSession } = await Sessions.items.create(session);
+            if(!newSession) resolve(false);
+            /******** Step 5: Return Token ********/
+            resolve ({ token: newSession.token, attr: CurrentUser.type });
+        }
     })
 }
 

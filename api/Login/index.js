@@ -3,6 +3,7 @@ const service = require('../SharedCode/services/Users');
 
 module.exports = async function (context, req) {
     context.log('JavaScript HTTP trigger function processed a request.');
+    context.log('req: ' + req);
     if (!req.body) {
         return context.res = {
             status: 400,
@@ -21,6 +22,8 @@ module.exports = async function (context, req) {
         }
 
         const result = await service.Login(data);
+
+        console.log("result in index is: " + result);
         if(!result) {
             return context.res = {
                 status: 400,
@@ -31,6 +34,8 @@ module.exports = async function (context, req) {
             body: result
         };
     } catch (error) {
+        context.log('Error in index.js triggered');
+        context.log("error in index.js: " + error);
         return context.res = {
             status: 500,
             body: error 
