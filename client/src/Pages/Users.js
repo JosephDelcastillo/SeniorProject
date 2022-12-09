@@ -1,10 +1,6 @@
 import React from 'react';
 import viewIcon from '../Media/viewicon.png';
  
-//Grabs user data from server
-async function getUsers() {
-    return fetch('/api/getUsers').then(data => data.json());
-}
 
 //Saves user email to session storage and redirects to user page of specified user
 function viewUser(userEmail) {
@@ -40,33 +36,37 @@ async function displayUsers(userInfo) {
     let userEmail = document.createElement('td');
     userEmail.textContent = userInfo.email;
 
+    //API does not currently return!!!!!
+    //TODO: add role to API
     let userRole = document.createElement('td');
-    userRole.textContent = userInfo.role;
+    userRole.textContent = "NA";
 
-    //Since we arent tracking archival stuff yet, this marks everyone as active
     let userArchive = document.createElement('td');
-    userArchive.textContent = "N";
+    userArchive.textContent = userInfo.archived;
 
     newRow.append(viewButtonBox, userName, userEmail, userRole, userArchive);
     tableUsers.append(newRow);
 } 
 
-//Iterates through users in table and sends to display function
-async function handleGetData() {
-    let userInfoList = await getUsers();
-
-    userInfoList.data.forEach(async user => {
-        await displayUsers(user);
-    });
-}
  
 /**
  * Users Page
  * @returns {React.Component}
  */
-function Users() {
-    //Triggers handleGetData function to get user info from server
-    handleGetData();
+function Users({ getToken, api }) {
+    //Triggers getUsers function to get user info from server
+    getUsers();
+
+    //Grabs user data from database
+    async function getUsers() {
+        const { success, data } = await api({ func: 'GetStaff', data: {"search": ""}});
+        if (success) {
+            data.forEach(async user => {
+                await displayUsers(user);
+            })
+        }
+    }
+
 
     return (
         <div className="card m-2 mt-5 border-none">

@@ -1,18 +1,75 @@
 // Import 
 const { Users, Sessions } = require('../lib/DBConnection');
-const db_dev = require('../lib/DBDevelopment');
-const Reply = require('../lib/Reply');
 const tb = require('../lib/Helpers');
 
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
-async function Create (data) {
-    return new Promise(resolve => {
-        const { id } = data;
+//used to just accept data
+async function Create ({name, email, password, type}) {
+    return new Promise(async resolve => {
+        console.log(name + email + password + type);
 
-        // Replace with New User ID or other reference 
-        resolve({ id, table: table.id });
+        //checks if user already exists
+        let queryUsers = `SELECT u.email
+            FROM u 
+            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${email}%" OR u.email LIKE "%${email}%" )
+            ORDER BY u.name`
+        
+            const { resources } = await Users.items.query(queryUsers).fetchAll();
+
+            //if email already in use, send back a false
+            if (resources) {
+               resolve(false);
+            } 
+
+            //check that email is an email
+            let emailValid = /\S+@\S+\.\S+/;
+            if (!emailValid.test(email)) {
+                resolve(false);
+            }
+
+            
+            const salt = await tb.genSalt();
+            console.log(salt);
+
+            const saltPass = await tb.hashing(password, salt);
+            console.log(saltPass);
+
+            const userId = await tb.genId();
+            console.log(userId);
+
+            //Check if the id is already in use
+            const idQuery = `SELECT u.name
+            FROM u 
+            WHERE u.id LIKE "${search}"`
+            let idCheck = await Users.items.query(idQuery).fetchAll();
+
+            //generates new id if in use already
+            if (idCheck) {
+                const userId = await tb.genId();
+                console.log(userId);
+            }
+
+                //puts everything into database
+                const query = {
+                    id: userId,
+                    archived: false,
+                    name,
+                    email,
+                    pass: saltPass,
+                    salt: salt,
+                    type: AUTH_ROLES.Staff,
+                    f_token: "",
+                    f_salt: "",
+                    f_created: ""
+                };
+
+                console.log(query);
+                const result = await Users.items.create(query);
+                console.log(result);
+
+       resolve(true);
     });
 }
 
@@ -33,19 +90,55 @@ async function GetStaff (search) {
 }
 
 // *** Authorization ***
-function Login ({email, password}) {
-    return Promise(resolve => {
-        let search = db_dev.Users.rows.find(u => tb.strLike(u.email, email));
-        if ( typeof search === "undefined" ) {
-            resolve(new Reply({ point: 'Find User' })) 
+async function Login ({email, password}) {
+    return new Promise(async resolve => {
+        /**
+         * Login Process
+         * 
+         * 1) Query for Matching Email
+         * 2) Authorize Pass 
+         *      *3) Query Matching Session
+         * 4) Create Session 
+         * 5) Return Token and Attr: User Type  
+         */
+        /******** Step 1: Query for Matching Email ********/
+        let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
+        FROM u WHERE u.email = "${email.toLowerCase()}"`;
+        
+        console.log('Pre-query')
+        const { resources: search } = await Users.items.query(query).fetchAll();
+        if (search && search.length <= 0) {
+            console.log(search)
+            resolve(false);
+            return;
         }
-
-        let user = db_dev.Users.rows.find(u => tb.strLike(u.password, password));
-        if( typeof user === "undefined" ) {
-            resolve(new Reply({ point: 'Authenticate User' }))
-        } 
-        // TODO: Add to sessions and return valid key 
-        resolve(new Reply({ data: 'jds8a-AD78B-a79NiP-as89CNj', success: true, point: 'Login'}))
+        
+        /******** Step 2: Authorize Password ********/
+        const isAuthorized = search[0].pass === await tb.hashing(password, search[0].salt);
+        if (!isAuthorized) {
+            resolve(false);
+            return;
+        } else {
+            
+            /******** Step 3: Check Session ********/
+            // TODO: Fill this Out 
+            
+            /******** Step 4: Creation Session ********/
+            const CurrentUser = search[0];
+            
+            const now = new Date();
+            const session = {
+                id: await tb.genId(),
+                user: CurrentUser.id,
+                token: await tb.genId(),
+                created: now.toISOString()
+            }
+            
+            const { resource: newSession } = await Sessions.items.create(session);
+            if(!newSession) resolve(false);
+            /******** Step 5: Return Token ********/
+            resolve ({ token: newSession.token, attr: CurrentUser.type });
+        }
     })
 }
 

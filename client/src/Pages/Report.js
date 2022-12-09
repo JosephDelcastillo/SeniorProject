@@ -107,11 +107,12 @@ function Report({ api, isAdmin }) {
                 </form>
                 <hr className='my-4' />
                 {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
-                    backendData.map(({ name, data, goal }) => (
+                    backendData.map(({ name, data, goal }, i) => (
                         <div className='w-100 my-3 border'>
-                            <HighChart key={name} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
+                            <HighChart key={name??i} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>
                     ))
+                    // <p>{JSON.stringify(backendData[0].data)}</p>
                 ) : (<></>)}
             </div>
         </div>

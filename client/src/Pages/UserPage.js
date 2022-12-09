@@ -1,59 +1,55 @@
 import React from 'react';
 
-//Grabs user data from server
-async function getUsers() {
-    return fetch('/api/getUsers').then(data => data.json());
-}
- 
-//Gets user info and displays it
-async function handleGetData() {
-    const userEmail = sessionStorage.getItem("userEmail");
+//constants
+const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
 
-    let userInfoList = await getUsers();
-
-    //Goes through user list until user is found, then displays data
-    userInfoList.data.every(async user => {
-        if (user.email == userEmail){
+//Displays user info
+async function displayUser(user) {
             
-            const userInfo = document.getElementById("userInfo");
+        const userInfo = document.getElementById("userInfo");
 
-            let userHeader = document.createElement('div');
-            userHeader.setAttribute("class", "card-header bg-white text-center");
+        let userHeader = document.createElement('div');
+        userHeader.setAttribute("class", "card-header bg-white text-center");
 
-            let userName = document.createElement('h1');
-            userName.textContent = user.name;
+        let userName = document.createElement('h1');
+        userName.textContent = user.name;
 
-            userHeader.appendChild(userName);
+        userHeader.appendChild(userName);
 
-            let userEmail = document.createElement('h3');
-            userEmail.setAttribute("class", "card-body bg-white text-center");
-            userEmail.textContent = "User Email: " + user.email;
+        let userEmail = document.createElement('h3');
+        userEmail.setAttribute("class", "card-body bg-white text-center");
+        userEmail.textContent = "User Email: " + user.email;
 
-            let userAccount = document.createElement('h3');
-            userAccount.setAttribute("class", "card-body bg-white text-center");
-            userAccount.textContent = "Account Type: " + user.role;
+        let userAccount = document.createElement('h3');
+        userAccount.setAttribute("class", "card-body bg-white text-center");
+        userAccount.textContent = "Account Type: " + "Staff";
 
-            //Since we arent tracking archival stuff yet, this marks everyone as active
-            let userArchive = document.createElement('h3');
-            userArchive.setAttribute("class", "card-body bg-white text-center");
-            userArchive.textContent = "Archive Statue: " + "Active";
+        let userArchive = document.createElement('h3');
+        userArchive.setAttribute("class", "card-body bg-white text-center");
+        userArchive.textContent = "Archive Status: " + user.archived;
 
-            userInfo.append(userHeader, userEmail, userAccount, userArchive);  
-
-            return false;
-        }
+        userInfo.append(userHeader, userEmail, userAccount, userArchive);  
 
         return true;
-    });
 }
 
 /**
  * User Page
  * @returns {React.Component}
  */
-function UserPage() {
+function UserPage({ getToken, api }) {
 
-    handleGetData();
+    getUser();
+
+    //Grabs user data from database
+    async function getUser() {
+        const { success, data } = await api({ func: 'GetStaff', data: {"search": sessionStorage.getItem("userEmail")}});
+        if (success) {
+            data.forEach(async user => {
+                await displayUser(user);
+            })
+        }
+    }
 
     //TODO:Connect the buttons to things
     return (

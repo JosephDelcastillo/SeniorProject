@@ -1,14 +1,20 @@
 const model = require('../models/Users');
 const { Reply } = require('../lib/Reply');
 
-async function Create (data) {
-    const { id } = data;
+async function Create (input) {
+    const { token, data } = input;
+    const { name, email, password, type } = data;
     try {
-        const res = await model.Create({ id });
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return false;
+
+        const res = await model.Create({name, email, password, type});
+
         if(res) return new Reply({ point: 'Create Generation', success: true, data: res });
         return new Reply({ point: 'Create Generation' });
     } catch(error) {
-        return new Reply({ point: 'Creation Inquiry' });
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Creation Inquiry'});
     }
 }
 
@@ -26,11 +32,23 @@ async function GetStaff(input) {
     }
 }
 
-async function Login (email, password) {
+//async function Login (email, password) {
+async function Login (input) {
+    console.log("Made it to service!!");
+    const { email, password } = input.data;
+
+    console.log("email: " + email);
+    console.log("password: " + password);
     try {
-        const login = model.Login({ email, password });
-        return login;
+        console.log('Attempt Login')
+        const login = await model.Login({ email, password });
+        console.log('Login Complete')
+        console.log(login)
+        if(login === false) return new Reply({point: 'Login' });
+
+        return new Reply({ point: 'Login', data: login, success: true });
     } catch (error) {
+        console.log("Error in services triggered");
         return new Reply({ point: 'Login Inquiry' });
     }
 }
