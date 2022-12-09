@@ -21,11 +21,7 @@ async function genSalt () {
     return await bcrypt.genSalt(10);
 }
 
-async function compareHashes (password, hash) {
-    return await bcrypt.compare(password, hash);
-}
-
 
 module.exports = {
-    strLike, genSalt, hashing, genId, compareHashes
+    strLike, genSalt, hashing, genId
 }
