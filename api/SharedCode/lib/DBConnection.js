@@ -1,5 +1,5 @@
 // Imports 
-const CosmosClient = require('@azure/cosmos').CosmosClient;
+const { CosmosClient } = require('@azure/cosmos');
 require('dotenv').config();
 
 // Reference Constants/Configuration 
