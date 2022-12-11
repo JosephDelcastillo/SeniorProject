@@ -34,9 +34,9 @@ async function AddSubmission({ user, data }){
         // Create Submit 
         const now = new Date();
         const submit = {
-            id: tb.genId(),
+            id: await tb.genId(),
             user, 
-            create: now.toISOString(),
+            created: now.toISOString(),
             modified_by: "",
             modified: ""
         }
@@ -45,7 +45,7 @@ async function AddSubmission({ user, data }){
         // Search DB For Matches  
         const { resource: submission } = await Submits.items.create(submit); 
 
-        if(!submission) resolve(false);
+        if(!submission) { resolve(false); return false; }
 
         // Create Responses
         let fails = 0;
@@ -62,6 +62,7 @@ async function AddSubmission({ user, data }){
         
         // Return Result 
         resolve(submission.id);
+        return submission.id
     })
 }
 
