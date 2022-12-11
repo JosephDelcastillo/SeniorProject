@@ -12,10 +12,10 @@ async function GetAllSubmissions(input) {
         let submissions = false;
 
         if (isAdmin) {
-            // submissions = await model.GetAllSubmissions();
+            submissions = await model.GetAllSubmissions();
         }
         else if (isStaff) {
-            // submissions = await model.GetAllSubmissions(isStaff);
+            submissions = await model.GetAllSubmissions(isStaff);
         }
         else if (submissions === false) {
             return new Reply({ point: 'Authorization' });
