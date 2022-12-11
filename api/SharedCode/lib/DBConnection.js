@@ -4,8 +4,8 @@ const CosmosClient = require('@azure/cosmos').CosmosClient;
 require('dotenv').config();
 
 // Reference Constants/Configuration 
-const key = process.env.COSMOS_KEY;
-const endpoint = process.env.COSMOS_ENDPOINT;
+const key = process.env["COSMOS_KEY"];
+const endpoint = process.env["COSMOS_ENDPOINT"];
 
 /**
  *  Databases and the Constants to Access them 
