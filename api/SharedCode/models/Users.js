@@ -20,13 +20,15 @@ async function Create ({name, email, password, type}) {
 
             //if email already in use, send back a false
             if (resources) {
-               resolve(false);
+                resolve(false);
+                return false;
             } 
 
             //check that email is an email
             let emailValid = /\S+@\S+\.\S+/;
             if (!emailValid.test(email)) {
                 resolve(false);
+                return false;
             }
 
             
@@ -51,25 +53,26 @@ async function Create ({name, email, password, type}) {
                 console.log(userId);
             }
 
-                //puts everything into database
-                const query = {
-                    id: userId,
-                    archived: false,
-                    name,
-                    email,
-                    pass: saltPass,
-                    salt: salt,
-                    type: AUTH_ROLES.Staff,
-                    f_token: "",
-                    f_salt: "",
-                    f_created: ""
-                };
+            //puts everything into database
+            const query = {
+                id: userId,
+                archived: false,
+                name,
+                email,
+                pass: saltPass,
+                salt: salt,
+                type: AUTH_ROLES.Staff,
+                f_token: "",
+                f_salt: "",
+                f_created: ""
+            };
 
-                console.log(query);
-                const result = await Users.items.create(query);
-                console.log(result);
+            console.log(query);
+            const result = await Users.items.create(query);
+            console.log(result);
 
-       resolve(true);
+        resolve(true);
+        return true;
     });
 }
 
@@ -78,14 +81,17 @@ async function GetStaff (search) {
         // Build Query 
         const query = `SELECT u.id, u.archived, u.name, u.email
             FROM u 
-            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )
+            WHERE LOWER(u.type) LIKE "${AUTH_ROLES.Staff.toLowerCase()}" 
+            ${(search && search.length > 0) && (`AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )`)}
             ORDER BY u.name`
 
+        console.log(query)
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
@@ -101,12 +107,13 @@ async function GetAllUsers(){
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
 async function GetUsersFromArray(array = []){
     return new Promise(async resolve => {
-        if(array.length < 1) resolve(false);
+        if(array.length < 1) { resolve(false); return false; }
 
         let query = `SELECT u.id, u.name, u.email FROM u WHERE `
         array.forEach((id, i) => query+=`"${id}" = u.id ${(i<(array.length-1))? "OR ":" "}`);
@@ -116,6 +123,7 @@ async function GetUsersFromArray(array = []){
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
@@ -135,21 +143,21 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email.toLowerCase()}"`;
+        FROM u WHERE LOWER(u.email) = "${email.toLowerCase()}"`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
         if (search && search.length <= 0) {
             console.log(search)
             resolve(false);
-            return;
+            return false;
         }
         
         /******** Step 2: Authorize Password ********/
         const isAuthorized = search[0].pass === await tb.hashing(password, search[0].salt);
         if (!isAuthorized) {
             resolve(false);
-            return;
+            return false;
         } else {
             
             /******** Step 3: Check Session ********/
@@ -167,9 +175,10 @@ async function Login ({email, password}) {
             }
             
             const { resource: newSession } = await Sessions.items.create(session);
-            if(!newSession) resolve(false);
+            if(!newSession) { resolve(false); return false; }
             /******** Step 5: Return Token ********/
             resolve ({ token: newSession.token, attr: CurrentUser.type });
+            return { token: newSession.token, attr: CurrentUser.type };
         }
     })
 }
@@ -185,11 +194,12 @@ async function Authorize (token, requirement = false) {
         // TODO: Fill this in with an actual token processor 
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f");
+        if ( token ) { resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f"); return "f43c2c17-c984-4f40-a929-2f12c1560f5f" }
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 
         resolve(false)
+        return false;
     })
 }
 

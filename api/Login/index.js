@@ -25,7 +25,8 @@ module.exports = async function (context, req) {
         console.log(data)
         const result = await service.Login(data);
 
-        console.log("result in index is: " + result);
+        console.log("result in index is: ");
+        console.log(result);
         if(!result) {
             return context.res = {
                 status: 400,
