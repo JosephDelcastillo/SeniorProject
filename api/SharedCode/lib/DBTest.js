@@ -23,14 +23,17 @@ const CONTAINERS = {
     Response: 'Responses' 
 }
 
+const client = new CosmosClient(CONFIG);
+
 
 function GetContainer(containerId = '') {
-    const client = new CosmosClient(CONFIG);
+    // const db = client.database(DATABASE_ID);
     
     console.log(Object.values(CONTAINERS))
     console.log(Object.values(CONTAINERS).includes(containerId))
     if(!Object.values(CONTAINERS).includes(containerId)) return false;
-    // return client.database(DATABASE_ID).container(containerId);
+    // if()
+    // return db.container(containerId);
     return containerId;
 }
 
