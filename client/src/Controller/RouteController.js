@@ -22,14 +22,12 @@ export default class RouteController extends React.Component {
                 <Route path="/" element={<Home />} />
                 {(this.props.getToken())?(<>
                     {(this.props.isAdmin())?(<>
-                        <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} /> {/* TODO: Replace this will Manage Form */}
-                        {/* TODO: Add Manage Users */}
-                        {/* TODO: Add Submit Form */}
+                        <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/users" element={<Users getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/user" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} api={this.props.api} />} />
                     </>):(<>
-                        <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} api={this.props.api} /> {/* TODO: Replace this will Submit Form */}
+                        <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} />} api={this.props.api} />
                         <Route path="/dashboard/user" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                     </>)}
                     <Route path="/logout" element={<Logout resetToken={this.props.resetToken} />} />

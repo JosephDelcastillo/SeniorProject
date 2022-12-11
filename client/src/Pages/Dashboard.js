@@ -29,7 +29,7 @@ function Dashboard({ getToken }) {
                         </figcaption>
                     </figure>
                 )}
-                <img src='https://via.placeholder.com/500/0000FF/png?text=PlaceHolder' alt='PlaceHolder' />
+                <img src='https://via.placeholder.com/500/8888FF/png?text=PlaceHolder' alt='PlaceHolder' />
             </div>
         </div>
     )
