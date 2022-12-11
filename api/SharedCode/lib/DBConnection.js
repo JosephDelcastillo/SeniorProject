@@ -1,11 +1,10 @@
 // Imports 
-const { Container } = require('@azure/cosmos');
 const CosmosClient = require('@azure/cosmos').CosmosClient;
 require('dotenv').config();
 
 // Reference Constants/Configuration 
-const key = process.env["COSMOS_KEY"] ?? process.env["PRIMARY KEY"];
-const endpoint = process.env["COSMOS_ENDPOINT"] ?? process.env["URI"];
+const key = process.env["COSMOS_KEY"];
+const endpoint = process.env["COSMOS_ENDPOINT"];
 
 /**
  *  Databases and the Constants to Access them 
@@ -29,13 +28,11 @@ const client = new CosmosClient({ endpoint, key });
 // Create Database References 
 const DATABASE = client.database(DATABASE_ID);
 
-// Create Container References 
-const containers = {
+// Expoort Container References 
+module.exports = {
     Users: DATABASE.container(containerIds.User), 
     Sessions: DATABASE.container(containerIds.Session), 
     Questions: DATABASE.container(containerIds.Question), 
     Submits: DATABASE.container(containerIds.Submit), 
     Responses: DATABASE.container(containerIds.Response) 
 }
-
-module.exports = containers
