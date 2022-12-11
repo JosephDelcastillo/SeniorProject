@@ -12,10 +12,10 @@ async function GetAllSubmissions(input) {
         let submissions = false;
 
         if (isAdmin) {
-            submissions = await model.GetAllSubmissions();
+            // submissions = await model.GetAllSubmissions();
         }
         else if (isStaff) {
-            submissions = await model.GetAllSubmissions(isStaff);
+            // submissions = await model.GetAllSubmissions(isStaff);
         }
         else if (submissions === false) {
             return new Reply({ point: 'Authorization' });
@@ -45,7 +45,7 @@ async function GetAllSubmissions(input) {
 
 async function GetSubmission(input) {
     try {
-          /* Get Submission Data Steps
+        /* Get Submission Data Steps
          * 1. Submission Data - data.id
          * 2. User Data - submission.user | submission.modified_by
          * 3. Response Data - data.id 
