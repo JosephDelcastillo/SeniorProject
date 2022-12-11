@@ -2,6 +2,7 @@
 const service = require('../SharedCode/services/Users');
 
 module.exports = async function (context, req) {
+    context.log.verbose('JS Comment Test');
     context.log('JavaScript HTTP trigger function processed a request.');
     context.log('req: ' + req);
     if (!req.body) {
