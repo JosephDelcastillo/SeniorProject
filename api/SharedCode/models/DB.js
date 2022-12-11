@@ -1,11 +1,10 @@
-const { GetContainer, CONTAINERS } = require('../lib/DBTest');
+const { Users } = require('../lib/DBConnection');
 
 // Test
 async function Test (data) {
     return new Promise(async resolve => {
-        const table = GetContainer(CONTAINERS.User);
-        resolve ({ table });
-        return { table };
+        resolve ({ Users });
+        return { Users };
     });
 }
 
