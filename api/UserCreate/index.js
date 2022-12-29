@@ -13,12 +13,13 @@ module.exports = async function (context, req) {
     try {
         const data = req.body;
         
-        if (!data.id) { 
+        //Why do we need the ID? We are creating a new user. There is no ID yet
+        /* if (!data.id) { 
             return context.res = {
                 status: 400,
                 body: "Please pass id in the request body" + req.body
             };
-        }
+        } */
 
         const result = await service.Create(data);
         if(!result) {

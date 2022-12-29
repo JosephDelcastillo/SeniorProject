@@ -13,7 +13,7 @@ function isAdmin () {
   const token = getToken();
   if(!token || !JSON.parse(token)) return false;
   const obj = JSON.parse(token)
-  return typeof obj.attr === "string" && obj.attr.toLowerCase() === "administrator"
+  return typeof obj.attr === "string" && obj.attr.toLowerCase() === "admin"
 }
 
 const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
@@ -42,7 +42,6 @@ async function api({ func, data, action }) {
       // Remove Last '&'
       url = url.slice(0, -1);
   }
-
   // Setup Data (With Token Possible)
   const DATA = getToken() ? { token: JSON.parse(getToken()), data } : data;
 

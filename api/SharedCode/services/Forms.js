@@ -17,6 +17,21 @@ async function GetQuestion(input) {
     }
 }
 
+async function AddSubmission (input) {
+    try {
+        const { token, data } = input;
+        const authorized = await Authorize(token); 
+        if(!authorized) return new Reply({ point: 'Authorization' });
+        
+        const success = await model.AddSubmission({ user: authorized, data });
+        if(success) return new Reply({ point: 'Add Submission', success: true, data: success });
+        return new Reply({ point: 'Add Submission' });
+    } catch (error) {
+        return new Reply({ point: 'Add Submission Inquiry' });
+    }
+}
+
 module.exports = {
+    AddSubmission,
     GetQuestion
 }

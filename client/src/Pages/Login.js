@@ -1,13 +1,8 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import { Navigate } from 'react-router-dom';
+import React from 'react';
 import Swal from 'sweetalert2';
 
-async function loginUser(credentials) {
-  return { success: true, data: { key: '701a7ffe-e479-459a-9056-99727008dfb5', attr: 'Administrator' } }
-  // return fetch('/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(credentials) })
-  // .then(data => data.json())
-}
+// Constants 
+const inputById = id => document.getElementById(id).value;
 
 /**
  *  Login Page
@@ -15,25 +10,26 @@ async function loginUser(credentials) {
  *  Manages Logging In 
  * @returns {React.Component} 
  */
-export default function Login({ getToken, setToken }) {
-  const [username, setEmail] = useState();
-  const [password, setPassword] = useState();
-  
-  if(getToken && getToken()) {
-    return (
-      <Navigate to="/dashboard" />
-    )
-  }
-
+export default function Login({ getToken, setToken, api}) {
   const handleSubmit = async e => {
     e.preventDefault();
-    const token = await loginUser({ username, password });
-    if(token.success) { 
-      setToken(token.data);
-      window.location.pathname = "dashboard";
-    } else {
-      Swal.fire({title: "Login Failed", icon: 'error'})
+
+    const data = {
+      email: inputById('email'),
+      password: inputById('password')
     }
+
+    if(!data.email) Swal.fire({ title: 'Missing Email', text: 'Email Is required', icon: 'error' });
+    if(!data.password) Swal.fire({ title: 'Missing Password', text: 'Password Is required', icon: 'error' });
+
+    if(!data.email || !data.password) return false;
+    const token = await api({ func: 'Login', data: { data } });
+    if(!token.success) { 
+      Swal.fire({title: "Login Failed", text: 'Check Your Email/Password', icon: 'error'});
+      return false;
+    }
+    setToken(token.data);
+    window.location.pathname = "dashboard";
   }
 
   return(
@@ -46,11 +42,11 @@ export default function Login({ getToken, setToken }) {
         <form onSubmit={handleSubmit}>
           <div className="mb-3 col-4 mx-auto mt-2">
             <label className="form-label">Email</label>
-            <input className="form-control" autoComplete="off" type="text" onChange={e => setEmail(e.target.value)} />
+            <input className="form-control" id='email' autoComplete="off" type="text" />
           </div>
           <div className="mb-3 col-4 mx-auto mt-5">
             <label className="form-label">Password</label>
-            <input className="form-control" autoComplete="off" type="password" onChange={e => setPassword(e.target.value)} />
+            <input className="form-control" id='password' autoComplete="off" type="password" />
           </div>
           <div>
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Submit</button>
@@ -60,7 +56,3 @@ export default function Login({ getToken, setToken }) {
     </div>
   )
 }
-
-Login.propTypes = {
-  setToken: PropTypes.func.isRequired
-};

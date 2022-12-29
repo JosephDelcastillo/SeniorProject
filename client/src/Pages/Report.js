@@ -51,7 +51,7 @@ function Report({ api, isAdmin }) {
                 end: inputByID("eDate") || new Date().toISOString().slice(0, 10)
             }, 
             graphType: inputByID("graphType"),
-            questions: questionSelected.map(q=>q.id) || [{}]
+            questions: questionSelected.map(q => q.id) || [{}]
         }
 
         // Validation 
@@ -100,16 +100,16 @@ function Report({ api, isAdmin }) {
             <div className='card-body'>
                 <form className='form' onSubmit={handleSubmit}>
                     {(isAdmin())?(
-                        <ReportAdmin GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
+                        <ReportAdmin key='Admin' GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
                     ):(
-                        <ReportStaff GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
+                        <ReportStaff key='Staff' GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
                     )}
                 </form>
                 <hr className='my-4' />
                 {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
-                    backendData.map(({ name, data, goal }) => (
+                    backendData.map(({ name, data, goal }, i) => (
                         <div className='w-100 my-3 border'>
-                            <HighChart key={name} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
+                            <HighChart key={name??i} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>
                     ))
                     // <p>{JSON.stringify(backendData[0].data)}</p>

@@ -18,7 +18,7 @@ function NavBar({ getToken, isAdmin }) {
                                 <Link className='nav-link dropdown-toggle' role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Users
                                 </Link>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul className="dropdown-menu dropdown-menu-end">
                                     <li><Link className='dropdown-item' to="dashboard/users">Manage Users</Link></li>
                                     <li><Link className='dropdown-item' to="dashboard/newuser">Add User</Link></li>
                                 </ul>
@@ -27,7 +27,7 @@ function NavBar({ getToken, isAdmin }) {
                                 <Link className='nav-link dropdown-toggle' role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Responses
                                 </Link>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <ul className="dropdown-menu dropdown-menu-end">
                                     <li><Link className='dropdown-item' to="dashboard/responses">Manage Responses</Link></li>
                                     <li><Link className='dropdown-item' to="dashboard/addResponse">Add Response</Link></li>
                                 </ul>
@@ -40,7 +40,7 @@ function NavBar({ getToken, isAdmin }) {
                             <Link className='nav-link dropdown-toggle' role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Profile
                             </Link>
-                            <ul class="dropdown-menu dropdown-menu-end">
+                            <ul className="dropdown-menu dropdown-menu-end">
                                 <li><Link className='dropdown-item' to="profile">Your Profile</Link></li>
                                 <li><Link className='dropdown-item' to="logout">Logout</Link></li>
                             </ul>

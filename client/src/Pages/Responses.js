@@ -1,88 +1,69 @@
-import React from 'react'
-import editIcon from '../Media/editicon.png';
-import viewIcon from '../Media/viewicon.png';
-import deleteIcon from '../Media/deleteicon.png';
+import React, { useState, useEffect } from 'react'
+
 /**
  *  Responses Page
  * 
  *  Manages Responses 
  * @returns {React.Component} 
  */
-function Responses() {
+
+
+function Responses({api}) {
+    const [entryData, setEntryData] = useState([{}]);
+
+    const deleteSubmission = id => {
+        const newEntryData = {users: entryData.users, submissions: entryData.submissions.filter(s => s.id !== id)};
+        setEntryData(newEntryData);
+        //TO DO: TRIGGER API CALL, IF SUCCESSFUL SET ENTRYDATA TO API RESULT
+    }
+
+    useEffect(() => {
+        api({func: "GetAllSubmissions", data: "test"}).then(({success, data}) => {
+            if(success){
+                setEntryData(data);
+            }
+            
+        })
+    }, [api,setEntryData]);
+
     return (
-        /*This is just dummy data to imitate data from database. Will be using a for loop to get data from database and output table dynamically*/
-        <>
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
-                <h1> Responses - All Users </h1> 
+                <h1> Responses </h1>
             </div>
-        </div>
-            <div class="panel">
-                <table class="table tableHover">
+            <div className='card-body'>
+                <hr />
+               {(entryData && entryData.submissions && entryData.users)? (
+                <div className="panel">
+                <table className="table tableHover">
                     <thead>
                         <tr>
-                            <th scope="col" width="180px"></th>
-                            <th scope="col">Username</th>
-                            <th scope="col" >Entry Date</th>
-                            <th scope="col">Last Editted</th>
-                        </tr>
+                            <th scope ="col" width="180px">&nbsp;</th>
+                            <th scope = "col">Email</th>
+                            <th scope = "col">Date</th>
+                            <th scope = "col">Modified By</th>
+                            <th scope = "col">Modified Date</th>
+                        </tr>                        
                     </thead>
                     <tbody>
-                        <tr>
-                            <th scope="row">
-                                &nbsp;&nbsp;<button class="iconButton" onclick="viewReponse()"><img src={viewIcon} alt='view' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="editResponse()"><img src={editIcon} alt='edit' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="deleteResponse()"><img src={deleteIcon} alt='delete' height='20px'/></button>&nbsp;&nbsp;
-                            </th>
-                            <td>jdoe@janfl.com</td>
-                            <td>9/18/22</td>
-                            <td>jdoe@janfl.com</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                &nbsp;&nbsp;<button class="iconButton" onclick="viewReponse()"><img src={viewIcon} alt='view' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="editResponse()"><img src={editIcon} alt='edit' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="deleteResponse()"><img src={deleteIcon} alt='delete' height='20px'/></button>&nbsp;&nbsp;
-                            </th>
-                            <td>smae@janfl.com</td>
-                            <td>9/20/22</td>
-                            <td>smae@janfl.com</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                &nbsp;&nbsp;<button class="iconButton" onclick="viewReponse()"><img src={viewIcon} alt='view' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="editResponse()"><img src={editIcon} alt='edit' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="deleteResponse()"><img src={deleteIcon} alt='delete' height='20px'/></button>&nbsp;&nbsp;
-                            </th>
-                            <td>aexample@janfl.com</td>
-                            <td>9/22/22</td>
-                            <td>tguthrie@janfl.com</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">
-                                &nbsp;&nbsp;<button class="iconButton" onclick="viewReponse()"><img src={viewIcon} alt='view' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="editResponse()"><img src={editIcon} alt='edit' height='20px'/></button>&nbsp;&nbsp;
-                                &nbsp;&nbsp;<button class="iconButton" onclick="deleteResponse()"><img src={deleteIcon} alt='delete' height='20px'/></button>&nbsp;&nbsp;
-                            </th>
-                            <td>tguy@janfl.com</td>
-                            <td>9/24/22</td>
-                            <td>tguy@janfl.com</td>
-                        </tr>
+                        {entryData.submissions.map(submit => (
+                            <tr key={submit.id}>
+                                <td>
+                                    <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {window.location.pathname = "/dashboard/response/"+ submit.id}}></i>
+                                    <i className="fa-regular fa-trash-can text-danger pe-1 c-pointer" onClick={()=>deleteSubmission(submit.id)}></i>
+                                </td>
+                                <td>{entryData.users.find(u => (u.id === submit.user)).email}</td>
+                                <td>{submit.created}</td>
+                                <td>{(submit.modified_by)?(entryData.users.find(u => (u.id === submit.modified_by)).email):("Not Modified")}</td>
+                                <td>{submit.modified?(entryData.users.find(u => (u.id === submit.modified_by)).email):("Not Modified")}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
+                </div>
+               ):(<></>)}
             </div>
-        </>
-    );
+        </div>
+    )
 }
-
-function deleteResponse(){
-    /*Code to delete responses belongs here*/
-}
-function viewReponse(){
-    /*Code to View individual responses belongs here*/
-}
-function editResponse(){
-    /*Code to Edit individual responses belongs here*/
-}
-
 export default Responses
