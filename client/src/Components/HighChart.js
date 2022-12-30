@@ -23,7 +23,7 @@ function HighChart({ data, title, yAxis, axisMax, type }) {
     });
     const options = {
         chart: {
-            type: type ?? 'splice'
+            type: type ?? 'column'
         },
         yAxis: {
             title: {
