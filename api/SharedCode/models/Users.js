@@ -16,7 +16,7 @@ async function Create ({name, email, password, type}) {
         //checks if user already exists
         let queryUsers = `SELECT u.email
             FROM u 
-            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${email}%" OR u.email LIKE "%${email}%" )
+            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${email.toLowerCase()}%" OR u.email LIKE "%${email.toLowerCase()}%" )
             ORDER BY u.name`
         
             const { resources } = await Users.items.query(queryUsers).fetchAll();
@@ -24,28 +24,33 @@ async function Create ({name, email, password, type}) {
             //if email already in use, send back a false
             if (resources) {
                resolve(false);
+               return;
             } 
 
             //check that email is an email
             let emailValid = /\S+@\S+\.\S+/;
             if (!emailValid.test(email)) {
                 resolve(false);
+                return;
             }
 
             
             const salt = await tb.genSalt();
             console.log(salt);
+            console.log("^ salt")
 
             const saltPass = await tb.hashing(password, salt);
             console.log(saltPass);
+            console.log("^ salted password")
 
             const userId = await tb.genId();
             console.log(userId);
+            console.log("^ userID")
 
             //Check if the id is already in use
             const idQuery = `SELECT u.name
             FROM u 
-            WHERE u.id LIKE "${search}"`
+            WHERE u.id LIKE "${userId}"`
             let idCheck = await Users.items.query(idQuery).fetchAll();
 
             //generates new id if in use already
@@ -54,7 +59,21 @@ async function Create ({name, email, password, type}) {
                 console.log(userId);
             }
 
-                //puts everything into database
+            //puts everything into database based on user type
+            if (type == "admin") {
+                const query = {
+                    id: userId,
+                    archived: false,
+                    name,
+                    email,
+                    pass: saltPass,
+                    salt: salt,
+                    type: AUTH_ROLES.Admin,
+                    f_token: "",
+                    f_salt: "",
+                    f_created: ""
+                };
+            } else {
                 const query = {
                     id: userId,
                     archived: false,
@@ -67,6 +86,7 @@ async function Create ({name, email, password, type}) {
                     f_salt: "",
                     f_created: ""
                 };
+            }
 
                 console.log(query);
                 const result = await Users.items.create(query);
@@ -138,7 +158,14 @@ async function Login ({email, password}) {
             }
             
             const { resource: newSession } = await Sessions.items.create(session);
-            if(!newSession) resolve(false);
+            if(!newSession) {
+                resolve(false);
+                return;
+            }
+
+            console.log(newSession.token);
+            console.log("^ token");
+
             /******** Step 5: Return Token ********/
             resolve ({ token: newSession.token, attr: CurrentUser.type });
         }
@@ -152,16 +179,91 @@ async function Login ({email, password}) {
  * @param {Function} successAction Action to do if authorized
  */
 async function Authorize (token, requirement) {
-    return new Promise(resolve => {
+    return new Promise( async resolve => {
+        /**
+         * Authorization Process
+         * 
+         * 1) Check for token
+         * 2) See if token matches a stored token
+         *  2.5)See if token is expired
+         * 3) Check for user
+         *  3.5) See is user is archived
+         * 4) Check to see if roles match
+         * 5) Return true and user id if all checks out  
+         */
+
+        console.log("starting authorization check");
+        console.log(requirement);
+
+
+        // Check for a token
+        if (!token) {
+            resolve (false);
+            return;
+        }
+
+        console.log("parsing token:");
+        let tokenObj = JSON.parse(token);
+        console.log(tokenObj);
+
+        console.log("token:");
+        console.log(tokenObj.token);
+
+        console.log("end authorization check");
+
+        // Query for session with that token in session table
+        let query = `SELECT u.id, u.user, u.created
+        FROM u WHERE u.token = "${tokenObj.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        if (!search) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search);
+
+        console.log(search[0].user);
+
+        // Query users for a user matching that id
+        let query2 = `SELECT u.type
+        FROM u WHERE u.id = "${search[0].user}"`;
+        
+        console.log('User Query')
+        const { resources: search2 } = await Users.items.query(query2).fetchAll();
+
+        if (!search2) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search2);
+
+        // Compare user types
+
+        if (search2[0].type == "admin" && requirement == "Administrator") {
+            console.log("Auth success");
+            resolve({id: search[0].user});
+            return;
+        }
+
+        if (search2[0].type == "staff" && requirement == "Staff") {
+            console.log("Auth success");
+            resolve({id: search[0].user});
+            return;
+        }
+
         // TODO: Fill this in with an actual token processor 
+        //???? ^
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-
-        if ( token ) resolve(true);
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 
-        resolve(false)
+        console.log("Auth failed");
+        resolve(false);
     })
 }
 
