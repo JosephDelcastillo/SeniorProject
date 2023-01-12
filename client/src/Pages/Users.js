@@ -42,7 +42,7 @@ async function displayUsers(userInfo) {
     //API does not currently return!!!!!
     //TODO: add role to API
     let userRole = document.createElement('td');
-    userRole.textContent = "NA";
+    userRole.textContent = "Staff";
 
     let userArchive = document.createElement('td');
     userArchive.textContent = userInfo.archived;

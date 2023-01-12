@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
-//used to just accept data
+
 async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
         console.log(name + email + password + type);
@@ -110,6 +110,64 @@ async function GetStaff (search) {
         // Return Result 
         resolve( resources );
     })
+}
+
+async function Edit ({name, oldemail, email, type}) {
+    return new Promise(async resolve => {
+        console.log(name + email + type);
+
+            let updateQuery = `UPDATE u
+            SET `
+
+            //See if email was updated
+            if (email) {
+                console.log(email);
+
+                //check that email is an email
+                let emailValid = /\S+@\S+\.\S+/;
+                if (!emailValid.test(email)) {
+                    resolve(false);
+                    return;
+                }
+
+                let emailQuery = `email = "%${email}%"`
+                updateQuery = updateQuery.concat(emailQuery);
+
+            }
+
+            //See if name was updated
+            if (name) {
+                console.log(name);
+
+                let nameQuery = ` name = "%${name}%"`
+                updateQuery = updateQuery.concat(nameQuery);
+            }
+
+            //See if user type was updated
+            if (type) {
+                console.log(type);
+
+                if ( type == "admin") {
+                    let typeQuery = ` type = Administrator`
+                    updateQuery = updateQuery.concat(typeQuery);
+                } else {
+                    let typeQuery = ` type = Staff`
+                    updateQuery = updateQuery.concat(typeQuery);
+                }
+            }
+
+
+            let endQuery = ` WHERE u.name LIKE "%${oldemail}%" OR u.email LIKE "%${oldemail}%"`
+            updateQuery = updateQuery.concat(endQuery);
+
+
+                console.log(updateQuery);
+            //TODO!!! fix users bug to prevent messing up my Account before uncommenting the below lines
+                //const result = await Users.items.query(query);
+                //console.log(result);
+
+       resolve(true);
+    });
 }
 
 // *** Authorization ***
@@ -272,5 +330,6 @@ module.exports = {
     Authorize,
     GetStaff,
     Login,
-    Create
+    Create,
+    Edit
 }

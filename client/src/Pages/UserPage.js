@@ -58,7 +58,7 @@ function UserPage({ getToken, api }) {
             <div id="userInfo"></div>
 
             <div className="text-center">
-                    <a className='btn btn-outline-primary col-3 mt-5'> Edit </a>
+                    <a className='btn btn-outline-primary col-3 mt-5' href='/dashboard/edituser'> Edit </a>
                     <a className='btn btn-outline-primary col-3 mt-5'> Archive Account </a>
                     <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
             </div>

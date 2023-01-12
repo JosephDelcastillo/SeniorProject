@@ -6,7 +6,7 @@ async function Create (input) {
     const { name, email, password, type } = data;
     try {
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
-        if(!authorized) return false;
+        if(!authorized) return new Reply({ point: 'Authorization'});
 
         const res = await model.Create({name, email, password, type});
 
@@ -32,7 +32,7 @@ async function GetStaff(input) {
     }
 }
 
-//async function Login (email, password) {
+
 async function Login (input) {
     console.log("Made it to service!!");
     const { email, password } = input.data;
@@ -53,8 +53,26 @@ async function Login (input) {
     }
 }
 
+async function Edit (input) {
+    const { token, data } = input;
+    const { name, oldemail, email, type } = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.Edit({name, oldemail, email, type});
+
+        if(res) return new Reply({ point: 'Edit', success: true, data: res });
+        return new Reply({ point: 'Edit' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Edit'});
+    }
+}
+
 module.exports = {
     GetStaff,
     Login,
-    Create
+    Create,
+    Edit
 }
