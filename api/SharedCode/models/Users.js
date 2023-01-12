@@ -13,19 +13,25 @@ async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
         console.log(name + email + password + type);
 
+        console.log("Checking if user exists");
+
         //checks if user already exists
         let queryUsers = `SELECT u.email
             FROM u 
-            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${email.toLowerCase()}%" OR u.email LIKE "%${email.toLowerCase()}%" )
+            WHERE u.email LIKE "${email.toLowerCase()}"
             ORDER BY u.name`
         
             const { resources } = await Users.items.query(queryUsers).fetchAll();
 
+            console.log(resources);
+
             //if email already in use, send back a false
-            if (resources) {
+            if (!resources.length == 0) {
                resolve(false);
                return;
             } 
+
+            console.log("Checking if email is valid");
 
             //check that email is an email
             let emailValid = /\S+@\S+\.\S+/;
@@ -54,14 +60,17 @@ async function Create ({name, email, password, type}) {
             let idCheck = await Users.items.query(idQuery).fetchAll();
 
             //generates new id if in use already
-            if (idCheck) {
+            if (!idCheck.length == 0) {
                 const userId = await tb.genId();
                 console.log(userId);
             }
 
+            console.log("Attempting to create user");
+            let query = {};
+
             //puts everything into database based on user type
             if (type == "admin") {
-                const query = {
+                query = {
                     id: userId,
                     archived: false,
                     name,
@@ -74,7 +83,7 @@ async function Create ({name, email, password, type}) {
                     f_created: ""
                 };
             } else {
-                const query = {
+                query = {
                     id: userId,
                     archived: false,
                     name,
@@ -106,6 +115,35 @@ async function GetStaff (search) {
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+async function GetUsers (search) {
+    return new Promise(async resolve => {
+        console.log("Search");
+        console.log(search);
+
+        // Build Query 
+        let query = `SELECT u.id, u.archived, u.name, u.email, u.type
+            FROM u`
+
+        if (search) {
+            let searchQuery = ` WHERE u.email LIKE "${search}"`
+            query = query.concat(searchQuery);
+        }
+        
+        let endQuery = ` ORDER BY u.name`
+        query = query.concat(endQuery);
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting Staff:");
+        console.log(resources);
+        console.log("Sending back...");
+
         
         // Return Result 
         resolve( resources );
@@ -130,7 +168,7 @@ async function Edit ({name, oldemail, email, type}) {
                     return;
                 }
 
-                let emailQuery = `email = "%${email}%"`
+                let emailQuery = `email = "${email}"`
                 updateQuery = updateQuery.concat(emailQuery);
 
             }
@@ -139,7 +177,7 @@ async function Edit ({name, oldemail, email, type}) {
             if (name) {
                 console.log(name);
 
-                let nameQuery = ` name = "%${name}%"`
+                let nameQuery = ` name = "${name}"`
                 updateQuery = updateQuery.concat(nameQuery);
             }
 
@@ -157,14 +195,19 @@ async function Edit ({name, oldemail, email, type}) {
             }
 
 
-            let endQuery = ` WHERE u.name LIKE "%${oldemail}%" OR u.email LIKE "%${oldemail}%"`
+            let endQuery = ` WHERE u.email LIKE "${oldemail}"`
             updateQuery = updateQuery.concat(endQuery);
 
 
                 console.log(updateQuery);
-            //TODO!!! fix users bug to prevent messing up my Account before uncommenting the below lines
-                //const result = await Users.items.query(query);
-                //console.log(result);
+            //TODO!!! FIGURE OUT WHY NOTHING IS GETTING UPDATED
+            //TRIED TAKING THE % OUT OF ALL OF THE %${}%!!!!!
+            //TRY CHANGING QUERY OR THE .UPSERT
+
+            console.log("Trying update query");
+
+                const result = await Users.items.upsert(updateQuery);
+                console.log(result);
 
        resolve(true);
     });
@@ -276,7 +319,7 @@ async function Authorize (token, requirement) {
         console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
 
-        if (!search) {
+        if (search.length == 0) {
             resolve (false);
             return;
         } 
@@ -292,7 +335,7 @@ async function Authorize (token, requirement) {
         console.log('User Query')
         const { resources: search2 } = await Users.items.query(query2).fetchAll();
 
-        if (!search2) {
+        if (search2.length == 0) {
             resolve (false);
             return;
         } 
@@ -301,13 +344,13 @@ async function Authorize (token, requirement) {
 
         // Compare user types
 
-        if (search2[0].type == "admin" && requirement == "Administrator") {
+        if ((search2[0].type == "admin" || search2[0].type == "Administrator") && requirement == "Administrator") {
             console.log("Auth success");
             resolve({id: search[0].user});
             return;
         }
 
-        if (search2[0].type == "staff" && requirement == "Staff") {
+        if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
             console.log("Auth success");
             resolve({id: search[0].user});
             return;
@@ -331,5 +374,6 @@ module.exports = {
     GetStaff,
     Login,
     Create,
-    Edit
+    Edit,
+    GetUsers
 }

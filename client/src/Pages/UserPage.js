@@ -22,7 +22,7 @@ async function displayUser(user) {
 
         let userAccount = document.createElement('h3');
         userAccount.setAttribute("class", "card-body bg-white text-center");
-        userAccount.textContent = "Account Type: " + "Staff";
+        userAccount.textContent = "Account Type: " + user.type;
 
         let userArchive = document.createElement('h3');
         userArchive.setAttribute("class", "card-body bg-white text-center");
@@ -43,7 +43,7 @@ function UserPage({ getToken, api }) {
 
     //Grabs user data from database
     async function getUser() {
-        const { success, data } = await api({ func: 'GetStaff', data: {"search": sessionStorage.getItem("userEmail")}});
+        const { success, data } = await api({ func: 'GetUsers', data: {"search": sessionStorage.getItem("userEmail")}});
         if (success) {
             data.forEach(async user => {
                 await displayUser(user);

@@ -39,10 +39,8 @@ async function displayUsers(userInfo) {
     let userEmail = document.createElement('td');
     userEmail.textContent = userInfo.email;
 
-    //API does not currently return!!!!!
-    //TODO: add role to API
     let userRole = document.createElement('td');
-    userRole.textContent = "Staff";
+    userRole.textContent = userInfo.type;
 
     let userArchive = document.createElement('td');
     userArchive.textContent = userInfo.archived;
@@ -57,18 +55,23 @@ async function displayUsers(userInfo) {
  * @returns {React.Component}
  */
 function Users({ getToken, api }) {
-    //Triggers getUsers function to get user info from server
-    getUsers();
 
     //Grabs user data from database
     async function getUsers() {
-        const { success, data } = await api({ func: 'GetStaff', data: {"search": ""}});
+        const { success, data } = await api({ func: 'GetUsers', data: {"search": ""}});
         if (success) {
+
+            console.log("Data returned:");
+            console.log(data);
+
             data.forEach(async user => {
                 await displayUsers(user);
             })
         }
     }
+
+    //Triggers getUsers function to get user info from server
+    getUsers();
 
 
     return (

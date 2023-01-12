@@ -32,6 +32,20 @@ async function GetStaff(input) {
     }
 }
 
+async function GetUsers(input) {
+    const { token, data } = input;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return false;
+        
+        const staff = await model.GetUsers(data.search);
+        if(staff) return new Reply({ point: 'Staff Generation', success: true, data: staff });
+        return new Reply({ point: 'Staff Generation' });
+    } catch(error) {
+        return new Reply({ point: 'Staff Inquiry' });
+    }
+}
+
 
 async function Login (input) {
     console.log("Made it to service!!");
@@ -74,5 +88,6 @@ module.exports = {
     GetStaff,
     Login,
     Create,
-    Edit
+    Edit,
+    GetUsers
 }
