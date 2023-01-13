@@ -78,14 +78,33 @@ async function GetStaff (search) {
         // Build Query 
         const query = `SELECT u.id, u.archived, u.name, u.email
             FROM u 
-            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )
+            WHERE LOWER(u.type) LIKE "${AUTH_ROLES.Staff.toLowerCase()}" 
+            ${(search && search.length > 0) && (`AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )`)}
             ORDER BY u.name`
+
+        console.log(query)
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+        return resources;
+    })
+}
+
+
+async function GetAllUsers(){
+    return new Promise(async resolve => {
+        const query = `SELECT u.id, u.email, u.name
+        FROM u 
+        ORDER BY u.email`
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
@@ -185,11 +204,12 @@ async function Authorize (token, requirement = false) {
         // TODO: Fill this in with an actual token processor 
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
         // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f");
+        if ( token ) resolve('ASD8-ASDc-aaAScds');
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 
         resolve(false)
+        return false;
     })
 }
 

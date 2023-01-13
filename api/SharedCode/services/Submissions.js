@@ -45,7 +45,7 @@ async function GetAllSubmissions(input) {
 
 async function GetSubmission(input) {
     try {
-          /* Get Submission Data Steps
+        /* Get Submission Data Steps
          * 1. Submission Data - data.id
          * 2. User Data - submission.user | submission.modified_by
          * 3. Response Data - data.id 

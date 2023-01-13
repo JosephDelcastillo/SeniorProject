@@ -15,11 +15,12 @@ async function GetAllSubmissions (userId = false) {
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
 async function GetSubmission(submissionId){
-    return new Promise(async resolve=> {
+    return new Promise(async resolve => {
         // Build Query 
         const query = `SELECT s.id, s.user, s.created, s.modified_by, s.modified
         FROM s 
@@ -31,11 +32,12 @@ async function GetSubmission(submissionId){
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 
 async function GetResponsesFromSubmit(submissionId){
-    return new Promise(async resolve=> {
+    return new Promise(async resolve => {
         // Build Query 
         const query = `SELECT r.id, r.submission, r.question, r.response
         FROM r 
@@ -46,6 +48,7 @@ async function GetResponsesFromSubmit(submissionId){
         
         // Return Result 
         resolve( resources );
+        return resources;
     })
 }
 

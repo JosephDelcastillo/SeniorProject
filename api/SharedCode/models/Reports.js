@@ -12,15 +12,15 @@ async function Get (people, questions, dates) {
             query = query.substring(0, query.length - 3) + ") AND ";
         }
         // Build Dates 
-        query += `( s.created > "${dates.start}" AND s.created < "${dates.end}" )`;
-
+        query += `( s.created > "${dates.start}" AND (s.created < "${dates.end}" OR s.created LIKE "${dates.end}%"))`;
+        console.log(query)
         //******** 2: Get the Submissions ********
         // Search DB For Matches  
         const submissionData = await Submits.items.query(query).fetchAll();
 
         // Resolve if none found 
-        if(submissionData.resources.length < 1) { resolve([]) }
-
+        if(submissionData.resources.length < 1) { resolve([]); return []; }
+        console.log(submissionData)
         //******** 3: Build the Response Query ********
         query = `SELECT r.id, r.submission, r.question, r.response FROM r WHERE `;
         // Build Questions 
@@ -36,6 +36,7 @@ async function Get (people, questions, dates) {
 
         //******** 4: Get the Responses ********
         // Search DB For Matches  
+        console.log(query)
         const responseData = await Responses.items.query(query).fetchAll();
 
         //******** 5: Get the Questions ********

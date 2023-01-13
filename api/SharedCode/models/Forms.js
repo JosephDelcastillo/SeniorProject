@@ -34,9 +34,9 @@ async function AddSubmission({ user, data }){
         // Create Submit 
         const now = new Date();
         const submit = {
-            id: tb.genId(),
+            id: await tb.genId(),
             user, 
-            create: now.toISOString(),
+            created: now.toISOString(),
             modified_by: "",
             modified: ""
         }
@@ -62,6 +62,7 @@ async function AddSubmission({ user, data }){
         
         // Return Result 
         resolve(submission.id);
+        return submission.id
     })
 }
 
