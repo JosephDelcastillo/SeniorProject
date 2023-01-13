@@ -293,9 +293,18 @@ async function Edit ({name, oldemail, email, type}) {
                       }
                     ]
                 }) ;
+
+                console.log("Succeeded in change (error not from if statement)");
             }
 
-       resolve(result);
+        //Seeing if we updated anything and got a result
+        if (result) {
+            resolve(true);
+            return;
+        } else {
+            resolve(false);
+            return;
+        } 
     });
 }
 
