@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Table from '../Components/Table';
+import Action, {ACTION_TYPES} from '../Components/Action';
 
 /**
  *  Responses Page
@@ -11,7 +12,8 @@ function Responses({api}) {
     const [entryData, setEntryData] = useState([{}]);
 
     const deleteSubmission = id => {
-        const newEntryData = {users: entryData.users, submissions: entryData.submissions.filter(s => s.id !== id)};
+        let newEntryData = { ...entryData };
+        newEntryData.tables.info = entryData.tables.info.filter(s => s.id !== id);
         setEntryData(newEntryData);
         //TO DO: TRIGGER API CALL, IF SUCCESSFUL SET ENTRYDATA TO API RESULT
     }
@@ -35,13 +37,13 @@ function Responses({api}) {
                     search = data.users.findIndex(u => u.id === modified);
                     modified = (search >= 0) ? data.users[search].email : 'Not Modified';
                     modified_by = (modified_by && modified_by.length > 1) ? modified_by : 'Not Modified';
-            
+                    
                     const actions = (
                     <>
-                        <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {window.location.pathname = `/dashboard/response/${id}`}}></i>
-                        <i className="fa-regular fa-trash-can text-danger pe-1 c-pointer" onClick={() => deleteSubmission(id)}></i>
+                        <Action type={ACTION_TYPES.VIEW} action={() => {window.location.pathname = `/dashboard/response/${id}`}} />
+                        <Action type={ACTION_TYPES.DEL} action={() => deleteSubmission(id)} />
                     </>)
-            
+
                     info.push({ id, user, created, modified, modified_by, actions })
                 });
                 

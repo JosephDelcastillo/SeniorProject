@@ -17,7 +17,6 @@ function Table({ columns, data }) {
         },
     }
 
-    console.log(columns)
     return (
         <DataTable 
             progressPending={!(data)} 
