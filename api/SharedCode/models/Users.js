@@ -246,7 +246,6 @@ async function Edit ({name, oldemail, email, type}) {
             }
 
             //See if user type was updated
-            //TODO: FIX THIS BUG!!!!!!!
             if (type) {
                 console.log(type);
 
@@ -405,7 +404,7 @@ async function Authorize (token, requirement) {
         console.log("token:");
         console.log(tokenObj.token);
 
-        console.log("end authorization check");
+        
 
         // Query for session with that token in session table
         let query = `SELECT u.id, u.user, u.created
@@ -423,8 +422,10 @@ async function Authorize (token, requirement) {
 
         console.log(search[0].user);
 
+        //TODO: Maybe add some sort of expiration check here????
+
         // Query users for a user matching that id
-        let query2 = `SELECT u.type
+        let query2 = `SELECT u.type, u.archived
         FROM u WHERE u.id = "${search[0].user}"`;
         
         console.log('User Query')
@@ -437,8 +438,13 @@ async function Authorize (token, requirement) {
 
         console.log(search2);
 
-        // Compare user types
+        //check to make sure user isn't archived
+        if (search2[0].archived == true) {
+            resolve(false);
+            return;
+        }
 
+        // Compare user types
         if ((search2[0].type == "admin" || search2[0].type == "Administrator") && requirement == "Administrator") {
             console.log("Auth success");
             resolve({id: search[0].user});
@@ -451,6 +457,7 @@ async function Authorize (token, requirement) {
             return;
         }
 
+
         // TODO: Fill this in with an actual token processor 
         //???? ^
         // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
@@ -458,7 +465,7 @@ async function Authorize (token, requirement) {
         
         // TODO: If invalid Token -> Return false 
         // TODO: Resolve with Reply 
-        console.log("Auth failed");
+        console.log("Auth Fail");
         resolve(false);
     })
 }
