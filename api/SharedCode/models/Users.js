@@ -152,10 +152,72 @@ async function GetUsers (search) {
 
 async function Edit ({name, oldemail, email, type}) {
     return new Promise(async resolve => {
-        console.log(name + email + type);
+        console.log(name + oldemail + email + type);
 
-            let updateQuery = `UPDATE u
-            SET `
+        //Getting needed user id info
+        let query = `SELECT u.id
+        FROM u
+        WHERE u.email LIKE "${oldemail}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+        console.log(resources[0].id);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            resolve(false);
+            return;
+        }
+
+        /* //Build update query
+        let updateQuery = `UPDATE u
+        SET `
+
+        //See if email was updated
+            if (email) {
+                console.log(email);
+
+                //check that email is an email
+                let emailValid = /\S+@\S+\.\S+/;
+                if (!emailValid.test(email)) {
+                    resolve(false);
+                    return;
+                }
+
+                let emailQuery = ` email = "${email}",`
+                updateQuery = updateQuery.concat(emailQuery);
+
+            }
+
+            //See if user type was updated
+            if (type) {
+                console.log(type);
+
+                if ( type == "admin") {
+                    let typeQuery = ` type = "Administrator",`
+                    updateQuery = updateQuery.concat(typeQuery);
+                } else {
+                    let typeQuery = ` type = "Staff",`
+                    updateQuery = updateQuery.concat(typeQuery);
+                }
+            }
+
+            //See if name was updated
+            if (name) {
+                console.log(name);
+
+                let nameQuery = ` name = "${name}"`
+                updateQuery = updateQuery.concat(nameQuery);
+            }
+
+            let endQuery = ` WHERE u.email = "${oldemail}"`
+
+            updateQuery = updateQuery.concat(endQuery);
+                console.log(updateQuery); */
+
+            let result = null;
 
             //See if email was updated
             if (email) {
@@ -168,48 +230,72 @@ async function Edit ({name, oldemail, email, type}) {
                     return;
                 }
 
-                let emailQuery = `email = "${email}"`
-                updateQuery = updateQuery.concat(emailQuery);
+                console.log("Trying to replace email:");
 
-            }
+                result = await Users.item(resources[0].id, resources[0].id).patch(
+                {
+                    "operations": [
+                      {
+                        "op": "replace",
+                        "path": "/email",
+                        "value": email
+                      }
+                    ]
+                }) ;
 
-            //See if name was updated
-            if (name) {
-                console.log(name);
-
-                let nameQuery = ` name = "${name}"`
-                updateQuery = updateQuery.concat(nameQuery);
             }
 
             //See if user type was updated
+            //TODO: FIX THIS BUG!!!!!!!
             if (type) {
                 console.log(type);
 
                 if ( type == "admin") {
-                    let typeQuery = ` type = Administrator`
-                    updateQuery = updateQuery.concat(typeQuery);
+                    console.log("Trying to replace type:");
+
+                    result = await Users.item(resources[0].id, resources[0].id).patch(
+                    {
+                        "operations": [
+                            {
+                                "op": "replace",
+                                "path": "/type",
+                                "value": AUTH_ROLES.Admin
+                            }
+                        ]
+                    }) ;
                 } else {
-                    let typeQuery = ` type = Staff`
-                    updateQuery = updateQuery.concat(typeQuery);
+                    console.log("Trying to replace type:");
+
+                    result = await Users.item(resources[0].id, resources[0].id).patch(
+                    {
+                        "operations": [
+                            {
+                                "op": "replace",
+                                "path": "/type",
+                                "value": AUTH_ROLES.Staff
+                            }
+                        ]
+                    }) ;
                 }
             }
 
+            //See if name was updated
+            if (name) {
+                console.log("Trying to replace name:");
 
-            let endQuery = ` WHERE u.email LIKE "${oldemail}"`
-            updateQuery = updateQuery.concat(endQuery);
+                result = await Users.item(resources[0].id, resources[0].id).patch(
+                {
+                    "operations": [
+                      {
+                        "op": "replace",
+                        "path": "/name",
+                        "value": name
+                      }
+                    ]
+                }) ;
+            }
 
-
-                console.log(updateQuery);
-            //TODO!!! FIGURE OUT WHY NOTHING IS GETTING UPDATED
-            //TRIED TAKING THE % OUT OF ALL OF THE %${}%!!!!!
-            //TRY CHANGING QUERY OR THE .UPSERT
-
-            console.log("Trying update query");
-
-                const result = await Users.items.upsert(updateQuery);
-                console.log(result);
-
-       resolve(true);
+       resolve(result);
     });
 }
 

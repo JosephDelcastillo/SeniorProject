@@ -22,6 +22,12 @@ function EditUser({ getToken, api }) {
             const { success, data } = await api({ func: 'EditUser', data: {"name": name, "oldemail": sessionStorage.getItem("userEmail"), "type": role, "email": email}});
             if(success) {
                 console.log(success);
+                //Update email in session if changed
+                //Maybe not that secure? :(
+                    if (email) {
+                        sessionStorage.setItem("userEmail", email);
+                    }
+
                 Swal.fire({title: "User Updated Successfully!", icon: 'success'}).then(function() {
                     window.location = "/dashboard/user";
                 });
