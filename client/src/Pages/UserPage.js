@@ -1,64 +1,39 @@
-import React from 'react';
-
-//constants
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
-
-//Displays user info
-async function displayUser(user) {
-            
-        const userInfo = document.getElementById("userInfo");
-
-        let userHeader = document.createElement('div');
-        userHeader.setAttribute("class", "card-header bg-white text-center");
-
-        let userName = document.createElement('h1');
-        userName.textContent = user.name;
-
-        userHeader.appendChild(userName);
-
-        let userEmail = document.createElement('h3');
-        userEmail.setAttribute("class", "card-body bg-white text-center");
-        userEmail.textContent = "User Email: " + user.email;
-
-        let userAccount = document.createElement('h3');
-        userAccount.setAttribute("class", "card-body bg-white text-center");
-        userAccount.textContent = "Account Type: " + user.type;
-
-        let userArchive = document.createElement('h3');
-        userArchive.setAttribute("class", "card-body bg-white text-center");
-        userArchive.textContent = "Archive Status: " + user.archived;
-
-        userInfo.append(userHeader, userEmail, userAccount, userArchive);  
-
-        return true;
-}
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 /**
  * User Page
  * @returns {React.Component}
  */
 function UserPage({ getToken, api }) {
-
-    getUser();
+    let {email} = useParams();
+    const [user, setUser] = useState({});
+    //getUser();
 
     //Grabs user data from database
-    async function getUser() {
-        const { success, data } = await api({ func: 'GetUsers', data: {"search": sessionStorage.getItem("userEmail")}});
-        if (success) {
-            data.forEach(async user => {
-                await displayUser(user);
-            })
-        }
-    }
+    useEffect( () => {
+        api({ func: 'GetUsers', data: {"search": email}}).then( ({success, data}) => {
+            if (success) {
+                console.log(data[0]);
+                setUser(data[0]);
+            }
+        });
+    }, [setUser, api] )
 
     //TODO:Connect the buttons to things
     return (
         <div className="card m-2 mt-5 border-none">
-
-            <div id="userInfo"></div>
+            <div>
+                <div className="card-header bg-white text-center">
+                <h1>{user.name ? user.name : "No User"}</h1>
+                </div>
+                <h3 className="card-body bg-white text-center">Email: {email ? email : "No Email"}</h3>
+                <h3 className="card-body bg-white text-center">Account Type: {user.type ? user.type : "No User"}</h3>
+                <h3 className="card-body bg-white text-center">Archived: {typeof user.archived !== "undefined" ? (user.archived ? "true" : "false") : "No User"}</h3>
+            </div>
 
             <div className="text-center">
-                    <a className='btn btn-outline-primary col-3 mt-5' href='/dashboard/edituser'> Edit </a>
+                    <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
                     <a className='btn btn-outline-primary col-3 mt-5'> Archive Account </a>
                     <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
             </div>

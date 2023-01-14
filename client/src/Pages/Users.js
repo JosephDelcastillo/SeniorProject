@@ -10,7 +10,7 @@ function viewUser(userEmail) {
     //Maybe not that secure? :(
     sessionStorage.setItem("userEmail", userEmail);
 
-    window.location = "/dashboard/user";
+    window.location = `/dashboard/user/${userEmail}`;
 }
 
 //Creates a row, inserts user info into row, inserts row into table

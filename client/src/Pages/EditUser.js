@@ -1,44 +1,39 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import UserForm from '../Components/UserForm';
+import { useParams } from 'react-router-dom';
 
-//constants
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
-
+const inputByID = (id) => document.getElementById(id).value;
  
 /**
  * Create New User Page
  * @returns {React.Component}
  */
 function EditUser({ getToken, api }) {
-    let name = "";
-    let role = "";
-    let email = "";
+    let {email} = useParams();
    
     const handleSubmit = async e => {
         e.preventDefault();
+        let data = {
+            "name": inputByID("emplName"),
+            "oldemail": email,
+            "type": inputByID("accType"),
+            "email": inputByID("emplEmail")
+        };
 
         //Sends info to database to create user
-        async function updateUser({name, role, email}) {
-            const { success, data } = await api({ func: 'EditUser', data: {"name": name, "oldemail": sessionStorage.getItem("userEmail"), "type": role, "email": email}});
-            if(success) {
-                console.log(success);
-                //Update email in session if changed
-                //Maybe not that secure? :(
-                    if (email) {
-                        sessionStorage.setItem("userEmail", email);
-                    }
+        const { success } = await api({ func: 'EditUser', data});
+        if(success) {
+            console.log(success);
 
-                Swal.fire({title: "User Updated Successfully!", icon: 'success'}).then(function() {
-                    window.location = "/dashboard/user";
-                });
-            } else {
-                Swal.fire({title: "Could Not Update User", icon: 'error'})
-                console.log(response);
-            }
+            Swal.fire({title: "User Updated Successfully!", icon: 'success'}).then(function() {
+                //TODO: check if email was valid and was successfully updated (if yes, send new email)
+                //If not, keep old email
+                window.location = `/dashboard/user/${data.email ? data.email : email}`;
+            });
+        } else {
+            Swal.fire({title: "Could Not Update User", icon: 'error'})
         }
-
-        //Triggers the create user function to send data to the server and gets either a success or failure back
-        let response = await updateUser({name, email, role});
  
     }
  
@@ -50,27 +45,7 @@ function EditUser({ getToken, api }) {
         </div>
  
         <div className="card-body text-center">
-        <form onSubmit={handleSubmit}>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label htmlFor="emplName" className="form-label">Employee Name:</label>
-                <input type="text" id="emplName" name="emplName" placeholder="John Doe" className="form-control" onChange={e => name = e.target.value}></input>
-            </div>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label htmlFor="emplEmail" className="form-label">Employee Email:</label>
-                <input type="email" id="emplEmail" name="emplEmail" placeholder="123@email.com" className="form-control" onChange={e => email = e.target.value}></input>
-            </div>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label htmlFor="accType" className="form-label">Account Type:</label>
-                <select name="accType" className="form-control" onClick={e => role = e.target.value}>
-                    <option value="0">Select Account Type</option>
-                    <option value="staff">Staff User</option>
-                    <option value="admin">Administrator</option>
-                </select>
-            </div>
- 
-            <button className="btn btn-outline-primary col-3 mt-5" type="submit"> Save </button>
-            <a href='/dashboard/user' type='button' className="btn btn-outline-primary col-3 mt-5"> Cancel </a>
-        </form>
+            <UserForm handleSubmit={handleSubmit}/>
         </div>
  
         </div>
