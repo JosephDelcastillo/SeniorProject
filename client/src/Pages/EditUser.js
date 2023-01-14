@@ -45,7 +45,7 @@ function EditUser({ getToken, api }) {
         </div>
  
         <div className="card-body text-center">
-            <UserForm handleSubmit={handleSubmit}/>
+            <UserForm handleSubmit={handleSubmit} user={email}/>
         </div>
  
         </div>

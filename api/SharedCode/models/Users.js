@@ -13,6 +13,12 @@ async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
         console.log(name + email + password + type);
 
+        //checks to make sure all needed info is filled in
+        if (!name || !email || !password || !type){
+            resolve(false);
+            return;
+        }
+
         console.log("Checking if user exists");
 
         //checks if user already exists
