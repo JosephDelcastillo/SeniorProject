@@ -127,15 +127,9 @@ async function GetUsers (search) {
 
         // Build Query 
         let query = `SELECT u.id, u.archived, u.name, u.email, u.type
-            FROM u`
-
-        if (search) {
-            let searchQuery = ` WHERE u.email LIKE "${search}"`
-            query = query.concat(searchQuery);
-        }
-        
-        let endQuery = ` ORDER BY u.name`
-        query = query.concat(endQuery);
+            FROM u
+            ${search ? ` WHERE u.email LIKE "${search}"`: ""} 
+            ORDER BY u.name`
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
@@ -380,7 +374,9 @@ async function Authorize (token, requirement) {
          * 
          * 1) Check for token
          * 2) See if token matches a stored token
-         *  2.5)See if token is expired
+         *  2.1)See if token is expired
+         *  2.2) See how many sessions user has
+         *  2.3) If not valid sessions, delete current session and return false
          * 3) Check for user
          *  3.5) See is user is archived
          * 4) Check to see if roles match
@@ -397,7 +393,7 @@ async function Authorize (token, requirement) {
             return;
         }
 
-        console.log("parsing token:");
+        console.log(token, "parsing token:");
         let tokenObj = JSON.parse(token);
         console.log(tokenObj);
 
@@ -445,13 +441,12 @@ async function Authorize (token, requirement) {
         }
 
         // Compare user types
-        if ((search2[0].type == "admin" || search2[0].type == "Administrator") && requirement == "Administrator") {
+        if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
             console.log("Auth success");
             resolve({id: search[0].user});
             return;
         }
-
-        if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
+        if (search2[0].type == "admin" || search2[0].type == "Administrator") {
             console.log("Auth success");
             resolve({id: search[0].user});
             return;

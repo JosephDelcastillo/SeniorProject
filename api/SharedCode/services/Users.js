@@ -38,11 +38,11 @@ async function GetUsers(input) {
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
         if(!authorized) return false;
         
-        const staff = await model.GetUsers(data.search);
-        if(staff) return new Reply({ point: 'Staff Generation', success: true, data: staff });
-        return new Reply({ point: 'Staff Generation' });
+        const users = await model.GetUsers(data.search);
+        if(users) return new Reply({ point: 'User Generation', success: true, data: users });
+        return new Reply({ point: 'User Generation' });
     } catch(error) {
-        return new Reply({ point: 'Staff Inquiry' });
+        return new Reply({ point: 'User Inquiry' });
     }
 }
 
