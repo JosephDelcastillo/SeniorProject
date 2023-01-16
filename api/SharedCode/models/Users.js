@@ -403,7 +403,7 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email.toLowerCase()}"`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
