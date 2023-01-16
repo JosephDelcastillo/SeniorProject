@@ -80,13 +80,6 @@ function UserPage({ getToken, api }) {
             : <div className="text-center">
             <a className='btn btn-outline-primary col-3 mt-5' onClick={handleUnArchive}> UnArchive Account </a>
             </div>}
-
-            {/* <div className="text-center">
-                    <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
-                    <a className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </a>
-                    <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
-            </div> */}
-
         </div>
     )
 }
