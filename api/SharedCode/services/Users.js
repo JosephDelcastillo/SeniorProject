@@ -84,10 +84,28 @@ async function Edit (input) {
     }
 }
 
+async function Archive (input) {
+    const { token, data } = input;
+    const { email, archive } = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.Archive({ email, archive});
+
+        if(res) return new Reply({ point: 'Archive', success: true, data: res });
+        return new Reply({ point: 'Archive' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Archive'});
+    }
+}
+
 module.exports = {
     GetStaff,
     Login,
     Create,
     Edit,
-    GetUsers
+    GetUsers,
+    Archive
 }

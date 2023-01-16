@@ -323,6 +323,72 @@ async function Edit ({name, oldemail, email, type}) {
     });
 }
 
+async function Archive ({email, archive}) {
+    return new Promise(async resolve => {
+        console.log(email + archive);
+
+        //Getting needed user id info
+        let query = `SELECT u.id
+        FROM u
+        WHERE u.email LIKE "${email}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+        console.log(resources[0].id);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            console.log("No user found");
+            resolve(false);
+            return;
+        }
+
+        // Try to change archival status
+        if (archive == false) {
+            console.log("Trying to archive:");
+
+            result = await Users.item(resources[0].id, resources[0].id).patch(
+            {
+                "operations": [
+                    {
+                    "op": "replace",
+                    "path": "/archived",
+                    "value": true
+                    }
+                ]
+            }) ;
+
+            console.log("Succeeded in change (error not from if statement)");
+        } else {
+            console.log("Trying to unarchive:");
+
+            result = await Users.item(resources[0].id, resources[0].id).patch(
+            {
+                "operations": [
+                    {
+                    "op": "replace",
+                    "path": "/archived",
+                    "value": false
+                    }
+                ]
+            }) ;
+
+            console.log("Succeeded in change (error not from if statement)");
+        }
+
+        //Seeing if we updated anything and got a result
+        if (result) {
+            resolve(true);
+            return;
+        } else {
+            resolve(false);
+            return;
+        } 
+    });
+}
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -494,5 +560,6 @@ module.exports = {
     Login,
     Create,
     Edit,
-    GetUsers
+    GetUsers,
+    Archive
 }

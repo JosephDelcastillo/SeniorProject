@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 /**
  * User Page
@@ -8,7 +9,6 @@ import { useParams } from 'react-router-dom';
 function UserPage({ getToken, api }) {
     let {email} = useParams();
     const [user, setUser] = useState({});
-    //getUser();
 
     //Grabs user data from database
     useEffect( () => {
@@ -19,6 +19,46 @@ function UserPage({ getToken, api }) {
             }
         });
     }, [setUser, api] )
+
+    const handleArchive = async e => {
+        console.log("Archive was clicked");
+        e.preventDefault();
+        let data = {
+            "email": email,
+            "archive": false
+        };
+
+        const { success } = await api({ func: 'ArchiveUser', data});
+        if(success) {
+            console.log(success);
+
+            Swal.fire({title: "User Archived Successfully!", icon: 'success'}).then(function() {
+                window.location = `/dashboard/user/${email}`;
+            });
+        } else {
+            Swal.fire({title: "Could Not Archive User", icon: 'error'})
+        }
+    }
+
+    const handleUnArchive = async e => {
+        console.log("Archive was clicked");
+        e.preventDefault();
+        let data = {
+            "email": email,
+            "archive": true
+        };
+
+        const { success } = await api({ func: 'ArchiveUser', data});
+        if(success) {
+            console.log(success);
+
+            Swal.fire({title: "User Unarchived Successfully!", icon: 'success'}).then(function() {
+                window.location = `/dashboard/user/${email}`;
+            });
+        } else {
+            Swal.fire({title: "Could Not Unarchived User", icon: 'error'})
+        }
+    }
 
     //TODO:Connect the buttons to things
     return (
@@ -32,11 +72,20 @@ function UserPage({ getToken, api }) {
                 <h3 className="card-body bg-white text-center">Archived: {typeof user.archived !== "undefined" ? (user.archived ? "true" : "false") : "No User"}</h3>
             </div>
 
-            <div className="text-center">
+            {!user.archived ? <div className="text-center">
                     <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
-                    <a className='btn btn-outline-primary col-3 mt-5'> Archive Account </a>
+                    <a className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </a>
                     <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
             </div>
+            : <div className="text-center">
+            <a className='btn btn-outline-primary col-3 mt-5' onClick={handleUnArchive}> UnArchive Account </a>
+            </div>}
+
+            {/* <div className="text-center">
+                    <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
+                    <a className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </a>
+                    <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
+            </div> */}
 
         </div>
     )
