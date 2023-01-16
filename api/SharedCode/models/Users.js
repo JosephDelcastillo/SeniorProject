@@ -24,8 +24,7 @@ async function Create ({name, email, password, type}) {
         //checks if user already exists
         let queryUsers = `SELECT u.email
             FROM u 
-            WHERE u.email LIKE "${email.toLowerCase()}"
-            ORDER BY u.name`
+            WHERE u.email LIKE "${email.toLowerCase()}"`
         
             const { resources } = await Users.items.query(queryUsers).fetchAll();
 
@@ -218,10 +217,27 @@ async function Edit ({name, oldemail, email, type}) {
                 console.log(updateQuery); */
 
             let result = null;
+            let resources2 = {};
 
             //See if email was updated
             if (email) {
                 console.log(email);
+                console.log("checking email usage:");
+
+                //checks if email is already in use
+                let queryusers = `SELECT u.email, u.name
+                FROM u
+                WHERE u.email LIKE "${email}"`
+            
+                resources2 = await Users.items.query(queryusers).fetchAll(); 
+
+                console.log(resources2.resources);
+
+                //if email already in use, send back a false
+                if (!resources2.resources.length == 0) {
+                    resolve(false);
+                    return;
+                } 
 
                 //check that email is an email
                 let emailValid = /\S+@\S+\.\S+/;
