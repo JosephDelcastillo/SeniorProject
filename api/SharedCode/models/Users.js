@@ -95,11 +95,11 @@ async function Authorize (token, requirement) {
         if ( token ){
             if(token==AUTH_ROLES.Admin && requirement==AUTH_ROLES.Admin)
             {
-              resolve("f3bd7d22-882b-4ecb-b071-8ee7f6424be2");  
+              resolve({id: "f3bd7d22-882b-4ecb-b071-8ee7f6424be2"});  
             }
             else if(token==AUTH_ROLES.Staff && requirement==AUTH_ROLES.Staff)
             {
-                resolve("f43c2c17-c984-4f40-a929-2f12c1560f5f");
+                resolve({id: "f43c2c17-c984-4f40-a929-2f12c1560f5f"});
             }
 
         }

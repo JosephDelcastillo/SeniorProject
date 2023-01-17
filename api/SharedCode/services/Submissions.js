@@ -93,7 +93,39 @@ async function GetSubmission(input) {
     }
 }
 
+async function ArchiveSubmission(input) {
+    try{
+        /**
+         * Step 1. Authorize Token
+         * Step 2. Ensure good submission id
+         * Step 3. Update Archive Status
+         * Step 4. Return submission on success
+         */
+        const { token, data } = input;
+        const {submissionId, archiveStatus} = data;
+        const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
+        const isStaff = await Authorize(token, AUTH_ROLES.Staff);
+
+        //Step 1
+        if(!isAdmin && !isStaff) return new Reply({ point: 'Archive Submission Inquiry; Bad Token' });
+        //Step 2
+        const submission = await model.GetSubmission(submissionId);
+        if(!submission && submission.length <= 0 && (submission.user != isStaff.id || !isAdmin)) return new Reply({ point: 'Staff Not Authorized to Archive' });
+        //Step 3
+        const userId = isAdmin ? isAdmin.id : isStaff.id; 
+        console.log("User ID", userId);
+        const output = await model.Archive(submissionId, archiveStatus, userId);
+        //Step 4
+        if(!output || typeof output === "string") return new Reply({ point: 'Cannot Update Database'});
+        return new Reply({point: 'Archiving the Submission', success: true, data: output});
+
+    } catch (error) {
+        return new Reply({ point: 'Archive Submission Inquiry' });
+    }
+}
 
 module.exports = {
-    GetAllSubmissions, GetSubmission
+    GetAllSubmissions, 
+    GetSubmission, 
+    ArchiveSubmission
 }
