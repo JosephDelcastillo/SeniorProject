@@ -23,88 +23,88 @@ async function Create ({name, email, password, type}) {
 
         //checks if user already exists
         let queryUsers = `SELECT u.email
-            FROM u 
-            WHERE u.email LIKE "${email.toLowerCase()}"`
+        FROM u 
+        WHERE u.email LIKE "${email.toLowerCase()}"`
+    
+        const { resources } = await Users.items.query(queryUsers).fetchAll();
+
+        console.log(resources);
+
+        //if email already in use, send back a false
+        if (!resources.length == 0) {
+            resolve(false);
+            return;
+        } 
+
+        console.log("Checking if email is valid");
+
+        //check that email is an email
+        let emailValid = /\S+@\S+\.\S+/;
+        if (!emailValid.test(email)) {
+            resolve(false);
+            return;
+        }
+
         
-            const { resources } = await Users.items.query(queryUsers).fetchAll();
+        const salt = await tb.genSalt();
+        console.log(salt);
+        console.log("^ salt")
 
-            console.log(resources);
+        const saltPass = await tb.hashing(password, salt);
+        console.log(saltPass);
+        console.log("^ salted password")
 
-            //if email already in use, send back a false
-            if (!resources.length == 0) {
-               resolve(false);
-               return;
-            } 
+        const userId = await tb.genId();
+        console.log(userId);
+        console.log("^ userID")
 
-            console.log("Checking if email is valid");
+        //Check if the id is already in use
+        const idQuery = `SELECT u.name
+        FROM u 
+        WHERE u.id LIKE "${userId}"`
+        let idCheck = await Users.items.query(idQuery).fetchAll();
 
-            //check that email is an email
-            let emailValid = /\S+@\S+\.\S+/;
-            if (!emailValid.test(email)) {
-                resolve(false);
-                return;
-            }
-
-            
-            const salt = await tb.genSalt();
-            console.log(salt);
-            console.log("^ salt")
-
-            const saltPass = await tb.hashing(password, salt);
-            console.log(saltPass);
-            console.log("^ salted password")
-
+        //generates new id if in use already
+        if (!idCheck.length == 0) {
             const userId = await tb.genId();
             console.log(userId);
-            console.log("^ userID")
+        }
 
-            //Check if the id is already in use
-            const idQuery = `SELECT u.name
-            FROM u 
-            WHERE u.id LIKE "${userId}"`
-            let idCheck = await Users.items.query(idQuery).fetchAll();
+        console.log("Attempting to create user");
+        let query = {};
 
-            //generates new id if in use already
-            if (!idCheck.length == 0) {
-                const userId = await tb.genId();
-                console.log(userId);
-            }
+        //puts everything into database based on user type
+        if (type == "admin") {
+            query = {
+                id: userId,
+                archived: false,
+                name,
+                email,
+                pass: saltPass,
+                salt: salt,
+                type: AUTH_ROLES.Admin,
+                f_token: "",
+                f_salt: "",
+                f_created: ""
+            };
+        } else {
+            query = {
+                id: userId,
+                archived: false,
+                name,
+                email,
+                pass: saltPass,
+                salt: salt,
+                type: AUTH_ROLES.Staff,
+                f_token: "",
+                f_salt: "",
+                f_created: ""
+            };
+        }
 
-            console.log("Attempting to create user");
-            let query = {};
-
-            //puts everything into database based on user type
-            if (type == "admin") {
-                query = {
-                    id: userId,
-                    archived: false,
-                    name,
-                    email,
-                    pass: saltPass,
-                    salt: salt,
-                    type: AUTH_ROLES.Admin,
-                    f_token: "",
-                    f_salt: "",
-                    f_created: ""
-                };
-            } else {
-                query = {
-                    id: userId,
-                    archived: false,
-                    name,
-                    email,
-                    pass: saltPass,
-                    salt: salt,
-                    type: AUTH_ROLES.Staff,
-                    f_token: "",
-                    f_salt: "",
-                    f_created: ""
-                };
-            }
-
-                console.log(query);
-                const result = await Users.items.create(query);
-                console.log(result);
+            console.log(query);
+            const result = await Users.items.create(query);
+            console.log(result);
 
        resolve(true);
     });
@@ -151,10 +151,11 @@ async function GetUsers (search) {
 
 async function Edit ({name, oldemail, email, type}) {
     return new Promise(async resolve => {
+        console.log("Info recieved:");
         console.log(name + oldemail + email + type);
 
         //Getting needed user id info
-        let query = `SELECT u.id
+        let query = `SELECT *
         FROM u
         WHERE u.email LIKE "${oldemail}"`
 
@@ -162,7 +163,6 @@ async function Edit ({name, oldemail, email, type}) {
 
         console.log("Getting user info:");
         console.log(resources);
-        console.log(resources[0].id);
 
         //Make sure user was found
         if (resources.length == 0) {
@@ -170,150 +170,80 @@ async function Edit ({name, oldemail, email, type}) {
             return;
         }
 
-        /* //Build update query
-        let updateQuery = `UPDATE u
-        SET `
+        //Declaring our needed variables which may or may not be used
+        let result = null;
+        let updated = null;
 
         //See if email was updated
-            if (email) {
-                console.log(email);
+        if (!email == "") {
+            console.log(email);
+            console.log("checking email usage:");
 
-                //check that email is an email
-                let emailValid = /\S+@\S+\.\S+/;
-                if (!emailValid.test(email)) {
-                    resolve(false);
-                    return;
-                }
+            //checks if email is already in use
+            let queryusers = `SELECT u.email, u.name
+            FROM u
+            WHERE u.email LIKE "${email}"`
+        
+            let resources2 = await Users.items.query(queryusers).fetchAll(); 
 
-                let emailQuery = ` email = "${email}",`
-                updateQuery = updateQuery.concat(emailQuery);
+            console.log(resources2.resources);
 
+            //if email already in use, send back a false
+            if (!resources2.resources.length == 0) {
+                resolve(false);
+                return;
+            } 
+
+            //check that email is an email
+            let emailValid = /\S+@\S+\.\S+/;
+            if (!emailValid.test(email)) {
+                resolve(false);
+                return;
             }
 
-            //See if user type was updated
-            if (type) {
-                console.log(type);
+            console.log("Trying to replace email:");
 
-                if ( type == "admin") {
-                    let typeQuery = ` type = "Administrator",`
-                    updateQuery = updateQuery.concat(typeQuery);
-                } else {
-                    let typeQuery = ` type = "Staff",`
-                    updateQuery = updateQuery.concat(typeQuery);
-                }
+            updated = {...resources[0], email};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+
+        }
+
+        //See if user type was updated
+        if (type && !(type == "0")) {
+            console.log(type);
+
+            if ( type == "admin") {
+                console.log("Trying to replace type:");
+
+                updated = {...resources[0], attr: AUTH_ROLES.Staff};
+                console.log("made new user", updated);
+                result = await Users.items.upsert(updated);
+                console.log(result);
+            } else {
+                console.log("Trying to replace type:");
+
+                updated = {...resources[0], attr: AUTH_ROLES.Admin};
+                console.log("made new user", updated);
+                result = await Users.items.upsert(updated);
+                console.log(result);
             }
+        }
 
-            //See if name was updated
-            if (name) {
-                console.log(name);
+        //See if name was updated
+        if (!name == "") {
+            console.log("Trying to replace name:");
 
-                let nameQuery = ` name = "${name}"`
-                updateQuery = updateQuery.concat(nameQuery);
-            }
-
-            let endQuery = ` WHERE u.email = "${oldemail}"`
-
-            updateQuery = updateQuery.concat(endQuery);
-                console.log(updateQuery); */
-
-            let result = null;
-            let resources2 = {};
-
-            //See if email was updated
-            if (email) {
-                console.log(email);
-                console.log("checking email usage:");
-
-                //checks if email is already in use
-                let queryusers = `SELECT u.email, u.name
-                FROM u
-                WHERE u.email LIKE "${email}"`
-            
-                resources2 = await Users.items.query(queryusers).fetchAll(); 
-
-                console.log(resources2.resources);
-
-                //if email already in use, send back a false
-                if (!resources2.resources.length == 0) {
-                    resolve(false);
-                    return;
-                } 
-
-                //check that email is an email
-                let emailValid = /\S+@\S+\.\S+/;
-                if (!emailValid.test(email)) {
-                    resolve(false);
-                    return;
-                }
-
-                console.log("Trying to replace email:");
-
-                result = await Users.item(resources[0].id, resources[0].id).patch(
-                {
-                    "operations": [
-                      {
-                        "op": "replace",
-                        "path": "/email",
-                        "value": email
-                      }
-                    ]
-                }) ;
-
-            }
-
-            //See if user type was updated
-            if (type) {
-                console.log(type);
-
-                if ( type == "admin") {
-                    console.log("Trying to replace type:");
-
-                    result = await Users.item(resources[0].id, resources[0].id).patch(
-                    {
-                        "operations": [
-                            {
-                                "op": "replace",
-                                "path": "/type",
-                                "value": AUTH_ROLES.Admin
-                            }
-                        ]
-                    }) ;
-                } else {
-                    console.log("Trying to replace type:");
-
-                    result = await Users.item(resources[0].id, resources[0].id).patch(
-                    {
-                        "operations": [
-                            {
-                                "op": "replace",
-                                "path": "/type",
-                                "value": AUTH_ROLES.Staff
-                            }
-                        ]
-                    }) ;
-                }
-            }
-
-            //See if name was updated
-            if (name) {
-                console.log("Trying to replace name:");
-
-                result = await Users.item(resources[0].id, resources[0].id).patch(
-                {
-                    "operations": [
-                      {
-                        "op": "replace",
-                        "path": "/name",
-                        "value": name
-                      }
-                    ]
-                }) ;
-
-                console.log("Succeeded in change (error not from if statement)");
-            }
+            updated = {...resources[0], name};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+        }
 
         //Seeing if we updated anything and got a result
         if (result) {
+            console.log(result);
             resolve(true);
             return;
         } else {
@@ -328,7 +258,7 @@ async function Archive ({email, archive}) {
         console.log(email + archive);
 
         //Getting needed user id info
-        let query = `SELECT u.id
+        let query = `SELECT *
         FROM u
         WHERE u.email LIKE "${email}"`
 
@@ -349,43 +279,25 @@ async function Archive ({email, archive}) {
         if (archive == false) {
             console.log("Trying to archive:");
 
-            result = await Users.item(resources[0].id, resources[0].id).patch(
-            {
-                "operations": [
-                    {
-                    "op": "replace",
-                    "path": "/archived",
-                    "value": true
-                    }
-                ]
-            }) ;
+            const updated = {...resources[0], archived: true};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
 
-            console.log("Succeeded in change (error not from if statement)");
+            console.log("Succeeded in change");
         } else {
             console.log("Trying to unarchive:");
 
-            result = await Users.item(resources[0].id, resources[0].id).patch(
-            {
-                "operations": [
-                    {
-                    "op": "replace",
-                    "path": "/archived",
-                    "value": false
-                    }
-                ]
-            }) ;
+            const updated = {...resources[0], archived: false};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
 
-            console.log("Succeeded in change (error not from if statement)");
+            console.log("Succeeded in change");
         }
 
-        //Seeing if we updated anything and got a result
-        if (result) {
-            resolve(true);
-            return;
-        } else {
-            resolve(false);
-            return;
-        } 
+        resolve (true);
+
     });
 }
 
