@@ -1,77 +1,33 @@
-import React from 'react';
-import viewIcon from '../Media/viewicon.png';
+import React, { useState, useEffect } from 'react';
 
-//constants
-const API_URL = (true) ? "https://epots-api.azurewebsites.net/api" : '/api';
- 
-
-//Saves user email to session storage and redirects to user page of specified user
+//Redirects to user page of specified user
 function viewUser(userEmail) {
-    //Maybe not that secure? :(
-    sessionStorage.setItem("userEmail", userEmail);
-
+    //ToDo: Check if the the email matches the current user's email
+    //If so, direct to profile page
     window.location = `/dashboard/user/${userEmail}`;
 }
-
-//Creates a row, inserts user info into row, inserts row into table
-async function displayUsers(userInfo) {
-    const tableUsers = document.getElementById("tableUsers");
-    let newRow = document.createElement('tr');
-
-    let viewButtonBox = document.createElement('td');
-    let viewButton = document.createElement('button');
-    viewButton.className = "iconButton";
-    viewButton.addEventListener("click", function(){
-        viewUser(userInfo.email);
-    });
-
-    let buttonImg = document.createElement('img');
-    buttonImg.setAttribute("src", viewIcon);
-    buttonImg.setAttribute("alt", "view");
-    buttonImg.setAttribute("height", '20px');
-
-    viewButton.appendChild(buttonImg);
-    viewButtonBox.appendChild(viewButton); 
-
-    let userName = document.createElement('td');
-    userName.textContent = userInfo.name;
-
-    let userEmail = document.createElement('td');
-    userEmail.textContent = userInfo.email;
-
-    let userRole = document.createElement('td');
-    userRole.textContent = userInfo.type;
-
-    let userArchive = document.createElement('td');
-    userArchive.textContent = userInfo.archived;
-
-    newRow.append(viewButtonBox, userName, userEmail, userRole, userArchive);
-    tableUsers.append(newRow);
-} 
-
  
 /**
  * Users Page
  * @returns {React.Component}
  */
 function Users({ getToken, api }) {
+    const [userData, setUserData] = useState([{}]);
 
-    //Grabs user data from database
-    async function getUsers() {
-        const { success, data } = await api({ func: 'GetUsers', data: {"search": ""}});
-        if (success) {
-
-            console.log("Data returned:");
+    useEffect(() => {
+        api({func: "GetUsers", data: {"search": ""}}).then(({success, data}) => {
+            console.log("What we got back");
+            console.log(success);
             console.log(data);
 
-            data.forEach(async user => {
-                await displayUsers(user);
-            })
-        }
-    }
-
-    //Triggers getUsers function to get user info from server
-    getUsers();
+            if(success){
+                setUserData(data);
+                console.log("User data set to:");
+                console.log(userData);
+            }
+            
+        })
+    }, [api,setUserData]);
 
 
     return (
@@ -92,6 +48,17 @@ function Users({ getToken, api }) {
                         </tr>
                     </thead>
                     <tbody id="tableUsers">
+                        {userData.map((user) => (
+                            <tr key={user.id}>
+                                <td>
+                                    <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {viewUser(user.email)}}></i>
+                                </td>
+                                <td>{user.name}</td>
+                                <td>{user.email}</td>
+                                <td>{user.type}</td>
+                                <td>{!user.archived?("False"):("True")}</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>
