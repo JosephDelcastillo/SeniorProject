@@ -14,6 +14,8 @@ function viewUser(userEmail) {
 function Users({ getToken, api }) {
     const [userData, setUserData] = useState([{}]);
 
+    //TODO: Have it check the emails and direct you to the profile page if you click yourself
+
     useEffect(() => {
         api({func: "GetUsers", data: {"search": ""}}).then(({success, data}) => {
             console.log("What we got back");

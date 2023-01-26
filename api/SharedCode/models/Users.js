@@ -110,6 +110,61 @@ async function Create ({name, email, password, type}) {
     });
 }
 
+async function GetCurrentUser (token) {
+    return new Promise( async resolve => {
+        console.log("starting get current user");
+
+        // Check for a token
+        if (!token) {
+            resolve (false);
+            return;
+        }
+
+        console.log(token, "parsing token:");
+        let tokenObj = JSON.parse(token);
+        console.log(tokenObj);
+
+        console.log("token:");
+        console.log(tokenObj.token);
+
+        // Query for session with that token in session table
+        // Get associated user id
+        let query = `SELECT u.user
+        FROM u WHERE u.token = "${tokenObj.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        // Make sure that we found the session
+        if (search.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search);
+
+        console.log(search[0].user);
+
+        // Query users for a user matching that id
+        let query2 = `SELECT u.type, u.name, u.email
+        FROM u WHERE u.id = "${search[0].user}"`;
+        
+        console.log('User Query')
+        const { resources: search2 } = await Users.items.query(query2).fetchAll();
+
+        //Make sure that we found the user
+        if (search2.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search2);
+
+        console.log("Found Current User");
+        resolve(search2);
+    })
+}
+
 async function GetStaff (search) {
     return new Promise(async resolve => {
         // Build Query 
@@ -473,5 +528,6 @@ module.exports = {
     Create,
     Edit,
     GetUsers,
-    Archive
+    Archive,
+    GetCurrentUser
 }

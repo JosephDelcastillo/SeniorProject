@@ -13,6 +13,7 @@ import NewUser from '../Pages/NewUser';
 import Users from '../Pages/Users';
 import UserPage from '../Pages/UserPage';
 import EditUser from '../Pages/EditUser';
+import Profile from '../Pages/Profile';
 
 export default class RouteController extends React.Component {
     render() {
@@ -30,6 +31,7 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/user" element={<Users getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/user/:email" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/edituser/:email" element={<EditUser getToken={this.props.getToken} api={this.props.api} />} />
+                    <Route path="/dashboard/profile" element={<Profile getToken={this.props.getToken} api={this.props.api} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="*" element={<NotFound />} />

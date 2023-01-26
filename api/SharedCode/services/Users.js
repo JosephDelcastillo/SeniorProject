@@ -32,6 +32,20 @@ async function GetStaff(input) {
     }
 }
 
+async function GetCurrentUser(input) {
+    const { token, data } = input;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Staff); 
+        if(!authorized) return false;
+        
+        const user = await model.GetCurrentUser(token);
+        if(user) return new Reply({ point: 'Current User Generation', success: true, data: user });
+        return new Reply({ point: 'Current User Generation' });
+    } catch(error) {
+        return new Reply({ point: 'Current User Inquiry' });
+    }
+}
+
 async function GetUsers(input) {
     const { token, data } = input;
     try {
@@ -107,5 +121,6 @@ module.exports = {
     Create,
     Edit,
     GetUsers,
-    Archive
+    Archive,
+    GetCurrentUser
 }
