@@ -4,7 +4,7 @@ export const ACTION_TYPES = {
     VIEW: 'VIEW', 
     EDIT: 'EDIT',
     DEL: 'DEL',
-    RESTORE: 'RESTORE'
+    RES: 'RES'
 }
 
 function Action({ type, action, classes = '', style = '' }) {
@@ -26,7 +26,7 @@ function Action({ type, action, classes = '', style = '' }) {
             break;
     }
 
-    return <i className={`fa-solid ${symbol} pe-1 c-pointer ${classes}`} styles={`${style}`} onClick={() => action()}></i>
+    return <i className={`fa-solid ${symbol} pe-1 c-pointer ${classes}`} styles={`${style}`} onClick={action}></i>
 }
 
 export default Action
