@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react'
-//import 'bootstrap/dist/css/bootstrap.min.css'
+import Swal from 'sweetalert2';
+//import changeArchiveStatus from '../../../api/changeArchiveStatus';
 
 
 
@@ -15,164 +16,147 @@ import React, { useState, useEffect } from 'react'
  *  Manages Individual Response
  * @returns {React.Component} 
  */
+function FormEdit({api}) {
+    const [serverQuestionData, setServerQuestionData] = useState([{}]);
+    const tableStyle = {
+        border: 'solid',
+        padding: '1.5em',
 
-//Setup state tracking and pull data
-const BuildForm = () => {
-    
-    const [newField, setNewField] = useState()
-    const [questionData, setQuestionData] = useState([{}]);
-    const [archiveData, setArchiveData] = useState([{}]);
-    const [buttonPopup,setButtonPopup] = useState(false);
-    const getQuestionData = async () => {
-        const response = await fetch('/api/form').then(data => data.json());
-        console.log('response', response)
-        if (response.success) {
-            console.log(response.data);
-            setQuestionData(response.data);
-            return (response.data);
-        } else {
-            console.log("failed");
-        }
-    }
-    const getArchiveData = async () => {
-        const response = await fetch('/api/archive').then(data => data.json());
-        console.log('response', response)
-        if (response.success) {
-            console.log(response.data);
-            setArchiveData(response.data);
-            return (response.data);
-        } else {
-            console.log("failed");
-        }
     }
 
     useEffect(() => {
-        getQuestionData()
-            .then((res) => {
-                setQuestionData(res)
-            })
-            .catch((e) => {
+        api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
 
-            })
-        getArchiveData()
-            .then((res) => {
-                setArchiveData(res)
-            })
-            .catch((e) => {
+    },[setServerQuestionData,api]);
 
-            })
-    }, []);
-
-
-    const onAddQuestion = () => {
-        setNewField({ newQuestion: '', newAnswer: '' })
-    }
-
-    const onInputChange = (e, field) => {
-        const val = e.target.value;
-        setNewField({ ...newField, [field]: val })
-    }
-
-    const onSaveQuestion = () => {
-        setQuestionData([...questionData, { question: newField.newQuestion }])
-    } 
-    
-    const onDeleteQuestion = (questionIndex) => {
-        const filteredQuestionData = questionData.filter((_question, index) => index !== questionIndex)
-        setQuestionData(filteredQuestionData)
-    }
-    const onUnArchive = (questionIndex) => {
-        const filteredQuestionData = archiveData.filter((_question, index) => index !== questionIndex)
-        setArchiveData(filteredQuestionData)
+    async function ToEdit(id, text, type){
+    Swal.fire({
+        title: 'Edit Question Content',
+        confirmButtonText:"Save Changes",
+        showCloseButton: true,
+        html:`        
+        <input id="editId" type="hidden" value="${id}"></input>
+        <label>Question Text
+            <br/>
+            <input id="editText" value="${text}"></input>
+        </label>
+        <label>Response Type
+        <br/>
+        <select id="editType">
+            <option value="number"> Number </option>
+            <option value="note"> Text </option>
+        </select>
+    </label>
+    <br/>`
         
-        
+    }).then((result) =>{
+        if(result.isConfirmed){
+            SaveContentEdit(document.getElementById("editId").value,document.getElementById("editText").value,document.getElementById("editType").value);
+        } else {
+            Swal.fire('Changes are not saved') 
+        }
+    })
     }
-            
-    return (
-            <form>
 
-                {questionData.map((question, index) => {
-                    return (
-                        <div className="form-group" key={index}>
-                            <>
-                                <label htmlFor={question.question}>{question.question}:</label>
-                                <input id='dynamicForm' className='form-control' type="text"></input>
-                                <button type="button" onClick={() => onDeleteQuestion(index)} className="btn btn-primary">Delete</button>
-                            </>
-                        </div>
-                    );
-                })}
-                {newField ? <>
-                    Add new question
-                    <br />
-                    <input type='text' name='newQuestion' placeholder='Enter question' value={newField.newQuestion} onChange={(evt) => onInputChange(evt, 'newQuestion')} />
-                    <br />
-                    <input type='text' name='newAnswer' placeholder='Enter answer type' value={newField.newAnswer} onChange={(evt) => onInputChange(evt, 'newAnswer')} />                    
-                    <button type="button" onClick={onSaveQuestion} className="btn btn-primary">Save</button>
-                    <button type="button" onClick={() => setButtonPopup(true)} className="btn btn-primary">Archived Questions</button>
-                </> : null}
-                <br></br>
-                    <Popup trigger={buttonPopup} setTrigger={setButtonPopup}>
-                    <h2>Archived Questions</h2>
-                        {archiveData.map((archive_question, archive_index,archive_date_stored) => {
-                        return (
-                            <div className="form-group" key={archive_index}>
-                                <>  
-                                    <label htmlFor={archive_date_stored.date_stored}>{archive_date_stored.date_stored}</label>
-                                    <label htmlFor={archive_question.question}>{archive_question.question}</label>
-                                    <input id='dynamicForm' className='form-control' type="text"></input>
-                                    <button type="button" onClick={() => onUnArchive(archive_index)} className="btn btn-primary">Un-Archive</button>
-                                </>
-                            </div>
-                            );
-                        })}
-                    </Popup>
-                <br></br>
-                <button type="button" onClick={onAddQuestion} className="btn btn-primary">Add Question</button>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
-                
-            </form>
-    )
-}
-function Popup(props){
-    return( props.trigger)?(
+    async function SaveContentEdit(id, text, type){
+        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type}});
+        if(!success) {
+            Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
+            return false;
+        }
+
         
-        <div className="popup" style={{
-            position: "fixed",
-            textAlign: "center",
-            top: "0",
-            right: "0",
-            width: "25%",
-            height: "100vh",
-            backgroundColor:"white",
-            border: "solid",
-            borderColor: "gray",
-            overflowY: "scroll",
-            
-        }}>
-            <div className="popup-inner">
-                <button className="close-btn" onClick={() => props.setTrigger(false)} style={{color:"red",}}>close</button>
-                { props.children }
-            </div>
-        </div>
-    ) : "";
-}
+        const index = serverQuestionData.findIndex(serverQuestion => serverQuestion.id === data.id);
+        if(index < 0) {
+            Swal.fire({ title: 'Submit Failed', text: "Question Id Not Found", icon: 'error' });
+            return false;
+        }
 
-//Display Page
-function FormEdit() {
+
+        let copyQuestionData = [ ...serverQuestionData ];
+        copyQuestionData[index] = data;
+        setServerQuestionData(copyQuestionData);
+
+        Swal.fire({title: 'Question Content Updated', text: 'Question Content Updated!', icon: 'success' });
+
+            document.getElementById("editId").value = "";
+            document.getElementById("editText").value = "";
+            document.getElementById("editType").value =  "";
+
+        return(true);
+    }
+
+
+    async function ArchiveQuestion(id, status = true) {
+        const { success, message, data } = await api({ func: 'ArchiveQuestion', data: { id, status }}); 
+        if(!success) {
+            Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
+            return false;
+        }
+
+        const index = serverQuestionData.findIndex(serverQuestion => serverQuestion.id === data.id);
+        console.log(index);
+        if(index < 0) {
+            Swal.fire({ title: 'Submit Failed', text: "Question Id Not Found", icon: 'error' });
+            return false;
+        }
+        console.log(index);
+        let copyQuestionData = [ ...serverQuestionData ];
+        copyQuestionData[index] = data;
+        console.log(serverQuestionData,copyQuestionData);
+        setServerQuestionData(copyQuestionData);
+        console.log(serverQuestionData);
+        Swal.fire({title: 'Question Archive Status Updated', text: 'Question Archive Status Updated!', icon: 'success' });
+        return(true);
+    }
+
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
-                <h1> Form - Edit</h1>
+                <h1> Form - Edit Contents</h1>
             </div>
+            <h2>Active Questions</h2>
             <div className='card-body'>
                 <div className="panel">
-                    <hr />
-                    {BuildForm()}
+                   <table>
+                        <thead>
+                            <tr>
+                                <th style={tableStyle}>ID</th>
+                                <th style={tableStyle}>Question Text</th>
+                                <th style={tableStyle}>Type</th>
+                                <th style={tableStyle}>Archive</th>
+                                <th style={tableStyle}>Edit</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {serverQuestionData.map(({id,text,type,archived,goal}) => 
+                                    <tr key={`EditQuestion-${id}`}>
+                                        <td style={tableStyle}>{id}</td>
+                                        <td style={tableStyle}>{text}</td>
+                                        <td style={tableStyle}>{type}</td>
+                                        <td>
+                                            <button className='btn btn-success' type="button" 
+                                                onClick={() => {ArchiveQuestion(id,!archived)}}>
+                                                {archived ? "Unarchive" : "Archive"}
+                                            </button>
+                                        </td>
+                                        <td>
+                                           <button className='btn btn-success' type="button" onClick={() => ToEdit(id,text,type)}>
+                                            Edit Question Content
+                                            </button> 
+                                        </td>
+                                    </tr>
+                                )}
+                        </tbody>
+                   </table>
                 </div>
             </div>
         </div>
     )
 }
+
+
+
 
 export default FormEdit

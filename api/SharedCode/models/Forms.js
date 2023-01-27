@@ -2,6 +2,8 @@
 const { Questions, Submits, Responses } = require('../lib/DBConnection');
 const tb = require('../lib/Helpers');
 
+
+
 async function GetQuestion (search, no_notes = false) {
     return new Promise(async resolve => {
         // Build Query 
@@ -15,6 +17,53 @@ async function GetQuestion (search, no_notes = false) {
         
         // Return Result 
         resolve( resources );
+    })
+}
+async function GetQuestionById (id) {
+    return new Promise(async resolve => {
+        // Build Query 
+        const query = `SELECT *
+            FROM q 
+            WHERE q.id = "${id}"`
+
+        // Search DB For Matches  
+        const { resources } = await Questions.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+async function EditQuestion(question, text, type){
+    return new Promise( async resolve=> {
+        const today = new Date(); 
+        const newQuestion = { ...question, text: text, type: type, modified: today.toISOString() };
+        const { resource: output } = await Questions.items.upsert(newQuestion);
+        return resolve({
+            id: output.id, 
+            text: output.text, 
+            type: output.type, 
+            archived: output.archived,
+            created: output.created,
+            modified: output.modified,
+            goal: output.goal
+        });
+    })
+
+}
+async function ArchiveQuestion(question, status){
+    return new Promise( async resolve=> {
+        const today = new Date(); 
+        const newQuestion = { ...question, archived: status, modified: today.toISOString() };
+        const { resource: output } = await Questions.items.upsert(newQuestion);
+        return resolve({
+            id: output.id, 
+            text: output.text, 
+            type: output.type, 
+            archived: output.archived,
+            created: output.created,
+            modified: output.modified,
+            goal: output.goal
+        });
     })
 }
 async function AddSubmission({ user, data }){
@@ -65,7 +114,29 @@ async function AddSubmission({ user, data }){
     })
 }
 
+async function GetQuestionFromArray (array = []) {
+    return new Promise(async resolve => {
+        if(array.length < 1) resolve(false)
+        // Build Query 
+        let query = `SELECT q.id, q.archived, q.text, q.type
+            FROM q 
+            WHERE `
+        array.forEach((item, i) => query += `"${item}" = q.id ${(i < (array.length-1))? "OR " : ""}`)
+        console.log(query);
+        // Search DB For Matches  
+        const { resources } = await Questions.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
+
+
 module.exports = {
+    GetQuestionFromArray,
+    GetQuestionById,
+    ArchiveQuestion,
+    EditQuestion,
     AddSubmission,
     GetQuestion
 }

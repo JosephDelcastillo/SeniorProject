@@ -31,13 +31,21 @@ function getAllSubmissions (sendFunc) {
     sendFunc(new Reply ({ point: `Get All Submissions`, success: true, data: output }));
 }
 
-function getStaff (search, sendFunc) {
+function getStaff (search, sendFunc) 
     // Search DB For Matches  
     const staff = (search) ? db.Users.filter(({ name, email }) => strSearch(name, search) || strSearch(email, search) ) : db.Users.rows;
     // Format Data for Security 
     const output = staff.map(({ id, name, email }) => { return ({ id, name, email }); }); 
     // Return Data 
     sendFunc(new Reply ({ point: `Get Staff`, success: true, data: output }));
+
+function changeArchiveStatus(id,sendFunc )
+{
+    db.Questions.updateOne({'id':id},{$set:{archived:true}});
+    const result = db.Questions.findOne({'id':id});
+    sendFunc(new Reply ({ point: `Update Archived`, success: true, data: result }));
+
+
 }
 
 function getQuestion (search, sendFunc) {
@@ -72,27 +80,6 @@ function getReport (people, questions, dates, sendFunc) {
 // **** Update Data **** 
 // **** Remove Data **** 
 
-function getQuestions (sendFunc) {
-    let output = [];
-    
-    db.Questions.rows.forEach(current => {
-            output.push({id: current.name, question: current.question});
-        });
-    
-    sendFunc(new Reply ({ point: `Get All Questions`, success: true, data: output }));
-}
-//***Get Archived Questions***
-function getArchive (sendFunc){
-    let output = [];
-
-    db.Archived.rows.map(current =>{
-        output.push({id: current.name, question: current.question, date: current.date_stored});
-         })
-    
-         sendFunc(new Reply({point:'Get All Archived', success:true,data: output}));
-
-
-}
 // *** Authorization ***
 function attemptLogin ({username, password}, sendFunc) {
     let search = db.Users.rows.find(({username}) => username == username);
@@ -139,6 +126,7 @@ module.exports = {
     runAuthorization,
     attemptLogin, 
     getQuestion,
+    changeArchiveStatus,
     getReport,
     getStaff
 };
