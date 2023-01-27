@@ -25,11 +25,11 @@ function Users({ getToken, api }) {
             if(success){
                 setUserData(data);
                 console.log("User data set to:");
-                console.log(userData);
+                // console.log(userData);
             }
             
         })
-    }, [api,setUserData]);
+    }, [api, setUserData]);
 
 
     return (

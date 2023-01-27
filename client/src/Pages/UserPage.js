@@ -7,7 +7,7 @@ import Swal from 'sweetalert2';
  * @returns {React.Component}
  */
 function UserPage({ getToken, api }) {
-    let {email} = useParams();
+    let { email } = useParams();
     const [user, setUser] = useState({});
 
     //Grabs user data from database
@@ -18,7 +18,7 @@ function UserPage({ getToken, api }) {
                 setUser(data[0]);
             }
         });
-    }, [setUser, api] )
+    }, [setUser, api, email] )
 
     const handleArchive = async e => {
         console.log("Archive was clicked");
@@ -74,11 +74,11 @@ function UserPage({ getToken, api }) {
 
             {!user.archived ? <div className="text-center">
                     <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
-                    <a className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </a>
-                    <a className='btn btn-outline-primary col-3 mt-5'> Reset Password </a>
+                    <button className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </button>
+                    <button className='btn btn-outline-primary col-3 mt-5'> Reset Password </button>
             </div>
             : <div className="text-center">
-            <a className='btn btn-outline-primary col-3 mt-5' onClick={handleUnArchive}> UnArchive Account </a>
+            <button className='btn btn-outline-primary col-3 mt-5' onClick={handleUnArchive}> UnArchive Account </button>
             </div>}
         </div>
     )

@@ -2,9 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import Question from '../Components/Question'
 import Swal from 'sweetalert2';
-import 'bootstrap/dist/css/bootstrap.min.css'
-
-
 
 //TO DO: FILTER INCOMING DATA BY ENTRYID POSTED FROM RESPONSES
 //TO DO: SETUP A POST FUNCTION TO POST FORM CHANGES TO DATABASE
@@ -19,7 +16,7 @@ const inputByID = (id) => document.getElementById(id).value;
  *  Manages Individual Response
  * @returns {React.Component} 
  */
-function Form({api}) {
+function Form({ api }) {
     const [serverQuestionData, setServerQuestionData] = useState([{}]);
 
     useEffect(() => {
@@ -48,11 +45,12 @@ function Form({api}) {
                 <div className="panel">
                     {(serverQuestionData && serverQuestionData.length > 0)?
                     (<form>
-                        {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (<Question key={id} number={i} id={id} type={type} text={text}/>))}
-
+                        {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
+                            <Question key={id} number={i} id={id} type={type} text={text}/>
+                        ))}
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
-                    <button className='btn btn-success' type="button"><a href="/dashboard/form-edit">Edit Form</a></button>
+                    <a className='btn btn-success' href="/dashboard/form-edit">Edit Form</a>
                 </div>
             </div>
         </div>

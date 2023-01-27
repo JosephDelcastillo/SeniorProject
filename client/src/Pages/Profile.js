@@ -29,7 +29,7 @@ function Profile({ getToken, api }) {
             </div>
 
             <div className="text-center">
-                    <a className='btn btn-outline-primary col-3 mt-5'> Edit Profile </a>
+                    <label className='btn btn-outline-primary col-3 mt-5'> Edit Profile </label>
             </div>
         </div>
     )
