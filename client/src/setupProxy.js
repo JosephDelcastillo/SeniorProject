@@ -1,7 +1,7 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const API = false ? "http://localhost:7071" : "https://epots-api.azurewebsites.net";
 
 module.exports = function(app) {
-    const API = false ? "http://localhost:7071" : "https://epots-api.azurewebsites.net/";
     app.use(
         '/api',
         createProxyMiddleware({

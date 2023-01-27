@@ -24,6 +24,9 @@ function Action({ type, action, classes = '', style = '' }) {
         case ACTION_TYPES.RESTORE:
             symbol  = 'fa-rotate-left text-warning'
             break;
+        default:
+            symbol = 'fa-circle-question text-light'
+            break;
     }
 
     return <i className={`fa-solid ${symbol} pe-1 c-pointer ${classes}`} styles={`${style}`} onClick={action}></i>
