@@ -5,72 +5,161 @@ const tb = require('../lib/Helpers');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
-//used to just accept data
+
 async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
         console.log(name + email + password + type);
 
+        //checks to make sure all needed info is filled in
+        if (!name || !email || !password || !type){
+            resolve(false);
+            return;
+        }
+
+        console.log("Checking if user exists");
+
         //checks if user already exists
         let queryUsers = `SELECT u.email
-            FROM u 
-            WHERE u.type LIKE "staff" AND ( u.name LIKE "%${email}%" OR u.email LIKE "%${email}%" )
-            ORDER BY u.name`
+        FROM u 
+        WHERE u.email LIKE "${email.toLowerCase()}"`
+    
+        const { resources } = await Users.items.query(queryUsers).fetchAll();
+
+        console.log(resources);
+
+        //if email already in use, send back a false
+        if (!resources.length == 0) {
+            resolve(false);
+            return;
+        } 
+
+        console.log("Checking if email is valid");
+
+        //check that email is an email
+        let emailValid = /\S+@\S+\.\S+/;
+        if (!emailValid.test(email)) {
+            resolve(false);
+            return;
+        }
+
         
-            const { resources } = await Users.items.query(queryUsers).fetchAll();
+        const salt = await tb.genSalt();
+        console.log(salt);
+        console.log("^ salt")
 
-            //if email already in use, send back a false
-            if (resources) {
-               resolve(false);
-            } 
+        const saltPass = await tb.hashing(password, salt);
+        console.log(saltPass);
+        console.log("^ salted password")
 
-            //check that email is an email
-            let emailValid = /\S+@\S+\.\S+/;
-            if (!emailValid.test(email)) {
-                resolve(false);
-            }
+        const userId = await tb.genId();
+        console.log(userId);
+        console.log("^ userID")
 
-            
-            const salt = await tb.genSalt();
-            console.log(salt);
+        //Check if the id is already in use
+        const idQuery = `SELECT u.name
+        FROM u 
+        WHERE u.id LIKE "${userId}"`
+        let idCheck = await Users.items.query(idQuery).fetchAll();
 
-            const saltPass = await tb.hashing(password, salt);
-            console.log(saltPass);
-
+        //generates new id if in use already
+        if (!idCheck.length == 0) {
             const userId = await tb.genId();
             console.log(userId);
+        }
 
-            //Check if the id is already in use
-            const idQuery = `SELECT u.name
-            FROM u 
-            WHERE u.id LIKE "${search}"`
-            let idCheck = await Users.items.query(idQuery).fetchAll();
+        console.log("Attempting to create user");
+        let query = {};
 
-            //generates new id if in use already
-            if (idCheck) {
-                const userId = await tb.genId();
-                console.log(userId);
-            }
+        //puts everything into database based on user type
+        if (type == "admin") {
+            query = {
+                id: userId,
+                archived: false,
+                name,
+                email,
+                pass: saltPass,
+                salt: salt,
+                type: AUTH_ROLES.Admin,
+                f_token: "",
+                f_salt: "",
+                f_created: ""
+            };
+        } else {
+            query = {
+                id: userId,
+                archived: false,
+                name,
+                email,
+                pass: saltPass,
+                salt: salt,
+                type: AUTH_ROLES.Staff,
+                f_token: "",
+                f_salt: "",
+                f_created: ""
+            };
+        }
 
-                //puts everything into database
-                const query = {
-                    id: userId,
-                    archived: false,
-                    name,
-                    email,
-                    pass: saltPass,
-                    salt: salt,
-                    type: AUTH_ROLES.Staff,
-                    f_token: "",
-                    f_salt: "",
-                    f_created: ""
-                };
-
-                console.log(query);
-                const result = await Users.items.create(query);
-                console.log(result);
+            console.log(query);
+            const result = await Users.items.create(query);
+            console.log(result);
 
        resolve(true);
     });
+}
+
+async function GetCurrentUser (token) {
+    return new Promise( async resolve => {
+        console.log("starting get current user");
+
+        // Check for a token
+        if (!token) {
+            resolve (false);
+            return;
+        }
+
+        console.log(token, "parsing token:");
+        let tokenObj = JSON.parse(token);
+        console.log(tokenObj);
+
+        console.log("token:");
+        console.log(tokenObj.token);
+
+        // Query for session with that token in session table
+        // Get associated user id
+        let query = `SELECT u.user
+        FROM u WHERE u.token = "${tokenObj.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        // Make sure that we found the session
+        if (search.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search);
+
+        console.log(search[0].user);
+
+        // Query users for a user matching that id
+        let query2 = `SELECT u.type, u.name, u.email
+        FROM u WHERE u.id = "${search[0].user}"`;
+        
+        console.log('User Query')
+        const { resources: search2 } = await Users.items.query(query2).fetchAll();
+
+        //Make sure that we found the user
+        if (search2.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search2);
+
+        console.log("Found Current User");
+        resolve(search2);
+    })
 }
 
 async function GetStaff (search) {
@@ -92,7 +181,6 @@ async function GetStaff (search) {
     })
 }
 
-
 async function GetAllUsers(){
     return new Promise(async resolve => {
         const query = `SELECT u.id, u.email, u.name
@@ -101,44 +189,186 @@ async function GetAllUsers(){
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
-        
         // Return Result 
         resolve( resources );
-        return resources;
     })
 }
 
-
-async function GetAllUsers(){
+async function GetUsers (search) {
     return new Promise(async resolve => {
-        const query = `SELECT u.id, u.email, u.name
-        FROM u 
-        ORDER BY u.email`
+        console.log("Search");
+        console.log(search);
+
+        // Build Query 
+        let query = `SELECT u.id, u.archived, u.name, u.email, u.type
+            FROM u
+            ${search ? ` WHERE u.email LIKE "${search}"`: ""} 
+            ORDER BY u.name`
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting Staff:");
+        console.log(resources);
+        console.log("Sending back...");
+
         
         // Return Result 
         resolve( resources );
     })
 }
 
-async function GetUsersFromArray(array = []){
+async function Edit ({name, oldemail, email, type}) {
     return new Promise(async resolve => {
-        if(array.length < 1) resolve(false);
+        console.log("Info recieved:");
+        console.log(name + oldemail + email + type);
 
-        let query = `SELECT u.id, u.name, u.email FROM u WHERE `
-        array.forEach((id, i) => query+=`"${id}" = u.id ${(i<(array.length-1))? "OR ":" "}`);
+        //Getting needed user id info
+        let query = `SELECT *
+        FROM u
+        WHERE u.email LIKE "${oldemail}"`
 
-        // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            resolve(false);
+            return;
+        }
+
+        //Declaring our needed variables which may or may not be used
+        let result = null;
+        let updated = null;
+
+        //See if email was updated
+        if (!email == "") {
+            console.log(email);
+            console.log("checking email usage:");
+
+            //checks if email is already in use
+            let queryusers = `SELECT u.email, u.name
+            FROM u
+            WHERE u.email LIKE "${email}"`
         
-        // Return Result 
-        resolve( resources );
-    })
+            let resources2 = await Users.items.query(queryusers).fetchAll(); 
+
+            console.log(resources2.resources);
+
+            //if email already in use, send back a false
+            if (!resources2.resources.length == 0) {
+                resolve(false);
+                return;
+            } 
+
+            //check that email is an email
+            let emailValid = /\S+@\S+\.\S+/;
+            if (!emailValid.test(email)) {
+                resolve(false);
+                return;
+            }
+
+            console.log("Trying to replace email:");
+
+            updated = {...resources[0], email};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+
+        }
+
+        //See if user type was updated
+        if (type && !(type == "0")) {
+            console.log(type);
+
+            if ( type == "admin") {
+                console.log("Trying to replace type:");
+
+                updated = {...resources[0], attr: AUTH_ROLES.Staff};
+                console.log("made new user", updated);
+                result = await Users.items.upsert(updated);
+                console.log(result);
+            } else {
+                console.log("Trying to replace type:");
+
+                updated = {...resources[0], attr: AUTH_ROLES.Admin};
+                console.log("made new user", updated);
+                result = await Users.items.upsert(updated);
+                console.log(result);
+            }
+        }
+
+        //See if name was updated
+        if (!name == "") {
+            console.log("Trying to replace name:");
+
+            updated = {...resources[0], name};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+        }
+
+        //Seeing if we updated anything and got a result
+        if (result) {
+            console.log(result);
+            resolve(true);
+            return;
+        } else {
+            resolve(false);
+            return;
+        } 
+    });
 }
 
+async function Archive ({email, archive}) {
+    return new Promise(async resolve => {
+        console.log(email + archive);
 
+        //Getting needed user id info
+        let query = `SELECT *
+        FROM u
+        WHERE u.email LIKE "${email}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+        console.log(resources[0].id);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            console.log("No user found");
+            resolve(false);
+            return;
+        }
+
+        // Try to change archival status
+        if (archive == false) {
+            console.log("Trying to archive:");
+
+            const updated = {...resources[0], archived: true};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
+
+            console.log("Succeeded in change");
+        } else {
+            console.log("Trying to unarchive:");
+
+            const updated = {...resources[0], archived: false};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
+
+            console.log("Succeeded in change");
+        }
+
+        resolve (true);
+
+    });
+}
 
 // *** Authorization ***
 async function Login ({email, password}) {
@@ -154,7 +384,7 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email.toLowerCase()}"`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
@@ -186,30 +416,17 @@ async function Login ({email, password}) {
             }
             
             const { resource: newSession } = await Sessions.items.create(session);
-            if(!newSession) resolve(false);
+            if(!newSession) {
+                resolve(false);
+                return;
+            }
+
+            console.log(newSession.token);
+            console.log("^ token");
+
             /******** Step 5: Return Token ********/
             resolve ({ token: newSession.token, attr: CurrentUser.type });
         }
-    })
-}
-
-/**
- * Run Authorization 
- * @param {string} token Authorization Token
- * @param {Function} sendFunc To Return Data
- * @param {Function} successAction Action to do if authorized
- */
-async function Authorize (token, requirement = false) {
-    return new Promise(resolve => {
-        // TODO: Fill this in with an actual token processor 
-        // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
-        // TODO: If Valid Token -> Return user id 
-        if ( token ) resolve('ASD8-ASDc-aaAScds');
-        
-        // TODO: If invalid Token -> Return false 
-        // TODO: Resolve with Reply 
-        resolve(false)
-        return false;
     })
 }
 
@@ -219,6 +436,8 @@ module.exports = {
     GetStaff,
     Login,
     Create,
-    GetAllUsers,
-    GetUsersFromArray
+    GetUsers,
+    Archive,
+    GetCurrentUser,
+    GetAllUsers
 }
