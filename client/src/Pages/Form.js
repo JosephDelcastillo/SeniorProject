@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Question from '../Components/Question'
 import Swal from 'sweetalert2';
-//import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 
 
@@ -24,7 +24,7 @@ function Form({api}) {
 
     useEffect(() => {
         api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
-    },[setServerQuestionData,api])
+    },[setServerQuestionData,api]);
 
 
     const formSubmit = e => {
@@ -48,10 +48,11 @@ function Form({api}) {
                 <div className="panel">
                     {(serverQuestionData && serverQuestionData.length > 0)?
                     (<form>
-                        {serverQuestionData.map(({id, type, text}, i) => (<Question key={id} number={i} id={id} type={type} text={text}/>))}
+                        {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (<Question key={id} number={i} id={id} type={type} text={text}/>))}
 
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
+                    <button className='btn btn-success' type="button"><a href="/dashboard/form-edit">Edit Form</a></button>
                 </div>
             </div>
         </div>
