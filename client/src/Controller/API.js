@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const API_ENDPOINT = false ? "http://localhost:7071" : "https://epots-api.azurewebsites.net";
-
 /**
   * API Helper Function <br>
   * 
@@ -13,7 +11,7 @@ const API_ENDPOINT = false ? "http://localhost:7071" : "https://epots-api.azurew
 async function call(getToken, { func, data, action }) {
     //********  Step 1: Initialize Data  ********
     // Prepare URL
-    const API_URL = `${API_ENDPOINT}/api`
+    const API_URL = `/api`
     // Get Post vs Get
     const IS_POST = action ? (action.toLowerCase() !== 'get') : true ; // Default to POST 
 

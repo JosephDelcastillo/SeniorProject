@@ -117,17 +117,13 @@ async function GetCurrentUser (token) {
             return;
         }
 
-        console.log(token, "parsing token:");
-        let tokenObj = JSON.parse(token);
-        console.log(tokenObj);
-
         console.log("token:");
-        console.log(tokenObj.token);
+        console.log(token.token);
 
         // Query for session with that token in session table
         // Get associated user id
         let query = `SELECT u.user
-        FROM u WHERE u.token = "${tokenObj.token}"`;
+        FROM u WHERE u.token = "${token.token}"`;
         
         console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
@@ -384,7 +380,7 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
+        FROM u WHERE u.email = "${email}" AND u.archived = false`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
@@ -462,18 +458,13 @@ async function Authorize (token, requirement) {
             return;
         }
 
-        console.log(token, "parsing token:");
-        let tokenObj = JSON.parse(token);
-        console.log(tokenObj);
-
         console.log("token:");
-        console.log(tokenObj.token);
-
+        console.log(token.token)
         
 
         // Query for session with that token in session table
         let query = `SELECT u.id, u.user, u.created
-        FROM u WHERE u.token = "${tokenObj.token}"`;
+        FROM u WHERE u.token = "${token.token}"`;
         
         console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
