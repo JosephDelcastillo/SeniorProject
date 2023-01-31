@@ -5,6 +5,109 @@ const tb = require('../lib/Helpers');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
+/**
+ * Run Authorization 
+ * @param {string} token Authorization Token
+ * @param {Function} sendFunc To Return Data
+ * @param {Function} successAction Action to do if authorized
+ */
+async function Authorize (token, requirement) {
+    return new Promise( async resolve => {
+        /**
+         * Authorization Process
+         * 
+         * 1) Check for token
+         * 2) See if token matches a stored token
+         *  2.1)See if token is expired
+         *  2.2) See how many sessions user has
+         *  2.3) If not valid sessions, delete current session and return false
+         * 3) Check for user
+         *  3.5) See is user is archived
+         * 4) Check to see if roles match
+         * 5) Return true and user id if all checks out  
+         */
+
+        console.log("starting authorization check");
+        console.log(requirement);
+
+
+        // Check for a token
+        if (!token) {
+            resolve (false);
+            return;
+        }
+
+        console.log(token, "parsing token:");
+        let tokenObj = JSON.parse(token);
+        console.log(tokenObj);
+
+        console.log("token:");
+        console.log(tokenObj.token);
+
+        
+
+        // Query for session with that token in session table
+        let query = `SELECT u.id, u.user, u.created
+        FROM u WHERE u.token = "${tokenObj.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        if (search.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search);
+
+        console.log(search[0].user);
+
+        //TODO: Maybe add some sort of expiration check here????
+
+        // Query users for a user matching that id
+        let query2 = `SELECT u.type, u.archived
+        FROM u WHERE u.id = "${search[0].user}"`;
+        
+        console.log('User Query')
+        const { resources: search2 } = await Users.items.query(query2).fetchAll();
+
+        if (search2.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search2);
+
+        //check to make sure user isn't archived
+        if (search2[0].archived == true) {
+            resolve(false);
+            return;
+        }
+
+        // Compare user types
+        if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
+            console.log("Auth success");
+            resolve({id: search[0].user});
+            return;
+        }
+        if (search2[0].type == "admin" || search2[0].type == "Administrator") {
+            console.log("Auth success");
+            resolve({id: search[0].user});
+            return;
+        }
+
+
+        // TODO: Fill this in with an actual token processor 
+        //???? ^
+        // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
+        // TODO: If Valid Token -> Return user id 
+        
+        // TODO: If invalid Token -> Return false 
+        // TODO: Resolve with Reply 
+        console.log("Auth Fail");
+        resolve(false);
+    })
+}
 
 async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
