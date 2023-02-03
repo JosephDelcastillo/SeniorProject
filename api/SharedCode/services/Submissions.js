@@ -15,7 +15,7 @@ async function GetAllSubmissions(input) {
             submissions = await model.GetAllSubmissions();
         }
         else if (isStaff) {
-            submissions = await model.GetAllSubmissions(isStaff);
+            submissions = await model.GetAllSubmissions(isStaff.id);
         }
         else if (submissions === false) {
             return new Reply({ point: 'Authorization' });
