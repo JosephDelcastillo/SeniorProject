@@ -627,7 +627,21 @@ async function Authorize (token, requirement) {
         resolve(false);
     })
 }
+async function GetUsersFromArray(array = []){
+    return new Promise(async resolve => {
+        if(array.length < 1) { resolve(false); return false; }
 
+        let query = `SELECT u.id, u.name, u.email FROM u WHERE `
+        array.forEach((id, i) => query+=`"${id}" = u.id ${(i<(array.length-1))? "OR ":" "}`);
+
+        // Search DB For Matches  
+        const { resources } = await Users.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+        return resources;
+    })
+}
 module.exports = {
     AUTH_ROLES,
     Authorize,
@@ -638,5 +652,6 @@ module.exports = {
     Edit,
     Archive,
     GetCurrentUser,
-    GetAllUsers
+    GetAllUsers,
+    GetUsersFromArray
 }
