@@ -38,7 +38,7 @@ async function Authorize (token, requirement) {
         }
 
         console.log(token, "parsing token:");
-        let tokenObj = JSON.parse(token);
+        let tokenObj = typeof token === "object" ? token : JSON.parse(token);
         console.log(tokenObj);
 
         console.log("token:");
