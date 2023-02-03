@@ -19,7 +19,7 @@ function NavBar({ getToken, isAdmin }) {
                                     Users
                                 </Link>
                                 <ul className="dropdown-menu dropdown-menu-end">
-                                    <li><Link className='dropdown-item' to="dashboard/users">Manage Users</Link></li>
+                                    <li><Link className='dropdown-item' to="dashboard/user">Manage Users</Link></li>
                                     <li><Link className='dropdown-item' to="dashboard/newuser">Add User</Link></li>
                                 </ul>
                             </div>
@@ -41,7 +41,7 @@ function NavBar({ getToken, isAdmin }) {
                                 Profile
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end">
-                                <li><Link className='dropdown-item' to="profile">Your Profile</Link></li>
+                                <li><Link className='dropdown-item' to="/dashboard/profile">Your Profile</Link></li>
                                 <li><Link className='dropdown-item' to="logout">Logout</Link></li>
                             </ul>
                         </div>
@@ -52,4 +52,4 @@ function NavBar({ getToken, isAdmin }) {
     )
 }
 
-export default NavBar 
+export default NavBar  

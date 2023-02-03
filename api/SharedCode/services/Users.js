@@ -6,7 +6,7 @@ async function Create (input) {
     const { name, email, password, type } = data;
     try {
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
-        if(!authorized) return false;
+        if(!authorized) return new Reply({ point: 'Authorization'});
 
         const res = await model.Create({name, email, password, type});
 
@@ -32,7 +32,35 @@ async function GetStaff(input) {
     }
 }
 
-//async function Login (email, password) {
+async function GetCurrentUser(input) {
+    const { token, data } = input;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Staff); 
+        if(!authorized) return false;
+        
+        const user = await model.GetCurrentUser(token);
+        if(user) return new Reply({ point: 'Current User Generation', success: true, data: user });
+        return new Reply({ point: 'Current User Generation' });
+    } catch(error) {
+        return new Reply({ point: 'Current User Inquiry' });
+    }
+}
+
+async function GetUsers(input) {
+    const { token, data } = input;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return false;
+        
+        const users = await model.GetUsers(data.search);
+        if(users) return new Reply({ point: 'User Generation', success: true, data: users });
+        return new Reply({ point: 'User Generation' });
+    } catch(error) {
+        return new Reply({ point: 'User Inquiry' });
+    }
+}
+
+
 async function Login (input) {
     console.log("Made it to service!!");
     const { email, password } = input.data;
@@ -53,8 +81,46 @@ async function Login (input) {
     }
 }
 
+async function Edit (input) {
+    const { token, data } = input;
+    const { name, oldemail, email, type } = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.Edit({name, oldemail, email, type});
+
+        if(res) return new Reply({ point: 'Edit', success: true, data: res });
+        return new Reply({ point: 'Edit' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Edit'});
+    }
+}
+
+async function Archive (input) {
+    const { token, data } = input;
+    const { email, archive } = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.Archive({ email, archive});
+
+        if(res) return new Reply({ point: 'Archive', success: true, data: res });
+        return new Reply({ point: 'Archive' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Archive'});
+    }
+}
+
 module.exports = {
     GetStaff,
     Login,
-    Create
+    Create,
+    Edit,
+    GetUsers,
+    Archive,
+    GetCurrentUser
 }

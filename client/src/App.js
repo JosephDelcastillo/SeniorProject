@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React from 'react';
+import axios from 'axios';
 import NavBar from './Components/NavBar';
 import RouteController from "./Controller/RouteController";
 
@@ -16,18 +16,18 @@ function isAdmin () {
   return typeof obj.attr === "string" && obj.attr.toLowerCase() === "admin"
 }
 
-const API_URL = false ? "/api" : "https://epots-api.azurewebsites.net/api";
-
 /**
-  *  Ajax Helper Function <br>
+  * API Helper Function <br>
   * 
-  *  Runs ajax call based on parameters and handles the errors
+  *  Runs axios call based on parameters and handles the errors
   * @param {string} func    The URL part of the api function name (api/{func})
   * @param {object} data    The data to pass, TOKEN is auto-amendend if it exists
   * @param {string} action  POST or GET | Defaults to POST
  */
 async function api({ func, data, action }) {
   //********  Step 1: Initialize Data  ********
+  // Prepare URL
+  const API_URL = `/api`
   // Get Post vs Get
   const IS_POST = action ? (action.toLowerCase() !== 'get') : true ; // Default to POST 
 
@@ -46,9 +46,9 @@ async function api({ func, data, action }) {
   const DATA = getToken() ? { token: JSON.parse(getToken()), data } : data;
 
   if(IS_POST){
-    return await axios.post(API_URL + url, DATA).then(response => response.data)
+      return await axios.post(API_URL + url, DATA).then(response => response.data)
   } else {
-    return await axios.get(API_URL + url).then(response => response.data)
+      return await axios.get(API_URL + url).then(response => response.data)
   }
 }
 
