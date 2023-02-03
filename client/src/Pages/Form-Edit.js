@@ -30,32 +30,32 @@ function FormEdit({api}) {
     },[setServerQuestionData,api]);
 
     async function ToEdit(id, text, type){
-    Swal.fire({
-        title: 'Edit Question Content',
-        confirmButtonText:"Save Changes",
-        showCloseButton: true,
-        html:`        
-        <input id="editId" type="hidden" value="${id}"></input>
-        <label>Question Text
+        Swal.fire({
+            title: 'Edit Question Content',
+            confirmButtonText:"Save Changes",
+            showCloseButton: true,
+            html:`        
+                <input id="editId" type="hidden" value="${id}"></input>
+                <label>Question Text
+                    <br/>
+                    <input id="editText" value="${text}"></input>
+                </label>
+                <label>Response Type
+                    <br/>
+                    <select id="editType">
+                        <option value="number" ${type == "number" ? "selected" : ""}> Number </option>
+                        <option value="note" ${type == "note" ? "selected" : ""}> Text </option>
+                    </select>
+                </label>
             <br/>
-            <input id="editText" value="${text}"></input>
-        </label>
-        <label>Response Type
-        <br/>
-        <select id="editType">
-            <option value="number"> Number </option>
-            <option value="note"> Text </option>
-        </select>
-    </label>
-    <br/>`
-        
-    }).then((result) =>{
-        if(result.isConfirmed){
-            SaveContentEdit(document.getElementById("editId").value,document.getElementById("editText").value,document.getElementById("editType").value);
-        } else {
-            Swal.fire('Changes are not saved') 
-        }
-    })
+            `
+        }).then((result) =>{
+            if(result.isConfirmed){
+                SaveContentEdit(document.getElementById("editId").value,document.getElementById("editText").value,document.getElementById("editType").value);
+            } else {
+                Swal.fire('Changes are not saved') 
+            }
+        })
     }
 
     async function SaveContentEdit(id, text, type){
