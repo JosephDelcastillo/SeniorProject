@@ -21,47 +21,54 @@ function Responses({api}) {
                 { cell: row => row.actions, width: '4rem' },
                 { name: 'User', selector: row => row.user, sortable: true }, 
                 { name: 'Created', selector: row => row.created, sortable: true }, 
-                { name: 'Modified', selector: row => row.modified, sortable: true }, 
-                { name: 'Modified By', selector: row => row.modified_by, sortable: true }
+                { name: 'Modified By', selector: row => row.modified_by, sortable: true }, 
+                { name: 'Last Edit Date', selector: row => row.modified, sortable: true },
+                { name: 'Archived?', selector: row => row.archived, sortable: true }
             ];
             let info = [];
-            data.submissions.forEach(({ id, user, created, modified, modified_by }, i) => {
+            data.submissions.forEach(({ id, user, created, modified, modified_by, archived}, i) => {
                 let search = data.users.findIndex(u => u.id === user);
-                user = (search >= 0) ? data.users[search].email : user;
+                user = (search >= 0) ? data.users[search].name : user;
+                console.log("User: ", data.users[search].email);
                 created = (created && created.length > 1) ? created : 'Unknown';
-                
-                search = data.users.findIndex(u => u.id === modified);
-                modified = (search >= 0) ? data.users[search].email : 'Not Modified';
-                modified_by = (modified_by && modified_by.length > 1) ? modified_by : 'Not Modified';
+                archived = (!archived) ? "No" : "Yes";
+                search = data.users.findIndex(u => u.id === modified_by);
+                modified = (modified && modified.length > 1) ? modified : 'Not Modified';
+                modified_by = (search >= 0 && created !== modified) ? data.users[search].name : 'Not Modified';
                 
                 const actions = (
                 <>
                     <Action key={uuid()} type={ACTION_TYPES.VIEW} action={() => {window.location.pathname = `/dashboard/response/${id}`}} />
-                    <Action key={uuid()} type={ACTION_TYPES.DEL} action={e => deleteSubmission(id)} />
+                    <Action key={uuid()} type={(archived === "Yes") ? ACTION_TYPES.RES : ACTION_TYPES.DEL} action={e => archiveHandler(id)} />
                 </>)
 
-                info.push({ id, user, created, modified, modified_by, actions })
+                info.push({ id, user, created, modified, modified_by, archived, actions })
             });
             
             const tables = { info, columns };
-            async function deleteSubmission (id) {
+            //*****Archive Handler Checks Archive Status of a Submission and Allows User to Archive/Unarchive that Submission******/
+            async function archiveHandler (id) {
                 let newEntryData = { tables, ...data };
 
+                //Find index of selected submission in array
                 const dataIndex = newEntryData.submissions.findIndex(submission => submission.id = id);
+               //Check that requested submissions exists
                 if(dataIndex < 0) return Swal.fire({title: 'Failed to Archive Submission', text: `Can Not Find Submission Id: ${id}` , icon: 'error'});
-                console.log("DataIndex is > 0", dataIndex);
-                
-                const apiOutput = await api({func: "ArchiveSubmissions", data: {submissionId: id, archiveStatus: true}});
-                console.log("apiOutput is: ", apiOutput);
+                //Check to see if submission needs to be archived or unarchived and set new value to that value
+                const newStatus = (data.submissions[0].archived === false)? true : false;
+                //Pass request to function in API
+                const apiOutput = await api({func: "ArchiveSubmissions", data: {submissionId: id, archiveStatus: newStatus}});
+                //Check for database query success
                 if(!apiOutput || !apiOutput.success) return Swal.fire({title: 'Failed to Archive Submission', text: !apiOutput.message ? 'API Query Failed' : apiOutput.message , icon: 'error'});
+                //Check for status change success
                 if(!apiOutput.data.id || newEntryData.submissions[dataIndex].id !== apiOutput.data.id) return Swal.fire({title: 'Error Archiving Submission', text: `Submission Id "${id}" Does Not Match Received Submission Id "${apiOutput.data.id}"` , icon: 'error'});
-                
-                console.log("NewEntryData.submissions[dataIndex]", newEntryData.submissions[dataIndex]);
+                //If all events successful, then update the submission data and update page
                 newEntryData.submissions[dataIndex] =  apiOutput.data;
                 
-                console.log("New Entry Data Before", newEntryData.submissions[dataIndex]);
+
                 setEntryData(newEntryData);
-                console.log("New Entry Data After", newEntryData.submissions[dataIndex]);
+                //TO DO: REPLACE WITH PROPER STATE UPDATES
+                window.location.reload();
             }
 
             setEntryData({ tables, ...data });
