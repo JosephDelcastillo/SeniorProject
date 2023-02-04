@@ -27,10 +27,10 @@ async function EditQuestion(input){
         const questions = await model.GetQuestionById(id);
 
         if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("text")) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
-        if(questions[0].text === text) return new Reply({point:'Text Matching', success: true, data: questions[0]});
+        if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
 
         const output = await model.EditQuestion(questions[0], text, type);
-        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: id});
+        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: output.id});
         return new Reply({point: 'Question Content Updated', success: true, data: output});
     } catch (error) {
         return new Reply({ point: 'Question Content Update Inquiry' });
