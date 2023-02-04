@@ -16,12 +16,12 @@ function Action({ type, action, classes = '', style = '' }) {
             symbol = 'fa-eye text-info'
             break;
         case ACTION_TYPES.EDIT:
-            symbol  = 'fa-pencil text-warning'
+            symbol  = 'fa-pencil text-info'
             break;
         case ACTION_TYPES.DEL:
             symbol  = 'fa-trash-can text-danger'
             break;
-        case ACTION_TYPES.RESTORE:
+        case ACTION_TYPES.RES:
             symbol  = 'fa-rotate-left text-warning'
             break;
         default:
