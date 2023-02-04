@@ -52,10 +52,11 @@ function Responses({api}) {
 
                 //Find index of selected submission in array
                 const dataIndex = newEntryData.submissions.findIndex(submission => submission.id = id);
+                console.log("Data Index: ",dataIndex);
                //Check that requested submissions exists
                 if(dataIndex < 0) return Swal.fire({title: 'Failed to Archive Submission', text: `Can Not Find Submission Id: ${id}` , icon: 'error'});
                 //Check to see if submission needs to be archived or unarchived and set new value to that value
-                const newStatus = (data.submissions[0].archived === false)? true : false;
+                const newStatus = (data.submissions[dataIndex].archived === false)? true : false;
                 //Pass request to function in API
                 const apiOutput = await api({func: "ArchiveSubmissions", data: {submissionId: id, archiveStatus: newStatus}});
                 //Check for database query success
@@ -68,7 +69,7 @@ function Responses({api}) {
 
                 setEntryData(newEntryData);
                 //TO DO: REPLACE WITH PROPER STATE UPDATES
-                window.location.reload();
+       
             }
 
             setEntryData({ tables, ...data });
