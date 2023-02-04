@@ -26,8 +26,8 @@ async function EditQuestion(input){
 
         const questions = await model.GetQuestionById(id);
 
-        if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("text")) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
-        if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
+        if(!questions || questions.length === 0 || !("text" in questions[0])) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
+        //if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
 
         const output = await model.EditQuestion(questions[0], text, type);
         if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: output.id});
