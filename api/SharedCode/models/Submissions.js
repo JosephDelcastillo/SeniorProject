@@ -57,12 +57,12 @@ async function Archive(id, status, userId){
     return new Promise( async resolve=> {
         const query = `SELECT *
         FROM s 
-        WHERE "${id}" = s.id
-        ORDER BY s.modified DESC`
-        console.log("Archive Reached");
+        WHERE "${id}" = s.id`
+        
+        console.log("Passed Status:", status);
         const { resources } = await Submits.items.query(query).fetchAll();
         console.log("Success", resources);
-        if(!resources || resources.length<=0){
+        if(!resources || resources.length<=0){  
            return resolve ("Failed to find submission");
         }
         const today = new Date(); 
