@@ -126,7 +126,7 @@ function FormEdit({api}) {
                                         </td>
                                         <td>{id}</td>
                                         <td>{text}</td>
-                                        <td>{type[0].toUpperCase()}{type.substring(1)}</td>
+                                        <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
                                             {archived ? "" : "Not "} Archived
                                         </td>
