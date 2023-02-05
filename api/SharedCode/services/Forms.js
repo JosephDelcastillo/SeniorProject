@@ -65,7 +65,7 @@ async function AddSubmission (input) {
         const authorized = await Authorize(token); 
         if(!authorized) return new Reply({ point: 'Authorization' });
         
-        const success = await model.AddSubmission({ user: authorized, data });
+        const success = await model.AddSubmission({ user: authorized.id, data });
         if(success) return new Reply({ point: 'Add Submission', success: true, data: success });
         return new Reply({ point: 'Add Submission' });
     } catch (error) {

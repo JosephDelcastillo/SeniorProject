@@ -26,7 +26,7 @@ function Form({ api }) {
 
     const formSubmit = e => {
         let input = [];
-        serverQuestionData.forEach(({id}) => input.push({ id, value: inputByID(id) }));
+        serverQuestionData.forEach(({id, archived}) => { if (!archived) input.push({ id, value: inputByID(id) }) });
         
         api({ func: 'AddSubmission', data: input }).then(({ success, message, data }) => {
             console.log(success);
