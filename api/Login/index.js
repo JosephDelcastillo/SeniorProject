@@ -2,6 +2,7 @@
 const service = require('../SharedCode/services/Users');
 
 module.exports = async function (context, req) {
+    context.log.verbose('JS Comment Test');
     context.log('JavaScript HTTP trigger function processed a request.');
     context.log('req: ' + req);
     if (!req.body) {
@@ -21,9 +22,12 @@ module.exports = async function (context, req) {
             };
         }
 
+        console.log('Started')
+        console.log(data)
         const result = await service.Login(data);
 
-        console.log("result in index is: " + result);
+        console.log("result in index is: ");
+        console.log(result);
         if(!result) {
             return context.res = {
                 status: 400,

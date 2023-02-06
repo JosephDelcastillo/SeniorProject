@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2';
+
+import Action, { ACTION_TYPES } from '../Components/Action';
 //import changeArchiveStatus from '../../../api/changeArchiveStatus';
 
 
@@ -18,11 +20,6 @@ import Swal from 'sweetalert2';
  */
 function FormEdit({api}) {
     const [serverQuestionData, setServerQuestionData] = useState([{}]);
-    const tableStyle = {
-        border: 'solid',
-        padding: '1.5em',
-
-    }
 
     useEffect(() => {
         api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
@@ -43,8 +40,8 @@ function FormEdit({api}) {
                 <label>Response Type
                     <br/>
                     <select id="editType">
-                        <option value="number" ${type == "number" ? "selected" : ""}> Number </option>
-                        <option value="note" ${type == "note" ? "selected" : ""}> Text </option>
+                        <option value="number" ${type === "number" ? "selected" : ""}> Number </option>
+                        <option value="note" ${type === "note" ? "selected" : ""}> Text </option>
                     </select>
                 </label>
             <br/>
@@ -64,7 +61,6 @@ function FormEdit({api}) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
         }
-
         
         const index = serverQuestionData.findIndex(serverQuestion => serverQuestion.id === data.id);
         if(index < 0) {
@@ -72,17 +68,11 @@ function FormEdit({api}) {
             return false;
         }
 
-
         let copyQuestionData = [ ...serverQuestionData ];
         copyQuestionData[index] = data;
         setServerQuestionData(copyQuestionData);
 
         Swal.fire({title: 'Question Content Updated', text: 'Question Content Updated!', icon: 'success' });
-
-            document.getElementById("editId").value = "";
-            document.getElementById("editText").value = "";
-            document.getElementById("editType").value =  "";
-
         return(true);
     }
 
@@ -115,41 +105,35 @@ function FormEdit({api}) {
             <div className="card-header bg-white text-center">
                 <h1> Form - Edit Contents</h1>
             </div>
-            <h2>Active Questions</h2>
             <div className='card-body'>
                 <div className="panel">
-                   <table>
+                    <table className='table table-hover table-striped'>
                         <thead>
                             <tr>
-                                <th style={tableStyle}>ID</th>
-                                <th style={tableStyle}>Question Text</th>
-                                <th style={tableStyle}>Type</th>
-                                <th style={tableStyle}>Archive</th>
-                                <th style={tableStyle}>Edit</th>
-
+                                <th></th>
+                                <th>ID</th>
+                                <th>Question Text</th>
+                                <th>Type</th>
+                                <th>Archived</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {serverQuestionData.map(({id,text,type,archived,goal}) => 
+                            {serverQuestionData.map(({id, text, type, archived, goal}) => 
                                     <tr key={`EditQuestion-${id}`}>
-                                        <td style={tableStyle}>{id}</td>
-                                        <td style={tableStyle}>{text}</td>
-                                        <td style={tableStyle}>{type}</td>
                                         <td>
-                                            <button className='btn btn-success' type="button" 
-                                                onClick={() => {ArchiveQuestion(id,!archived)}}>
-                                                {archived ? "Unarchive" : "Archive"}
-                                            </button>
+                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
+                                            <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                         </td>
-                                        <td>
-                                           <button className='btn btn-success' type="button" onClick={() => ToEdit(id,text,type)}>
-                                            Edit Question Content
-                                            </button> 
+                                        <td>{id}</td>
+                                        <td>{text}</td>
+                                        <td>{type}</td>
+                                        <td className={archived?'text-danger':'text-success'}>
+                                            {archived ? "" : "Not "} Archived
                                         </td>
                                     </tr>
                                 )}
                         </tbody>
-                   </table>
+                    </table>
                 </div>
             </div>
         </div>

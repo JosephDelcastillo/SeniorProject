@@ -26,11 +26,11 @@ async function EditQuestion(input){
 
         const questions = await model.GetQuestionById(id);
 
-        if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("text")) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
-        if(questions[0].text === text) return new Reply({point:'Text Matching', success: true, data: questions[0]});
+        if(!questions || questions.length === 0 || !("text" in questions[0])) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
+        //if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
 
         const output = await model.EditQuestion(questions[0], text, type);
-        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: id});
+        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: output.id});
         return new Reply({point: 'Question Content Updated', success: true, data: output});
     } catch (error) {
         return new Reply({ point: 'Question Content Update Inquiry' });
@@ -65,7 +65,7 @@ async function AddSubmission (input) {
         const authorized = await Authorize(token); 
         if(!authorized) return new Reply({ point: 'Authorization' });
         
-        const success = await model.AddSubmission({ user: authorized, data });
+        const success = await model.AddSubmission({ user: authorized.id, data });
         if(success) return new Reply({ point: 'Add Submission', success: true, data: success });
         return new Reply({ point: 'Add Submission' });
     } catch (error) {
