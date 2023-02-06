@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@azure/cosmos": "^3.17.1",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.3"
   }
 }

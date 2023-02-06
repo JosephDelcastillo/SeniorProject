@@ -1,40 +1,27 @@
+ /**
+ * Report Generation Form 
+ */
 import React, { useState } from 'react'
-import Swal from 'sweetalert2';
-import BarGraph from '../Components/BarGraph';
-import LineGraph from '../Components/LineGraph';
-import PieGraph from '../Components/PieGraph';
+import HighChart from '../Components/HighChart'
+import Swal from 'sweetalert2'
+import ReportAdmin from '../Components/ReportAdmin';
+import ReportStaff from '../Components/ReportStaff';
 
-async function getData() {
-    return fetch('/api').then(data => data.json());
-}
+// Constants 
+const GRAPH_TYPES = [
+    { name: 'Bar (Horizontal)', value: 'bar'}, 
+    { name: 'Column (Vertical)', value: 'column'}, 
+    { name: 'Spline (Curved)', value: 'spline'}, 
+    { name: 'Area (Underarea)', value: 'area'}, 
+    { name: 'Line (Straight)', value: 'line'}, 
+    { name: 'Scatter', value: 'scatter'}, 
+    { name: 'Pie', value: 'pie'}, 
+];
 
-function randColor (all = true) { 
-    let color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    while(!all && (color === '#000000' || color === '#FFFFFF')) {
-        color = '#' + Math.floor(Math.random() * 16777215).toString(16);
-    } 
-    return color;
-}
+// Helper Functions 
+// Shorthand for Input Value gain  
+const inputByID = (id) => document.getElementById(id).value;
 
-// Churns though data from api and reformats it for my purposes
-function churnInitData(data) {
-    let output = [];
-
-    const USERS = new Set(data.map(e => e.user));
-    const QUESTIONS = new Set(data.map(e => e.question));
-    
-    USERS.forEach(user => {
-        // Re-init Responses
-        let responses = [];
-        QUESTIONS.forEach(question => { responses.push({ question: question, responses: [] }); })
-        
-        data.filter(e => e.user === user).forEach(({ question, submission, date, value }) => {
-            responses[responses.findIndex(resp => resp.question === question)].responses.push({ submission: 'Submission ' + submission, date: date, value: value });
-        });
-        output.push({user: user, responses: responses });
-    })
-    return output;
-} 
 
 /**
  *  Report Page
@@ -42,80 +29,93 @@ function churnInitData(data) {
  *  Renders Final Report Graphics  
  * @returns {React.Component} 
  */
-function Report() {
-    const GRAPH_TYPES = { bar: 'bar', line: 'line', pie: 'pie' };
+function Report({ api, isAdmin }) {
+    const [ graphType, setGraphType ] = useState([{}]);
     const [ backendData, setBackendData ] = useState([{}]);
-    const [ graphType, setGraphType ] = useState(String);
+    const [ peopleSelected, setPeopleSelected ] = useState([{}]);
+    const [ questionSelected, setQuestionSelected ] = useState([{}]);
 
-    let value_color = randColor();
-    
+    const PeopleState = [peopleSelected, setPeopleSelected];
+    const QuestionsState = [questionSelected, setQuestionSelected];
+
+    // Generate Report 
     const handleSubmit = async e => {
         e.preventDefault();
+        let errors = [];
 
-        if( graphType ) {
-            const response = await getData();
-            if(response.success) { 
-                console.log(response.data);
-                console.log(churnInitData(response.data)); 
-                setBackendData(churnInitData(response.data)); 
-            } else {
-                Swal.fire({title: "Data Retrieval Failed", icon: 'error'})
-            }
+        // Get Informaiton 
+        let input = {
+            people: isAdmin() ? (peopleSelected.map(p=>p.id) || [{}]) : -202,
+            dates: {
+                start: inputByID("sDate") || '01-01-1999',
+                end: inputByID("eDate") || new Date().toISOString().slice(0, 10)
+            }, 
+            graphType: inputByID("graphType"),
+            questions: questionSelected.map(q => q.id) || [{}]
+        }
+
+        // Validation 
+        if (isAdmin() && input.people.length <= 0) errors.push("People"); 
+        if (input.questions.length <= 0) errors.push("Questions"); 
+        if (input.graphType.length <= 0) errors.push("Graph Type"); 
+
+        if(errors.length > 0) {
+            let msg = errors.join(' and ');
+            Swal.fire({ title: 'Missing Information to Generate', text: 'Missing Information for ' + msg, icon: 'error' })
+            return false;
+        }
+        
+        // Then Query the Backend for Report Data 
+        const { success, data } = await api({ func: 'GetReport', data: input });
+        if(success) { 
+            setGraphType(input.graphType)
+            // Final Structure [{ question: Question #, data: [{ name: Employee Name, data: [{ name: Submission #, y: Submission Value }] }] }]
+            // First Get Questions 
+            let prep = data.questions.map(({ id, text }) => { return {name: text, question: id, goal: undefined} });
+            // Next Add Employees to each Question 
+            prep.map(e => e.data = data.people.map(({id, name}) => { return { name, person: id } }));
+            // Then Add Submission to Each Question/Employee 
+            prep.map(q => q.data.map(p => p.data = data.submissions.filter(s => s.user === p.person).map(s => {return { name: 'Submission ' + s.created, submission: s.id }})) )
+            // Then Add Responses to Each Submission
+            prep.map(q => q.data.map(p => p.data.map(s => {
+                let found = data.responses.find(r => (r.submission === s.submission && r.question === q.question));
+                s.y = (found && found.response) ? found.response : 0;
+            })));
+            // Finally Remove all the helper values from the object
+            let output = prep.map(({ name, data, goal }) => { 
+                return { name, goal, data: data.map(({ name, data }) => {
+                    return { name, data: data.map(({ name, y }) => { 
+                        return { name, y: parseInt(y) } 
+                    })}
+                })} 
+            }); 
+            setBackendData(output);
+        } else {
+            Swal.fire({title: "Data Retrieval Failed", icon: 'error'})
         }
     }
 
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
-                <h1> Report - All Users </h1>
+                <h1> Report Generation </h1>
             </div>
             <div className='card-body'>
-                <hr />
                 <form className='form' onSubmit={handleSubmit}>
-                    <div className='row g-3 mx-4 align-items-center'>
-                        <div className="col-3">
-                            <label className="col-form-label" htmlFor='graphType'>Graph Type ({ graphType }) </label>
-                        </div>
-                        <div className="col-6">
-                            <select className='form-control' id='graphType' onChange={e => (e.target.value) ? setGraphType(e.target.value) : null}>
-                                <option value="">Select Graph Type</option>
-                                <option value={GRAPH_TYPES.line}>Line</option>
-                                <option value={GRAPH_TYPES.bar}>Bar</option>
-                                <option value={GRAPH_TYPES.pie}>Pie</option>
-                            </select>
-                        </div>
-                        <div className='col-3'>
-                            <button className="form-control btn btn-outline-primary col-3" type="submit">Submit</button>
-                        </div>
-                    </div>
+                    {(isAdmin())?(
+                        <ReportAdmin key='Admin' GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
+                    ):(
+                        <ReportStaff key='Staff' GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
+                    )}
                 </form>
-                <hr />
-                {(graphType && backendData && backendData.length > 0 && backendData[0].user) ? ( 
-                    backendData.map(({ user, responses }) => (
-                        <div className='row'>
-                            {responses.map(({question, responses}) => (
-                                (question === 2 || question === 4) ? (<></>) : (
-                                <div className='col-3'>
-                                    <div className="card m-2 border-none">
-                                        <div className="card-header bg-white text-center">
-                                            <h4> User: {user} - Question {question} </h4>
-                                        </div>
-                                        <div className="card-body text-center">
-                                        {(graphType === GRAPH_TYPES.bar) ? (
-                                                <BarGraph key={`${user}-${question}`} xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
-                                            ) : ( 
-                                                (graphType === GRAPH_TYPES.pie) ? (
-                                                    <PieGraph key={`${user}-${question}`} target='value' xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
-                                                ) : (
-                                                <LineGraph key={`${user}-${question}`} xKey='submission' columns={[{id: 'value', color: value_color }]} data={responses} />
-                                            )
-                                        )}
-                                        </div>
-                                    </div>
-                                </div>
-                            )))}
+                <hr className='my-4' />
+                {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
+                    backendData.map(({ name, data, goal }, i) => (
+                        <div className='w-100 my-3 border'>
+                            <HighChart key={name??i} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>
                     ))
+                    // <p>{JSON.stringify(backendData[0].data)}</p>
                 ) : (<></>)}
             </div>
         </div>

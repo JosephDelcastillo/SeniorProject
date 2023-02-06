@@ -1,10 +1,37 @@
 import React from 'react';
+import Swal from 'sweetalert2';
+import UserForm from '../Components/UserForm';
+
+
+const inputByID = (id) => document.getElementById(id).value;
 
 /**
- * Create New User Page 
- * @returns {React.Component} 
+ * Create New User Page
+ * @returns {React.Component}
  */
-function NewUser() {
+function NewUser({ getToken, api }) {
+
+    const handleSubmit = async e => {
+        e.preventDefault();
+        let data = {
+            "name": inputByID("emplName"),
+            "password": inputByID("emplPass"),
+            "type": inputByID("accType"),
+            "email": inputByID("emplEmail")
+        };
+
+        //Sends info to database to create user
+        const { success } = await api({ func: 'UserCreate', data});
+        if(success) {
+            Swal.fire({title: "User Created Successfully!", icon: 'success'}).then(function() {
+                window.location = "/dashboard/user";
+            });
+            console.log(success);
+        } else {
+            Swal.fire({title: "Could Not Create User", icon: 'error'})
+        }
+    }
+
     return (
         <div className="card m-2 mt-5 border-none">
         <div className="text-center">
@@ -13,35 +40,11 @@ function NewUser() {
         </div>
 
         <div className="card-body text-center">
-        <form>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplName" className="form-label">Employee Name:</label>
-                <input type="text" id="emplName" name="emplName" placeholder="John Doe" className="form-control" required></input>
-            </div>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplEmail" className="form-label">Employee Email:</label>
-                <input type="email" id="emplEmail" name="emplEmail" placeholder="123@email.com" className="form-control" required></input>
-            </div>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="accType" className="form-label">Account Type:</label>
-                <select name="accType" className="form-control">
-                    <option value="0" required>Select Account Type</option>
-                    <option value="staff">Staff User</option>
-                    <option value="admin">Administrator</option>
-                </select>
-            </div>
-            <div className="mb-3 col-4 mx-auto mt-1">
-                <label for="emplPass" className="form-label">Account Password:</label>
-                <input type="text" id="emplPass" name="emplPass" placeholder="DoeJohn" className="form-control" required></input>
-            </div>
-
-            <button className="btn btn-outline-primary col-3 mt-5" type="submit">Create</button>
-            <button className="btn btn-outline-primary col-3 mt-5" type="reset">Cancel</button>
-        </form>
+        <UserForm handleSubmit={handleSubmit}/>
         </div>
 
         </div>
     )
 }
-
+ 
 export default NewUser

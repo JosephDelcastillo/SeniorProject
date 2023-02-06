@@ -12,13 +12,6 @@ module.exports = async function (context, req) {
 
     try {
         const data = req.body;
-        
-        if (!data.id) { 
-            return context.res = {
-                status: 400,
-                body: "Please pass id in the request body" + req.body
-            };
-        }
 
         const result = await service.Create(data);
         if(!result) {
