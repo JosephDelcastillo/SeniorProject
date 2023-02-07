@@ -12,30 +12,47 @@ const strLike = (haystack, needle) => (haystack.toLowerCase().indexOf(needle.toL
 
 async function genId () { return await uuidv4(); }
 
-async function hashing (password, salt) { return await bcrypt.hash(password, salt); } 
+async function hashing (token, salt) { return await bcrypt.hash(token, salt); } 
 async function genSalt () { return await bcrypt.genSalt(10); }
 
-function sanitize(obj={}) {
-    const flags = ["token", "salt"];
-    if(!obj || !Array.isArray(obj.keys())) return false;
+function sanitizeObj(obj={}) {
+    const flags = ["token", "salt", "pass"];
+    if(!obj || !Array.isArray(Object.keys(obj))) return false;
     let output = {};
-    obj.keys().forEach(key => {
+    Object.keys(obj).forEach(key => {
         if (key[0] == "_") return;
-        let valid = true;
-        for (const flag in flags) if(key.includes(flags)) valid = false;
-        if(valid) output[key] = obj[key];
+        if (!flags.some(flag => key.includes(flag))) output[key] = obj[key];
     });
-    return obj;
-}
-
-function sanatizeArr(arr=[]){
-    let output = [];
-    arr.forEach(e => output.push(sanatize(e)));
     return output;
 }
 
+function sanitizeArr(arr=[]){
+    if(!Array.isArray(arr)) return false;
+    let output = [];
+    arr.forEach(e => output.push(sanitizeObj(e)));
+    return output;
+}
+
+/**
+ * Sanitize Object or Array of Objects
+ * 
+ * @param {Object|Array} data Object or Array of Objects to Sanitize
+ * @returns {Object|Array} Sanitized Object/Array of Objects
+ */
+function sanitize(data) {
+    if(Array.isArray(data)) {
+        if(data.length <= 0) return data;
+        return sanitizeArr(data);
+    } else if(Object.keys(data)) {
+        if(Object.keys(data).length <= 0) return data;
+        return sanitizeObj(data);
+    } else {
+        console.log("Else")
+        return data;
+    }
+}
+
 module.exports = {
-    sanatizeArr,
     sanitize,
     strLike, 
     genSalt, 
