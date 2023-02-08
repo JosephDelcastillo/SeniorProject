@@ -4,7 +4,8 @@ export const ACTION_TYPES = {
     VIEW: 'VIEW', 
     EDIT: 'EDIT',
     DEL: 'DEL',
-    RES: 'RES'
+    RES: 'RES',
+    INFO: 'INFO'
 }
 
 function Action({ type, action, classes = '', style = '' }) {
@@ -23,6 +24,9 @@ function Action({ type, action, classes = '', style = '' }) {
             break;
         case ACTION_TYPES.RES:
             symbol  = 'fa-rotate-left text-warning'
+            break;
+        case ACTION_TYPES.INFO:
+            symbol  = 'fa-circle-info text-info'
             break;
         default:
             symbol = 'fa-circle-question text-light'
