@@ -77,7 +77,7 @@ function Report({ api, isAdmin }) {
             // Then Add Submission to Each Question/Employee 
             prep.map(q => q.data.map(p => p.data = data.submissions.filter(s => s.user === p.person).map(s => {return { name: 'Submission ' + s.created, submission: s.id }})) )
             // Then Add Responses to Each Submission
-            prep.map(q => q.data.map(p => p.data.map(s => {
+            prep.map(q => q.data.map(p => p.data.forEach(s => {
                 let found = data.responses.find(r => (r.submission === s.submission && r.question === q.question));
                 s.y = (found && found.response) ? found.response : 0;
             })));
