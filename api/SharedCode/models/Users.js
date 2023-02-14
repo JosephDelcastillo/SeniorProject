@@ -469,6 +469,113 @@ async function Archive ({email, archive}) {
     });
 }
 
+async function EditCurrentUser ({name, oldemail, email, password, password2}) {
+    return new Promise(async resolve => {
+        console.log("Info recieved:");
+        console.log(name + oldemail + email + password + password2);
+
+        //Getting needed user id info
+        let query = `SELECT *
+        FROM u
+        WHERE u.email LIKE "${oldemail}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            resolve(false);
+            return;
+        }
+
+        //Declaring our needed variables which may or may not be used
+        let result = null;
+        let updated = null;
+
+        //See if email was updated
+        if (!email == "") {
+            console.log(email);
+            console.log("checking email usage:");
+
+            //checks if email is already in use
+            let queryusers = `SELECT u.email, u.name
+            FROM u
+            WHERE u.email LIKE "${email}"`
+        
+            let resources2 = await Users.items.query(queryusers).fetchAll(); 
+
+            console.log(resources2.resources);
+
+            //if email already in use, send back a false
+            if (!resources2.resources.length == 0) {
+                resolve(false);
+                return;
+            } 
+
+            //check that email is an email
+            let emailValid = /\S+@\S+\.\S+/;
+            if (!emailValid.test(email)) {
+                resolve(false);
+                return;
+            }
+
+            console.log("Trying to replace email:");
+
+            updated = {...resources[0], email};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+
+        }
+
+        //See if password was updated
+        if (password && !(password == "0")) {
+            console.log(password);
+
+            if (password == password2) {
+
+                const salt = await tb.genSalt();
+                console.log(salt);
+                console.log("^ salt")
+
+                const saltPass = await tb.hashing(password, salt);
+                console.log(saltPass);
+                console.log("^ salted password")
+
+                password = saltPass;
+
+                updated = {...resources[0], password, salt};
+                console.log("made new user", updated);
+                result = await Users.items.upsert(updated);
+                console.log(result);
+            }
+        }
+
+        //See if name was updated
+        if (!name == "") {
+            console.log("Trying to replace name:");
+
+            updated = {...resources[0], name};
+            console.log("made new user", updated);
+            result = await Users.items.upsert(updated);
+            console.log(result);
+        }
+
+        //Seeing if we updated anything and got a result
+        if (result) {
+            console.log(result);
+            resolve(true);
+            return;
+        } else {
+            resolve(false);
+            return;
+        } 
+    });
+}
+
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -653,5 +760,6 @@ module.exports = {
     Archive,
     GetCurrentUser,
     GetAllUsers,
-    GetUsersFromArray
+    GetUsersFromArray,
+    EditCurrentUser
 }
