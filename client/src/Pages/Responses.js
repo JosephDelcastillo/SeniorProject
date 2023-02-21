@@ -19,6 +19,7 @@ function Responses({api}) {
             if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });
             const columns = [
                 { cell: row => row.actions, width: '4rem' },
+                {name: 'id', selector: row=>row.id, sortable: true},
                 { name: 'User', selector: row => row.user, sortable: true }, 
                 { name: 'Created', selector: row => row.created, sortable: true }, 
                 { name: 'Modified By', selector: row => row.modified_by, sortable: true }, 
@@ -26,6 +27,8 @@ function Responses({api}) {
                 { name: 'Archived?', selector: row => row.archived, sortable: true }
             ];
             let info = [];
+            console.log(data.submissions);
+            console.log(info);
             data.submissions.forEach(({ id, user, created, modified, modified_by, archived}, i) => {
                 let search = data.users.findIndex(u => u.id === user);
                 user = (search >= 0) ? data.users[search].name : user;
@@ -46,11 +49,13 @@ function Responses({api}) {
             });
             
             const tables = { info, columns };
+            
             //*****Archive Handler Checks Archive Status of a Submission and Allows User to Archive/Unarchive that Submission******/
             async function archiveHandler (id) {
                 let newEntryData = { tables, ...data };
 
                 //Find index of selected submission in array
+                console.log(newEntryData.submissions);
                 const dataIndex = newEntryData.submissions.findIndex(submission => submission.id = id);
                 console.log("Data Index: ",dataIndex);
                //Check that requested submissions exists
@@ -66,13 +71,15 @@ function Responses({api}) {
                 //If all events successful, then update the submission data and update page
                 newEntryData.submissions[dataIndex] =  apiOutput.data;
                 
-
+                Swal.fire({title: 'Submission Updated', text: `Submission Updated` , icon: 'success'}) //.then(function() {window.location.reload()});
+                console.log(newEntryData);
                 setEntryData(newEntryData);
-                //TO DO: REPLACE WITH PROPER STATE UPDATES
+              
        
             }
 
             setEntryData({ tables, ...data });
+        
         })
     }, [api]);
 
