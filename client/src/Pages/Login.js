@@ -52,6 +52,9 @@ export default function Login({ getToken, setToken, api}) {
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Submit</button>
           </div>
         </form>
+        <div className="text-center">
+                <a href='/forgotpassword'> Forgot Password? </a>
+            </div>
       </div>
     </div>
   )
