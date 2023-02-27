@@ -469,6 +469,95 @@ async function Archive ({email, archive}) {
     });
 }
 
+async function ForgotPassword ({email}) {
+    return new Promise(async resolve => {
+        
+        //Query for user info
+        let query = `SELECT u.pass
+        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+
+        console.log('Pre-query')
+        const { resources: search } = await Users.items.query(query).fetchAll();
+
+        //Make sure user was found
+        if (!search || search.length <= 0) {
+            console.log(search)
+            resolve(false);
+            return;
+        } 
+
+        //create reset link
+        const link = `${clientURL}/resetpassword/${email}/${search[0].pass}`;
+
+        //send email
+        //TODO: FIGURE OUT NODEMAILER!!!!!!!
+        
+        resolve(true);
+    })
+}
+
+async function ResetPassword ({email, oldpass, password, password2}) {
+    return new Promise(async resolve => {
+        console.log(email + oldpass + password + password2);
+
+        //Getting needed user id info
+        let query = `SELECT *
+        FROM u
+        WHERE u.email LIKE "${email}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        console.log("Getting user info:");
+        console.log(resources);
+        console.log(resources[0].id);
+
+        //Make sure user was found
+        if (resources.length == 0) {
+            console.log("No user found");
+            resolve(false);
+            return;
+        }
+
+        //Make sure old password matches
+        if (resources[0].pass != oldpass) {
+            console.log("Old password incorrect");
+            resolve(false);
+            return;
+        }
+
+        //Make sure password and confirm password match
+        if (password != password2) {
+            console.log("Passwords don't match");
+            resolve(false);
+            return;
+        }
+
+        //generates new salt
+        const salt = await tb.genSalt();
+        console.log(salt);
+        console.log("^ salt")
+
+        //hashes new password
+        const saltPass = await tb.hashing(password, salt);
+        console.log(saltPass);
+        console.log("^ salted password")
+
+        // Try to change salt and password
+        if (archive == false) {
+            console.log("Trying to change password and salt:");
+
+            const updated = {...resources[0], salt: salt, pass: saltPass};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
+
+            console.log("Succeeded in change");
+        } 
+
+        resolve (true);
+    });
+}
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -653,5 +742,7 @@ module.exports = {
     Archive,
     GetCurrentUser,
     GetAllUsers,
-    GetUsersFromArray
+    GetUsersFromArray,
+    ForgotPassword,
+    ResetPassword
 }

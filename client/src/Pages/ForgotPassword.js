@@ -5,9 +5,9 @@ import Swal from 'sweetalert2';
 const inputById = id => document.getElementById(id).value;
 
 /**
- *  Login Page
+ *  Forgot Password Page
  * 
- *  Manages Logging In 
+ *  Manages Password Reset Email Sending 
  * @returns {React.Component} 
  */
 export default function ForgotPass({ getToken, setToken, api}) {
@@ -15,20 +15,20 @@ export default function ForgotPass({ getToken, setToken, api}) {
     e.preventDefault();
 
     const data = {
-      email: inputById('email'),
+      email: inputById('email')
     }
-
-    if(!data.email) Swal.fire({ title: 'Missing Email', text: 'Email Is required', icon: 'error' });
 
     if(!data.email) return false;
-    //Change the function to forgot password function
-    const token = await api({ func: 'Login', data: { data } });
-    if(!token.success) { 
+    //Change the function to forgot password function!!!!
+    const {response} = await api({ func: 'ForgotPassword', data: {data} });
+    if(!response.success) { 
       Swal.fire({title: "Reset Failed", text: 'Check Your Email', icon: 'error'});
       return false;
-    }
-    setToken(token.data);
-    window.location.pathname = "Login";
+    } else {
+      Swal.fire({title: "Reset Email Sent!", icon: 'success'}).then(function() {
+        window.location = "/login";
+      });
+    } 
   }
 
   return(
@@ -42,7 +42,7 @@ export default function ForgotPass({ getToken, setToken, api}) {
         <form onSubmit={handleSubmit}>
           <div className="mb-3 col-4 mx-auto mt-2">
             <label className="form-label">Email</label>
-            <input className="form-control" id='email' autoComplete="off" type="text" />
+            <input className="form-control" id='email' autoComplete="off" placeholder='email@email.com' type="email" required />
           </div>
           <div>
             <button className="btn btn-outline-primary col-3 mt-5" type="submit">Submit</button>

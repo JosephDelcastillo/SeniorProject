@@ -53,7 +53,7 @@ export default function Login({ getToken, setToken, api}) {
           </div>
         </form>
         <div className="text-center">
-                <a href='/forgotpassword'> Forgot Password? </a>
+                <a href='/resetpassword'> Forgot Password? </a>
             </div>
       </div>
     </div>
