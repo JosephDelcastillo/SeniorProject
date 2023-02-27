@@ -491,30 +491,34 @@ async function ForgotPassword ({email}) {
         const link = `${clientURL}/resetpassword/${email}/${search[0].pass}`;
 
         //send email
-        //Code currently unedited snippet from W3schools
-        //TODO: Figure out + edit
-        /* var transporter = nodemailer.createTransport({
+        //TODO: Test!!!!
+        //Create transporter
+        let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-              user: 'youremail@gmail.com',
-              pass: 'yourpassword'
+              user: 'testy.mctestyface.987@gmail.com',
+              pass: 'Password.McPasswordF4ce'
             }
           });
           
+          //create message
           var mailOptions = {
-            from: 'youremail@gmail.com',
-            to: 'myfriend@yahoo.com',
-            subject: 'Sending Email using Node.js',
-            text: 'That was easy!'
+            from: 'testy.mctestyface.987@gmail.com',
+            to: `${email}`,
+            subject: 'EPOTS Password Reset',
+            text: `Hello, we recieved a reset password request for your EPOTS account. Please follow the link to reset: ${link}`
           };
           
+          //send message
           transporter.sendMail(mailOptions, function(error, info){
             if (error) {
               console.log(error);
+              resolve(false);
+              return;
             } else {
               console.log('Email sent: ' + info.response);
             }
-          }); */
+          });
         
         resolve(true);
     })
