@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ManageResponse from "../Components/ManageResponse";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 const subDate = str => {
   if(!str || str.length < 10) return '';
   return str.substr(0, 10);
@@ -9,15 +9,14 @@ const subDate = str => {
 
 function Response({ api }) {
 	const params = useParams();
-	const [responseData, setResponseData] = useState([{}]);
-	console.log("Response Data:", responseData);
+	const [entryData, setEntryData] = useState([{}]);
 	useEffect(() => {
 		api({ func: "GetSubmission", data: params.id }).then(({ success, data }) => {
 			if (success) {
-				setResponseData(data);
+				setEntryData(data);
 			}
 		});
-	}, [api, params, setResponseData]);
+	}, [api, params, setEntryData]);
 	console.log(params.id);
 
 	async function Edit(id, response){
@@ -50,16 +49,16 @@ function Response({ api }) {
         }
 
         
-        const index = responseData.findIndex(responseData => responseData.id === data.id);
+        const index = entryData.findIndex(entryData => entryData.id === data.id);
         if(index < 0) {
             Swal.fire({ title: 'Submit Failed', text: "Response Id Not Found", icon: 'error' });
             return false;
         }
 
 
-        let copyResponseData = [ ...responseData ];
+        let copyResponseData = [ ...entryData ];
         copyResponseData[index] = data;
-        setResponseData(copyResponseData);
+        setEntryData(copyResponseData);
 
         Swal.fire({title: 'Response Updated', text: 'Response Updated!', icon: 'success' });
 
@@ -78,19 +77,19 @@ function Response({ api }) {
 				{params && params.id ? (
 					<div className="panel">
 						<div className="row">
-							{responseData && responseData.submissions && responseData.users ? (
+							{entryData && entryData.submissions && entryData.users ? (
 								<>
 									<div className="col-2">
 										<h4>Created:</h4>
 									</div>
 									<div className="col-4">
-										<h4>{subDate(responseData.submissions[0].created)}</h4>
+										<h4>{subDate(entryData.submissions[0].created)}</h4>
 									</div>
 									<div className="col-1">
 										<h4>By:</h4>
 									</div>
 									<div className="col-5">
-										<h4>{responseData.users.find((u) => u.id === responseData.submissions[0].user).name}</h4>
+										<h4>{entryData.users.find((u) => u.id === entryData.submissions[0].user).name}</h4>
 									</div>
 									<br />
 									<br />
@@ -100,11 +99,12 @@ function Response({ api }) {
 								<></>
 							)}
 						</div>
-						{responseData && responseData.questions && responseData.responses ? (
+						{entryData && entryData.questions && entryData.responses ? (
 							<>
-								{responseData.responses.map((response) => (
-									<ManageResponse key={response.id} id={response.id} response={response.response} question={response.questions.find((q) => q.id === response.question).text} />
+								{entryData.responses.map((response) => (
+									<ManageResponse key={response.id} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
 								))}
+								
 							</>
 						) : (
 							<></>
@@ -118,3 +118,4 @@ function Response({ api }) {
 	);
 }
 export default Response;
+
