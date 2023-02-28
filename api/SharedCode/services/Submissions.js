@@ -93,6 +93,22 @@ async function GetSubmission(input) {
     }
 }
 
+async function EditResponse(input){
+    try{
+        const{token, data} = input;
+        const {id, response} = data;
+        if(!response) return new Reply({point: 'No Response Available to Edit', data: {id, response}})
+        const output = await model.Edit(id, response);
+
+        if(!output) return new Reply({point: 'Failed to Update Response Content', data: id});
+        
+        return new Reply({point: 'Response Updated', success: true, data: output});
+    } catch (error) {
+        return new Reply({ point: 'Response Content Update Inquiry' });
+    }
+
+}
+
 async function ArchiveSubmission(input) {
     try{
         /**
@@ -127,5 +143,6 @@ async function ArchiveSubmission(input) {
 module.exports = {
     GetAllSubmissions, 
     GetSubmission, 
+    EditResponse,
     ArchiveSubmission
 }

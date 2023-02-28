@@ -19,7 +19,6 @@ function Responses({api}) {
             if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });
             const columns = [
                 { cell: row => row.actions, width: '4rem' },
-                {name: 'id', selector: row=>row.id, sortable: true},
                 { name: 'User', selector: row => row.user, sortable: true }, 
                 { name: 'Created', selector: row => row.created, sortable: true }, 
                 { name: 'Modified By', selector: row => row.modified_by, sortable: true }, 

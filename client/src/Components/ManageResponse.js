@@ -1,6 +1,7 @@
 import React from 'react'
 
 function ManageResponse({id, question, response}) {
+  
   return (
     <div className='row'>
         <div className='col-11'>
