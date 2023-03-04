@@ -100,12 +100,12 @@ async function Edit (input) {
 
 async function EditCurrentUser (input) {
     const { token, data } = input;
-    const { name, email, password, password2} = data;
+    const { email, name, password, password2} = data;
     try {
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Staff); 
         if(!authorized) return new Reply({ point: 'Authorization'});
 
-        const res = await model.Edit({name, email, password, password2, token});
+        const res = await model.EditCurrentUser({name, email, password, password2, token});
 
         if(res) return new Reply({ point: 'Edit Current User', success: true, data: res });
         return new Reply({ point: 'Edit Current User' });
