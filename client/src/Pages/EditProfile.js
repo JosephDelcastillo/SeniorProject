@@ -12,8 +12,8 @@ function EditProfile({ getToken, api }) {
     const handleSubmit = async e => {
         e.preventDefault();
         let data = {
-            "name": inputByID("emplName"),
             "email": inputByID("emplEmail"),
+            "name": inputByID("emplName"),
             "password": inputByID("userpass"),
             "password2": inputByID("userpass2")
         };
