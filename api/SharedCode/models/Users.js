@@ -497,7 +497,7 @@ async function ForgotPassword ({email}) {
             service: 'gmail',
             auth: {
               user: 'testy.mctestyface.987@gmail.com',
-              pass: 'Password.McPasswordF4ce'
+              pass: 'sfycxavaakmrzzwy'
             }
           });
           
