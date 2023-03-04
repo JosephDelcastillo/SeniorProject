@@ -469,26 +469,49 @@ async function Archive ({email, archive}) {
     });
 }
 
-async function EditCurrentUser ({name, oldemail, email, password, password2}) {
+async function EditCurrentUser ({name, email, password, password2, token}) {
     return new Promise(async resolve => {
         console.log("Info recieved:");
-        console.log(name + oldemail + email + password + password2);
-
-        //Getting needed user id info
-        let query = `SELECT *
-        FROM u
-        WHERE u.email LIKE "${oldemail}"`
-
-        const { resources } = await Users.items.query(query).fetchAll(); 
-
-        console.log("Getting user info:");
-        console.log(resources);
-
-        //Make sure user was found
-        if (resources.length == 0) {
-            resolve(false);
+        console.log(name + email + password + password2);
+        
+        // Check for a token
+        if (!token) {
+            resolve (false);
             return;
         }
+
+        console.log("token:");
+        console.log(token.token);
+
+        // Query for session with that token in session table
+        // Get associated user id
+        let query1 = `SELECT u.user
+        FROM u WHERE u.token = "${token.token}"`;
+        
+        console.log('session Query')
+        const { search } = await Sessions.items.query(query1).fetchAll();
+
+        // Make sure that we found the session
+        if (search.length == 0) {
+            resolve (false);
+            return;
+        } 
+
+        console.log(search);
+        console.log(search[0].user);
+
+        // Query users for a user matching that id
+        let query2 = `SELECT *
+        FROM u WHERE u.id = "${search[0].user}"`;
+        
+        console.log('User Query')
+        const { resources } = await Users.items.query(query2).fetchAll();
+
+        //Make sure that we found the user
+        if (resources.length == 0) {
+            resolve (false);
+            return;
+        } 
 
         //Declaring our needed variables which may or may not be used
         let result = null;
@@ -531,8 +554,14 @@ async function EditCurrentUser ({name, oldemail, email, password, password2}) {
         }
 
         //See if password was updated
-        if (password && !(password == "0")) {
+        if (password && !(password == "")) {
             console.log(password);
+
+            //make sure confirm password was filled out
+            if (password2 == "") {
+                resolve(false);
+                return;
+            }
 
             if (password == password2) {
 
@@ -550,6 +579,9 @@ async function EditCurrentUser ({name, oldemail, email, password, password2}) {
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
+            } else {
+                resolve(false);
+                return;
             }
         }
 

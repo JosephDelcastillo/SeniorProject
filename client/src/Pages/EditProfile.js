@@ -1,6 +1,5 @@
 import React from 'react';
 import Swal from 'sweetalert2';
-import { useParams } from 'react-router-dom';
 
 const inputByID = (id) => document.getElementById(id).value;
  
@@ -9,14 +8,11 @@ const inputByID = (id) => document.getElementById(id).value;
  * @returns {React.Component}
  */
 function EditProfile({ getToken, api }) {
-    //TODO: Figure out how to get the email!!!!!!!!!!!!!
-    let {email} = useParams();
    
     const handleSubmit = async e => {
         e.preventDefault();
         let data = {
             "name": inputByID("emplName"),
-            "oldemail": email,
             "email": inputByID("emplEmail"),
             "password": inputByID("userpass"),
             "password2": inputByID("userpass2")
