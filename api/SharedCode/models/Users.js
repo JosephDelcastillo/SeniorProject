@@ -5,110 +5,6 @@ const tb = require('../lib/Helpers');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
-/**
- * Run Authorization 
- * @param {string} token Authorization Token
- * @param {Function} sendFunc To Return Data
- * @param {Function} successAction Action to do if authorized
- */
-async function Authorize (token, requirement) {
-    return new Promise( async resolve => {
-        /**
-         * Authorization Process
-         * 
-         * 1) Check for token
-         * 2) See if token matches a stored token
-         *  2.1)See if token is expired
-         *  2.2) See how many sessions user has
-         *  2.3) If not valid sessions, delete current session and return false
-         * 3) Check for user
-         *  3.5) See is user is archived
-         * 4) Check to see if roles match
-         * 5) Return true and user id if all checks out  
-         */
-
-        console.log("starting authorization check");
-        console.log(requirement);
-
-
-        // Check for a token
-        if (!token) {
-            resolve (false);
-            return;
-        }
-
-        console.log(token, "parsing token:");
-        let tokenObj = typeof token === "object" ? token : JSON.parse(token);
-        console.log(tokenObj);
-
-        console.log("token:");
-        console.log(tokenObj.token);
-
-        
-
-        // Query for session with that token in session table
-        let query = `SELECT u.id, u.user, u.created
-        FROM u WHERE u.token = "${tokenObj.token}"`;
-        
-        console.log('session Query')
-        const { resources: search } = await Sessions.items.query(query).fetchAll();
-
-        if (search.length == 0) {
-            resolve (false);
-            return;
-        } 
-
-        console.log(search);
-
-        console.log(search[0].user);
-
-        //TODO: Maybe add some sort of expiration check here????
-
-        // Query users for a user matching that id
-        let query2 = `SELECT u.type, u.archived
-        FROM u WHERE u.id = "${search[0].user}"`;
-        
-        console.log('User Query')
-        const { resources: search2 } = await Users.items.query(query2).fetchAll();
-
-        if (search2.length == 0) {
-            resolve (false);
-            return;
-        } 
-
-        console.log(search2);
-
-        //check to make sure user isn't archived
-        if (search2[0].archived == true) {
-            resolve(false);
-            return;
-        }
-
-        // Compare user types
-        if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
-            console.log("Auth success");
-            resolve({id: search[0].user});
-            return;
-        }
-        if (search2[0].type == "admin" || search2[0].type == "Administrator") {
-            console.log("Auth success");
-            resolve({id: search[0].user});
-            return;
-        }
-
-
-        // TODO: Fill this in with an actual token processor 
-        //???? ^
-        // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
-        // TODO: If Valid Token -> Return user id 
-        
-        // TODO: If invalid Token -> Return false 
-        // TODO: Resolve with Reply 
-        console.log("Auth Fail");
-        resolve(false);
-    })
-}
-
 async function Create ({name, email, password, type}) {
     return new Promise(async resolve => {
         console.log(name + email + password + type);
@@ -385,14 +281,14 @@ async function Edit ({name, oldemail, email, type}) {
             if ( type == "admin") {
                 console.log("Trying to replace type:");
 
-                updated = {...resources[0], attr: AUTH_ROLES.Staff};
+                updated = {...resources[0], type: AUTH_ROLES.Admin};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
             } else {
                 console.log("Trying to replace type:");
 
-                updated = {...resources[0], attr: AUTH_ROLES.Admin};
+                updated = {...resources[0], type: AUTH_ROLES.Staff};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
@@ -469,10 +365,10 @@ async function Archive ({email, archive}) {
     });
 }
 
-async function EditCurrentUser ({name, email, password, password2, token}) {
+async function EditCurrentUser ({email, name, password, password2, token}) {
     return new Promise(async resolve => {
         console.log("Info recieved:");
-        console.log(name + email + password + password2);
+        console.log(name + email + password + password2 + token.token);
         
         // Check for a token
         if (!token) {
@@ -485,19 +381,22 @@ async function EditCurrentUser ({name, email, password, password2, token}) {
 
         // Query for session with that token in session table
         // Get associated user id
-        let query1 = `SELECT u.user
+        let query = `SELECT u.id, u.user, u.created
         FROM u WHERE u.token = "${token.token}"`;
         
-        console.log('session Query')
-        const { search } = await Sessions.items.query(query1).fetchAll();
+        console.log('session Query');
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+        console.log("Looking for sessions got:");
+        console.log(search[0]);
 
-        // Make sure that we found the session
+        //Make sure we found a matching session
         if (search.length == 0) {
             resolve (false);
             return;
         } 
 
         console.log(search);
+
         console.log(search[0].user);
 
         // Query users for a user matching that id
@@ -575,7 +474,7 @@ async function EditCurrentUser ({name, email, password, password2, token}) {
 
                 password = saltPass;
 
-                updated = {...resources[0], password, salt};
+                updated = {...resources[0], pass: password, salt};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
