@@ -4,7 +4,6 @@ import NavBar from './Components/NavBar';
 import RouteController from "./Controller/RouteController";
 
 const LOCAL_STORAGE_KEY = 'janfl-epots.user';
-const API = false ? "http://localhost:7071" : "https://epots-api.azurewebsites.net";
 
 function setToken(userToken) { sessionStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userToken)); }
 function getToken() { return sessionStorage.getItem(LOCAL_STORAGE_KEY); }
@@ -28,7 +27,7 @@ function isAdmin () {
 async function api({ func, data, action }) {
   //********  Step 1: Initialize Data  ********
   // Prepare URL
-  const API_URL = `${API}/api`;
+  const API_URL = `/api`;
   // Get Post vs Get
   const IS_POST = action ? (action.toLowerCase() !== 'get') : true; // Default to POST 
 

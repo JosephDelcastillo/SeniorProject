@@ -1,9 +1,11 @@
- /**
+/**
  * Report Generation Form 
  */
-import React, { useState } from 'react'
-import HighChart from '../Components/HighChart'
-import Swal from 'sweetalert2'
+import React, { useState } from 'react';
+import HighChart from '../Components/HighChart';
+import Swal from 'sweetalert2';
+import { v4 as uuid } from 'uuid';
+
 import ReportAdmin from '../Components/ReportAdmin';
 import ReportStaff from '../Components/ReportStaff';
 
@@ -103,15 +105,15 @@ function Report({ api, isAdmin }) {
             <div className='card-body'>
                 <form className='form' onSubmit={handleSubmit}>
                     {(isAdmin())?(
-                        <ReportAdmin key='Admin' GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
+                        <ReportAdmin key='AdminReportMenu' GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
                     ):(
-                        <ReportStaff key='Staff' GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
+                        <ReportStaff key='StaffReportMenu' GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
                     )}
                 </form>
                 <hr className='my-4' />
                 {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
                     backendData.map(({ name, data, goal }, i) => (
-                        <div className='w-100 my-3 border'>
+                        <div key={uuid()} className='w-100 my-3 border'>
                             <HighChart key={name??i} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>
                     ))
