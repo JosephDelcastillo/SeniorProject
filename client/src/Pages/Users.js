@@ -32,7 +32,7 @@ function Users({ getToken, api }) {
 
                 let info = [];
                 data.forEach(({ name, email, type, archived}, i) => {
-                    archived = (!archived) ? "True" : "False";
+                    archived = (!archived) ? "False" : "True";
                     
                     const actions = (
                     <>
