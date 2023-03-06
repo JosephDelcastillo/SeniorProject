@@ -98,6 +98,23 @@ async function Edit (input) {
     }
 }
 
+async function EditCurrentUser (input) {
+    const { token, data } = input;
+    const { email, name, password, password2} = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Staff); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.EditCurrentUser({name, email, password, password2, token});
+
+        if(res) return new Reply({ point: 'Edit Current User', success: true, data: res });
+        return new Reply({ point: 'Edit Current User' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Edit Edit Current user'});
+    }
+}
+
 async function Archive (input) {
     const { token, data } = input;
     const { email, archive } = data;
@@ -122,5 +139,6 @@ module.exports = {
     Edit,
     GetUsers,
     Archive,
-    GetCurrentUser
+    GetCurrentUser,
+    EditCurrentUser
 }

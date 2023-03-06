@@ -161,7 +161,7 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
             <div className="col-xl-2 col-lg-4">
                 <select className='form-control text-center' id='graphType'>
                     <option value="">Graph Type</option>
-                    {GRAPH_TYPES.map(({ name, value }) => <option value={value}>{name}</option>)}
+                    {GRAPH_TYPES.map(({ name, value }) => <option key={`GraphType-${value}`} value={value}>{name}</option>)}
                 </select>
             </div>
         </div>

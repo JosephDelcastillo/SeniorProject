@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuid } from 'uuid'
+import Action, { ACTION_TYPES } from '../Components/Action'
+import Table from '../Components/Table';
 
 //Redirects to user page of specified user
 function viewUser(userEmail) {
@@ -18,18 +21,31 @@ function Users({ getToken, api }) {
 
     useEffect(() => {
         api({func: "GetUsers", data: {"search": ""}}).then(({success, data}) => {
-            console.log("What we got back");
-            console.log(success);
-            console.log(data);
-
             if(success){
-                setUserData(data);
-                console.log("User data set to:");
-                // console.log(userData);
+                const columns = [
+                    { cell: row => row.actions, width: '60px' },
+                    { name: 'Name', selector: row => row.name, sortable: true }, 
+                    { name: 'Email', selector: row => row.email, sortable: true }, 
+                    { name: 'Account Type', selector: row => row.type, sortable: true }, 
+                    { name: 'Archival Status', selector: row => row.archived, sortable: true }
+                ];
+
+                let info = [];
+                data.forEach(({ name, email, type, archived}, i) => {
+                    archived = (!archived) ? "False" : "True";
+                    
+                    const actions = (
+                    <>
+                        <Action key={uuid()} type={ACTION_TYPES.VIEW} action={() => {viewUser(email)}} />
+                    </>)
+
+                    info.push({ name, email, type, archived, actions})
+                });
+
+                setUserData({info, columns}); 
             }
-            
         })
-    }, [api, setUserData]);
+    }, [api]);
 
 
     return (
@@ -39,31 +55,10 @@ function Users({ getToken, api }) {
         </div>
  
         <div className="panel">
-                <table className="table tableHover">
-                    <thead>
-                        <tr>
-                            <th scope="col" width="60px"></th>
-                            <th scope="col">Name <button>&#9660;</button></th>
-                            <th scope="col">Email <button>&#9660;</button></th>
-                            <th scope="col">Account Type <button>&#9660;</button></th>
-                            <th scope="col">Archival Status <button>&#9660;</button></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableUsers">
-                        {userData.map((user) => (
-                            <tr key={user.id}>
-                                <td>
-                                    <i className="fa-regular fa-eye text-info pe-1 c-pointer" onClick={() => {viewUser(user.email)}}></i>
-                                </td>
-                                <td>{user.name}</td>
-                                <td>{user.email}</td>
-                                <td>{user.type}</td>
-                                <td>{!user.archived?("False"):("True")}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            {(!userData || !userData.info || !userData.columns)?(<></>):(
+                    <Table key={uuid} columns={userData.columns} data={userData.info}  />
+                )}
+        </div>
 
             <div className="text-center">
                 <a href='/dashboard/newuser' className='btn btn-outline-primary col-3 mt-5'> Create New User </a>
