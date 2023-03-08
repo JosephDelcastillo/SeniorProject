@@ -12,14 +12,14 @@ const inputById = id => document.getElementById(id).value;
  * @returns {React.Component} 
  */
 export default function PasswordReset({ getToken, setToken, api}) {
-  let { pass, email } = useParams();
+  let { token, email } = useParams();
 
   const handleSubmit = async e => {
     e.preventDefault();
 
     const data = {
       email: email,
-      oldpass: pass,
+      token: token,
       password: inputById('pass'),
       password2: inputById('pass2')
     }

@@ -375,19 +375,33 @@ async function ForgotPassword ({email}) {
         console.log(email)
         
         //Query for user info
-        let query = `SELECT u.pass 
+        let query = `SELECT * 
         FROM u WHERE u.email = "${email}" AND u.archived = false`;
         
         console.log('Query to find user with that email')
         const { resources: search } = await Users.items.query(query).fetchAll();
+        //Make sure user was found
         if (search && search.length <= 0) {
             console.log(search)
             resolve(false);
             return;
         }
 
+        //Generate reset token salt
+        const salt = await tb.genSalt();
+        console.log(salt);
+        console.log("^ salt")
+
+        //hashes  to create token
+        let secretPhrase = "supersecrettokenphrase"
+        const saltToken = await tb.hashing(secretPhrase, salt);
+        console.log(saltToken);
+        console.log("^ salted password")
+
+        //TODO: store resettoken, resetsalt, and resetdate!!!!!!
+
         //create reset link
-        const link = `${clientURL}/resetpassword/${email}/${search[0].pass}`;
+        const link = `${clientURL}/resetpassword/${email}/${saltToken}`;
 
         //Send reset email
         //Create transporter
@@ -425,9 +439,9 @@ async function ForgotPassword ({email}) {
     })
 }
 
-async function ResetPassword ({email, oldpass, password, password2}) {
+async function ResetPassword ({email, token, password, password2}) {
     return new Promise(async resolve => {
-        console.log(email + oldpass + password + password2);
+        console.log(email + token + password + password2);
 
         //Getting needed user id info
         let query = `SELECT *
@@ -447,9 +461,17 @@ async function ResetPassword ({email, oldpass, password, password2}) {
             return;
         }
 
-        //Make sure old password matches
-        if (resources[0].pass != oldpass) {
-            console.log("Old password incorrect");
+        //Make sure reset token matches
+        if (resources[0].passtoken != token) {
+            console.log("Token incorrect");
+            resolve(false);
+            return;
+        }
+
+        //Make sure reset token isn't expired (older than an hour)
+        let oneHour = 60 * 60 * 1000;
+        if (((new Date) - resetdate) > oneHour ) {
+            console.log("Token expired");
             resolve(false);
             return;
         }

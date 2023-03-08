@@ -102,12 +102,12 @@ async function ForgotPassword (input) {
 
 async function ResetPassword (input) {
     console.log("Made it to service!!");
-    const {email, oldpass, password, password2} = input.data;
+    const {email, token, password, password2} = input.data;
 
     console.log("email: " + email);
     try {
         console.log('Attempt Reset Password')
-        const response = await model.ResetPassword({ email, oldpass, password, password2 });
+        const response = await model.ResetPassword({ email, token, password, password2 });
         console.log('Reset Password Complete')
         console.log(response)
         if(response === false) return new Reply({point: 'Reset Password' });

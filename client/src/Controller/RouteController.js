@@ -45,7 +45,7 @@ export default class RouteController extends React.Component {
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="/resetpassword" element={<ForgotPass getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
-                <Route path="/resetpassword/:email/:pass" element={<PasswordReset getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
+                <Route path="/resetpassword/:email/:token" element={<PasswordReset getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             </div>
