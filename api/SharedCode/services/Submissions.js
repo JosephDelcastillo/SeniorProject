@@ -95,8 +95,18 @@ async function GetSubmission(input) {
 
 async function EditResponse(input){
     try{
-        const{token, data} = input;
+        const { token, data } = input;
+        const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
+        const isStaff = await Authorize(token, AUTH_ROLES.Staff);
         const {id, response} = data;
+        if (isAdmin) {
+            checkAuth = await model.Edit(data);
+        } else if (isStaff) {
+            checkAuth = await model.Edit(data);
+        } else if (checkAuth === false) {
+            return new Reply({ point: 'Authorization' });
+        }
+        
         if(!response) return new Reply({point: 'No Response Available to Edit', data: {id, response}})
         const output = await model.Edit(id, response);
 

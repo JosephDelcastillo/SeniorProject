@@ -19,55 +19,6 @@ function Response({ api }) {
 	}, [api, params, setEntryData]);
 	console.log(params.id);
 
-	async function Edit(id, response){
-        Swal.fire({
-            title: 'Edit Response',
-            confirmButtonText:"Save Changes",
-            showCloseButton: true,
-            html:`        
-                <input id="editId" type="hidden" value="${id}"></input>
-                <label>Question Text
-                    <br/>
-                    <input id="editResponse" value="${response}"></input>
-                </label>
-            <br/>
-            `
-        }).then((result) =>{
-            if(result.isConfirmed){
-                SaveContentEdit(document.getElementById("editId").value,document.getElementById("editResponse").value);
-            } else {
-                Swal.fire('Changes are not saved') 
-            }
-        })
-    }
-
-    async function SaveContentEdit(id, response){
-        const {success, message, data } = await api({ func: 'Edit', data: {id, response}});
-        if(!success) {
-            Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
-            return false;
-        }
-
-        
-        const index = entryData.findIndex(entryData => entryData.id === data.id);
-        if(index < 0) {
-            Swal.fire({ title: 'Submit Failed', text: "Response Id Not Found", icon: 'error' });
-            return false;
-        }
-
-
-        let copyResponseData = [ ...entryData ];
-        copyResponseData[index] = data;
-        setEntryData(copyResponseData);
-
-        Swal.fire({title: 'Response Updated', text: 'Response Updated!', icon: 'success' });
-
-            document.getElementById("responseId").value = "";
-            document.getElementById("response").value = "";
-
-        return(true);
-    }
-
 	return (
 		<div className="card m-2 border-none">
 			<div className="card-header bg-white text-center">
@@ -102,7 +53,7 @@ function Response({ api }) {
 						{entryData && entryData.questions && entryData.responses ? (
 							<>
 								{entryData.responses.map((response) => (
-									<ManageResponse key={response.id} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
+									<ManageResponse key={response.id} api = {api} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
 								))}
 								
 							</>
