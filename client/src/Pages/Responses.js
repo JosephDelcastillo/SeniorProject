@@ -13,7 +13,7 @@ import Table from '../Components/Table';
  */
 function Responses({api}) {
     const [entryData, setEntryData] = useState([{}]);
-
+console.log(api)
     useEffect(() => {
         api({func: "GetAllSubmissions", data: "All"}).then(({success, data}) => {
             if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });

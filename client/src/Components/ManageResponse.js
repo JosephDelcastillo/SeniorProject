@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom';
 
 
 function ManageResponse({api, id, question, response}) {
-   console.log(id);
     const params = useParams();
     const [entryData, setEntryData] = useState([{}]);
+    console.log("Entry Data: ", entryData);
     useEffect(() => {
       api({ func: "GetSubmission", data: params.id }).then(({ success, data }) => {
         if (success) {
@@ -39,17 +39,22 @@ function ManageResponse({api, id, question, response}) {
 
     async function SaveContentEdit(id, response){
         const {success, message, data } = await api({ func: 'EditResponse', data: {id, response}});
-        console.log(id);
+        console.log(data);
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
-        }
-                const index = entryData.findIndex(responseData => responseData.id === data.id);
-                console.log(index);
+        } 
+                const index = entryData.responses.findIndex(responseData => responseData.id === data.id);
         if(index < 0) {
             Swal.fire({ title: 'Submit Failed', text: "Response Id Not Found", icon: 'error' });
             return false;
       }
+
+        setEntryData(entryData);
+
+        Swal.fire({title: 'Question Content Updated', text: 'Question Content Updated!', icon: 'success' });
+        window.location.reload();
+        return false;
     }
 
   return (
