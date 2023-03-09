@@ -604,7 +604,7 @@ async function Authorize (token, requirement) {
         
 
         // Query for session with that token in session table
-        let query = `SELECT u.id, u.user, u.created
+        let query = `SELECT *
         FROM u WHERE u.token = "${token.token}"`;
         
         console.log('session Query')
@@ -619,7 +619,23 @@ async function Authorize (token, requirement) {
 
         console.log(search[0].user);
 
-        //TODO: Maybe add some sort of expiration check here????
+        //check to see if token is older than 2 hours
+        const now = new Date();
+        const twoHour = 60 * 60 * 1000 * 2;
+        if ((new Date(search[0].created) - now) > twoHour) {
+            //Delete session!!
+
+            resolve (false);
+            return;
+        } else {
+            //update created date of token
+            console.log("Trying to update created");
+
+            updated = {...search[0], created : now.toISOString()};
+            console.log("made new user", updated);
+            result = await Sessions.items.upsert(updated);
+            console.log(result);
+        }
 
         // Query users for a user matching that id
         let query2 = `SELECT u.type, u.archived
