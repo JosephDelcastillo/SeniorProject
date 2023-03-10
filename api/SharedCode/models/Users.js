@@ -490,6 +490,15 @@ async function ResetPassword ({email, token, password, password2}) {
         let oneHour = 60 * 60 * 1000;
         if (now - (new Date(resources[0].f_created)) > oneHour ) {
             console.log("Token expired");
+
+            console.log("Trying to clear out token:");
+
+            const updated = {...resources[0], f_token: "", f_salt: "", f_created: ""};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
+
+            console.log("Succeeded in change");
             resolve(false);
             return;
         }
