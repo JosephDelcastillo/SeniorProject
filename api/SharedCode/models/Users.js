@@ -387,21 +387,15 @@ async function ForgotPassword ({email}) {
             return;
         }
 
-        //Generate reset token salt
-        const salt = await tb.genSalt();
-        console.log(salt);
-        console.log("^ salt")
+        //Generate reset token id
+        const resetToken = await tb.genId();
+        console.log(resetToken);
+        console.log("^ resetToken")
 
-        //hashes  to create token
-        let secretPhrase = "supersecrettokenphrase"
-        const saltToken = await tb.hashing(secretPhrase, salt);
-        console.log(saltToken);
-        console.log("^ salted password")
-
-        //TODO: store resettoken, resetsalt, and resetdate!!!!!!
+        //TODO: store resettoken, and resetdate!!!!!!
 
         //create reset link
-        const link = `${clientURL}/resetpassword/${email}/${saltToken}`;
+        const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
 
         //Send reset email
         //Create transporter
