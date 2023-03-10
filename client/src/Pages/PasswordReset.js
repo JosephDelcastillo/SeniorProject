@@ -25,8 +25,8 @@ export default function PasswordReset({ getToken, setToken, api}) {
     }
 
     if(!data.password || !data.password2) return false;
-    const token = await api({ func: 'ResetPassword', data: { data } });
-    if(!token.success) { 
+    const token2 = await api({ func: 'ResetPassword', data: { data } });
+    if(!token2.success) { 
       Swal.fire({title: "Reset Failed", icon: 'error'});
       return false;
     } else {

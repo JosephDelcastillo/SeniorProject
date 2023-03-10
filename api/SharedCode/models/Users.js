@@ -381,7 +381,7 @@ async function ForgotPassword ({email}) {
         console.log('Query to find user with that email')
         const { resources: search } = await Users.items.query(query).fetchAll();
         //Make sure user was found
-        if (search && search.length <= 0) {
+        if (!search || search.length <= 0) {
             console.log(search)
             resolve(false);
             return;
@@ -469,8 +469,9 @@ async function ResetPassword ({email, token, password, password2}) {
         }
 
         //Make sure reset token isn't expired (older than an hour)
+        const now = new Date();
         let oneHour = 60 * 60 * 1000;
-        if (((new Date) - resetdate) > oneHour ) {
+        if (now - (new Date(resources[0].tokencreated)) > oneHour ) {
             console.log("Token expired");
             resolve(false);
             return;
