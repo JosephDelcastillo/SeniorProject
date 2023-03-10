@@ -507,6 +507,43 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 }
 
 
+async function Logout (token) {
+    return new Promise( async resolve => {
+        console.log("starting logout");
+
+        console.log("checking for token");
+        // Check for a token
+        if (!token) {
+            console.log("No token found");
+            resolve (true);
+            return;
+        }
+
+        console.log("token:");
+        console.log(token.token);
+
+        // Query for session with that token in session table
+        let query = `SELECT *
+        FROM u WHERE u.token = "${token.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        // Make sure that we found the session
+        if (search.length == 0) {
+            console.log("No session found");
+            resolve (true);
+            return;
+        } 
+
+        console.log("deleting session");
+        const something = await Sessions.item(search[0].id , search[0].id).delete();
+
+        resolve(true);
+    })
+}
+
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -622,7 +659,10 @@ async function Authorize (token, requirement) {
         //check to see if token is older than 2 hours
         const now = new Date();
         const twoHour = 60 * 60 * 1000 * 2;
-        if ((new Date(search[0].created) - now) > twoHour) {
+        let time = new Date(search[0].created) - now;
+        console.log("Time diff is:");
+        console.log(time);
+        if (now - (new Date(search[0].created)) > twoHour) {
             //Delete session!!
 
             resolve (false);
@@ -701,6 +741,7 @@ module.exports = {
     Authorize,
     GetStaff,
     Login,
+    Logout,
     Create,
     GetUsers,
     Edit,
