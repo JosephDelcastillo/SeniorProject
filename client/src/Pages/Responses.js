@@ -19,7 +19,7 @@ function Responses({api}) {
             if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });
             const columns = [
                 { cell: row => row.actions, width: '4rem' },
-                {name: 'id', selector: row=>row.id, sortable: true},
+                //{ name: 'id', selector: row=> row.id, sortable: true },
                 { name: 'User', selector: row => row.user, sortable: true }, 
                 { name: 'Created', selector: row => row.created, sortable: true }, 
                 { name: 'Modified By', selector: row => row.modified_by, sortable: true }, 
@@ -51,7 +51,7 @@ function Responses({api}) {
             data.submissions.forEach(({ id, user, created, modified, modified_by, archived}, i) => {
                 let search = data.users.findIndex(u => u.id === user);
                 user = (search >= 0) ? data.users[search].name : user;
-                console.log("User: ", data.users[search].email);
+                console.log("User: ", data.users[search]);
                 
                 created = (created && created.length > 1) ? created : 'Unknown';
                 archived = (!archived) ? "No" : "Yes";
