@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ManageResponse from "../Components/ManageResponse";
-
+import Swal from "sweetalert2";
 const subDate = str => {
   if(!str || str.length < 10) return '';
   return str.substr(0, 10);
@@ -53,8 +53,9 @@ function Response({ api }) {
 						{entryData && entryData.questions && entryData.responses ? (
 							<>
 								{entryData.responses.map((response) => (
-									<ManageResponse key={response.id} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
+									<ManageResponse key={response.id} api = {api} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
 								))}
+								
 							</>
 						) : (
 							<></>
@@ -68,3 +69,4 @@ function Response({ api }) {
 	);
 }
 export default Response;
+

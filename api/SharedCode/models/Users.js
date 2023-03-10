@@ -325,7 +325,6 @@ async function Archive ({email, archive}) {
         let query = `SELECT *
         FROM u
         WHERE u.email LIKE "${email}"`
-
         const { resources } = await Users.items.query(query).fetchAll(); 
 
         console.log("Getting user info:");
