@@ -387,12 +387,31 @@ async function ForgotPassword ({email}) {
             return;
         }
 
-        //Generate reset token id
-        const resetToken = await tb.genId();
-        console.log(resetToken);
-        console.log("^ resetToken")
+        let resetToken = "";
+        let salt = "";
+
+        do {
+            //generates new salt
+            salt = await tb.genSalt();
+            console.log(salt);
+            console.log("^ salt")
+
+            //hashes new password
+            resetToken = await tb.hashing(email, salt);
+            console.log(resetToken);
+            console.log("^ salted Token")
+        } while (resetToken.includes("/"))
 
         //TODO: store resettoken, and resetdate!!!!!!
+        const now = new Date();
+        console.log("Trying to change password and salt:");
+
+        const updated = {...search[0], f_token: resetToken, f_salt: salt, f_created: now.toISOString() };
+        console.log("made new user", updated);
+        const result = await Users.items.upsert(updated);
+        console.log(result);
+
+        console.log("Succeeded in change");
 
         //create reset link
         const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
@@ -408,14 +427,14 @@ async function ForgotPassword ({email}) {
           });
           
           //create message
-          //CHANGE AFTER TESTING!!!!
           var mailOptions = {
             from: 'testy.mctestyface.987@gmail.com',
             to: `${email}`,
             subject: 'EPOTS Password Reset',
             text: `Hello, 
             We received a reset password request for your EPOTS account. Please follow the link to reset your password:
-             ${link}`
+             ${link}
+            (This reset request will expire in 1 hour)`
           };
           
           //send message
@@ -444,10 +463,6 @@ async function ResetPassword ({email, token, password, password2}) {
 
         const { resources } = await Users.items.query(query).fetchAll(); 
 
-        console.log("Getting user info:");
-        console.log(resources);
-        console.log(resources[0].id);
-
         //Make sure user was found
         if (!resources || resources.length == 0) {
             console.log("No user found");
@@ -456,16 +471,24 @@ async function ResetPassword ({email, token, password, password2}) {
         }
 
         //Make sure reset token matches
-        if (resources[0].passtoken != token) {
+        if (resources[0].f_token != token) {
             console.log("Token incorrect");
             resolve(false);
             return;
         }
 
+        //Make sure reset token is valid
+        const isAuthorized = (token === await tb.hashing(email, resources[0].f_salt));
+        if (!isAuthorized) {
+            console.log("token is fake");
+            resolve(false);
+            return;
+        } 
+
         //Make sure reset token isn't expired (older than an hour)
         const now = new Date();
         let oneHour = 60 * 60 * 1000;
-        if (now - (new Date(resources[0].tokencreated)) > oneHour ) {
+        if (now - (new Date(resources[0].f_created)) > oneHour ) {
             console.log("Token expired");
             resolve(false);
             return;
@@ -488,15 +511,15 @@ async function ResetPassword ({email, token, password, password2}) {
         console.log(saltPass);
         console.log("^ salted password")
 
-        // Try to change salt and password
-            console.log("Trying to change password and salt:");
+        // Try to change salt and password. and clear out token data
+        console.log("Trying to change password and salt:");
 
-            const updated = {...resources[0], salt, pass: saltPass};
-            console.log("made new user", updated);
-            const result = await Users.items.upsert(updated);
-            console.log(result);
+        const updated = {...resources[0], salt, pass: saltPass, f_token: "", f_salt: "", f_created: ""};
+        console.log("made new user", updated);
+        const result = await Users.items.upsert(updated);
+        console.log(result);
 
-            console.log("Succeeded in change");
+        console.log("Succeeded in change");
 
         resolve (true);
     });
