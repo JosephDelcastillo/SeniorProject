@@ -58,7 +58,20 @@ async function ArchiveQuestion(input){
     }
 
 }
+async function AddQuestion (input) {
+    try {
+        const { token, data } = input;
+        const authorized = await Authorize(token); 
+        if(!authorized) return new Reply({ point: 'Authorization' });
+        const { text, type } = data;
 
+        const success = await model.AddQuestion({ text, type});
+        if(success) return new Reply({ point: 'Add Question', success: true, data: success });
+        return new Reply({ point: 'Add Question' });
+    } catch (error) {
+        return new Reply({ point: 'Add Question Inquiry', success: true, data: output});
+    }
+}
 async function AddSubmission (input) {
     try {
         const { token, data } = input;
@@ -77,5 +90,6 @@ module.exports = {
     ArchiveQuestion,
     EditQuestion,
     AddSubmission,
-    GetQuestion
+    GetQuestion,
+    AddQuestion
 }
