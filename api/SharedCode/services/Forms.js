@@ -63,7 +63,9 @@ async function AddQuestion (input) {
         const { token, data } = input;
         const authorized = await Authorize(token); 
         if(!authorized) return new Reply({ point: 'Authorization' });
-        const success = await model.AddQuestion({ user: authorized.id, inputText: data.text, inputType: data.type});
+        const { text, type } = data;
+
+        const success = await model.AddQuestion({ text, type});
         if(success) return new Reply({ point: 'Add Question', success: true, data: success });
         return new Reply({ point: 'Add Question' });
     } catch (error) {
