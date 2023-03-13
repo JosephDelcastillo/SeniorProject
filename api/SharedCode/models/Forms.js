@@ -66,6 +66,26 @@ async function ArchiveQuestion(question, status){
         });
     })
 }
+async function AddQuestion(inputText, inputType){
+    return new Promise(async resolve => {
+        console.log("LOOK HERE" + inputText, inputType)
+        const now = new Date();
+        const newQuestion = {
+            id: await tb.genId(),
+            text: inputText,
+            type: inputType,
+            archived: true,
+            created: now.toISOString() 
+        };
+     
+        const { resource: submission } = await Questions.items.create(newQuestion);
+        if(!submission) { resolve(false); return false; } 
+
+        resolve(submission.id);
+        return submission.id
+
+    })
+}
 async function AddSubmission({ user, data }){
     return new Promise(async resolve => {
         /**
@@ -139,5 +159,6 @@ module.exports = {
     ArchiveQuestion,
     EditQuestion,
     AddSubmission,
-    GetQuestion
+    GetQuestion,
+    AddQuestion
 }
