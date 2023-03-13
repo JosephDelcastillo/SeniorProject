@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import ManageResponse from "../Components/ManageResponse";
-import Swal from "sweetalert2";
+
 const subDate = str => {
-  if(!str || str.length < 10) return '';
-  return str.substr(0, 10);
+	if(!str || str.length < 10) return '';
+	return str.substr(0, 10);
 }
 
 function Response({ api }) {
