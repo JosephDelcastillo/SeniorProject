@@ -81,8 +81,9 @@ async function AddQuestion({ text, type }){
         const { resource: submission } = await Questions.items.create(newQuestion);
         if(!submission) { resolve(false); return false; } 
 
-        resolve(submission.id);
-        return submission.id
+        tb.sanitize(submission)
+        resolve(tb.sanitize(submission));
+        return tb.sanitize(submission)
     });
 }
 async function AddSubmission({ user, data }){
