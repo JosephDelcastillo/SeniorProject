@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2';
 
 import Action, { ACTION_TYPES } from '../Components/Action';
-//import changeArchiveStatus from '../../../api/changeArchiveStatus';
+import { v4 as uuid } from 'uuid'
 
 
 
@@ -48,7 +48,11 @@ function FormEdit({api}) {
             `
         }).then((result) =>{
             if(result.isConfirmed){
-                SaveContentEdit(document.getElementById("editId").value,document.getElementById("editText").value,document.getElementById("editType").value);
+                SaveContentEdit(
+                    document.getElementById("editId").value,
+                    document.getElementById("editText").value,
+                    document.getElementById("editType").value
+                );
             } else {
                 Swal.fire('Changes are not saved') 
             }
@@ -100,6 +104,36 @@ function FormEdit({api}) {
         return(true);
     }
 
+    async function AddQuestion (e) {
+        const { value: question } = await Swal.fire({
+            icon: "question",
+            title: "Add Question",
+            showCancelButton: true,
+            html: 
+                `<input id="AddQuestionText" class="swal2-input">` +
+                `<select id="AddQuestionType" class="swal2-input">` +
+                    `<option value="number">Number</option>` +
+                    `<option value="note">Note</option>` +
+                `</option>`,
+            focusConfirm: false,
+            preConfirm: () => {
+                return {
+                    text: document.getElementById('AddQuestionText').value,
+                    type: document.getElementById('AddQuestionType').value
+                }
+            }
+        });
+        if (!question || !question.text || question.text.length <= 1) return;
+
+        const { success, message: text, data } = await api({ func: 'AddQuestion', data: question })
+        if(!success) {
+            Swal.fire({ title: 'Add Question Failed', text, icon: 'error' });
+            return;
+        }
+        const newQuestionData = [ data, ...serverQuestionData]
+        setServerQuestionData(newQuestionData);
+    }
+    const cols = [ "Question Text", "Type", "Archived" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -111,27 +145,30 @@ function FormEdit({api}) {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>ID</th>
-                                <th>Question Text</th>
-                                <th>Type</th>
-                                <th>Archived</th>
+                                {cols.map(e => <th key={uuid()}>{e}</th>)}
                             </tr>
                         </thead>
                         <tbody>
-                            {serverQuestionData.map(({id, text, type, archived, goal}) => 
+                            {!serverQuestionData || serverQuestionData.length <= 0 ? (<tr><td colSpan={cols.length + 1}>No Questions Loaded</td></tr>) : 
+                                serverQuestionData.map(({id, text, type, archived, goal}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
                                             <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                         </td>
-                                        <td>{id}</td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
                                             {archived ? "" : "Not "} Archived
                                         </td>
                                     </tr>
-                                )}
+                                )
+                            }
+                            <tr>
+                                <td colSpan={cols.length + 1}>
+                                    <button className='btn btn-outline-primary w-100' onClick={AddQuestion}>Add Question</button>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
