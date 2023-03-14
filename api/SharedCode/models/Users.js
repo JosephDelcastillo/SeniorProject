@@ -1,6 +1,7 @@
 // Import 
 const { Users, Sessions } = require('../lib/DBConnection');
 const tb = require('../lib/Helpers');
+const nodemailer = require('nodemailer');
 
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
@@ -102,7 +103,7 @@ async function Create ({name, email, password, type}) {
             const result = await Users.items.create(query);
             console.log(result);
 
-       resolve(true);
+        resolve(true);
     });
 }
 
@@ -281,14 +282,14 @@ async function Edit ({name, oldemail, email, type}) {
             if ( type == "admin") {
                 console.log("Trying to replace type:");
 
-                updated = {...resources[0], type: AUTH_ROLES.Admin};
+                updated = {...resources[0], attr: AUTH_ROLES.Admin};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
             } else {
                 console.log("Trying to replace type:");
 
-                updated = {...resources[0], type: AUTH_ROLES.Staff};
+                updated = {...resources[0], attr: AUTH_ROLES.Staff};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
@@ -506,6 +507,173 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 }
 
 
+async function ForgotPassword ({email}) {
+    return new Promise(async resolve => {
+        //CHANGE WHEN USING TESTING!!!
+        clientURL = "https://epots.azurewebsites.net"
+        console.log("Email received: ")
+        console.log(email)
+        
+        //Query for user info
+        let query = `SELECT * 
+        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+        
+        console.log('Query to find user with that email')
+        const { resources: search } = await Users.items.query(query).fetchAll();
+        //Make sure user was found
+        if (!search || search.length <= 0) {
+            console.log(search)
+            resolve(false);
+            return;
+        }
+
+        let resetToken = "";
+        let salt = "";
+
+        do {
+            //generates new salt
+            salt = await tb.genSalt();
+            console.log(salt);
+            console.log("^ salt")
+
+            //hashes new password
+            resetToken = await tb.hashing(email, salt);
+            console.log(resetToken);
+            console.log("^ salted Token")
+        } while (resetToken.includes("/"))
+
+        //store token and date
+        const now = new Date();
+        console.log("Trying to change password and salt:");
+
+        const updated = {...search[0], f_token: resetToken, f_salt: salt, f_created: now.toISOString() };
+        console.log("made new user", updated);
+        const result = await Users.items.upsert(updated);
+        console.log(result);
+
+        console.log("Succeeded in change");
+
+        //create reset link
+        const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
+
+        //Send reset email
+        //Create transporter
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'testy.mctestyface.987@gmail.com',
+                pass: 'sfycxavaakmrzzwy'
+            }
+        });
+        
+          //create message
+        var mailOptions = {
+            from: 'testy.mctestyface.987@gmail.com',
+            to: `${email}`,
+            subject: 'EPOTS Password Reset',
+            text: `Hello, 
+            We received a reset password request for your EPOTS account. Please follow the link to reset your password:
+            ${link}
+            (This reset request will expire in 1 hour)`
+        };
+        
+          //send message
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+                resolve(false);
+                return;
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
+        
+        resolve(true);
+    })
+}
+
+async function ResetPassword ({email, token, password, password2}) {
+    return new Promise(async resolve => {
+        console.log(email + token + password + password2);
+
+        //Getting needed user id info
+        let query = `SELECT *
+        FROM u
+        WHERE u.email LIKE "${email}"`
+
+        const { resources } = await Users.items.query(query).fetchAll(); 
+
+        //Make sure user was found
+        if (!resources || resources.length == 0) {
+            console.log("No user found");
+            resolve(false);
+            return;
+        }
+
+        //Make sure reset token matches
+        if (resources[0].f_token != token) {
+            console.log("Token incorrect");
+            resolve(false);
+            return;
+        }
+
+        //Make sure reset token is valid
+        const isAuthorized = (token === await tb.hashing(email, resources[0].f_salt));
+        if (!isAuthorized) {
+            console.log("token is fake");
+            resolve(false);
+            return;
+        } 
+
+        //Make sure reset token isn't expired (older than an hour)
+        const now = new Date();
+        let oneHour = 60 * 60 * 1000;
+        if (now - (new Date(resources[0].f_created)) > oneHour ) {
+            console.log("Token expired");
+
+            console.log("Trying to clear out token:");
+
+            const updated = {...resources[0], f_token: "", f_salt: "", f_created: ""};
+            console.log("made new user", updated);
+            const result = await Users.items.upsert(updated);
+            console.log(result);
+
+            console.log("Succeeded in change");
+            resolve(false);
+            return;
+        }
+
+        //Make sure password and confirm password match
+        if (password != password2) {
+            console.log("Passwords don't match");
+            resolve(false);
+            return;
+        }
+
+        //generates new salt
+        const salt = await tb.genSalt();
+        console.log(salt);
+        console.log("^ salt")
+
+        //hashes new password
+        const saltPass = await tb.hashing(password, salt);
+        console.log(saltPass);
+        console.log("^ salted password")
+
+        // Try to change salt and password. and clear out token data
+        console.log("Trying to change password and salt:");
+
+        const updated = {...resources[0], salt, pass: saltPass, f_token: "", f_salt: "", f_created: ""};
+        console.log("made new user", updated);
+        const result = await Users.items.upsert(updated);
+        console.log(result);
+
+        console.log("Succeeded in change");
+
+        resolve (true);
+    });
+}
+
 // *** Authorization ***
 async function Login ({email, password}) {
     return new Promise(async resolve => {
@@ -691,5 +859,7 @@ module.exports = {
     GetCurrentUser,
     GetAllUsers,
     GetUsersFromArray,
-    EditCurrentUser
+    EditCurrentUser,
+    ForgotPassword,
+    ResetPassword
 }
