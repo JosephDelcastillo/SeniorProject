@@ -576,7 +576,27 @@ async function Login ({email, password}) {
         } else {
             
             /******** Step 3: Check Session ********/
-            // TODO: Fill this Out 
+            // Checks if user has more than 3 sessions (if yes, delete oldest sessions)
+
+            let query2 = `SELECT *
+            FROM u WHERE u.user = "${search[0].id}"
+            ORDER BY u.created`;
+        
+            console.log('Pre login sessions query')
+            const { resources: sessions } = await Sessions.items.query(query2).fetchAll();
+
+            if (sessions && (sessions.length > 3)) {
+                console.log("More than 3 sessions");
+                console.log("sessions:");
+                for (let i = 0 ; i < (sessions.length - 3) ; i++) {
+                    console.log(i);
+                    console.log(sessions[i].id);
+                    console.log(sessions[i].created);
+
+                    console.log("deleting session");
+                    const something = await Sessions.item(sessions[i].id , sessions[i].id).delete();
+                }
+            }
             
             /******** Step 4: Creation Session ********/
             const CurrentUser = search[0];
@@ -664,6 +684,10 @@ async function Authorize (token, requirement) {
         console.log(time);
         if (now - (new Date(search[0].created)) > twoHour) {
             //Delete session!!
+            //Maybe direct them to logout??
+
+            console.log("deleting session");
+            const something = await Sessions.item(search[0].id , search[0].id).delete();
 
             resolve (false);
             return;
@@ -709,14 +733,6 @@ async function Authorize (token, requirement) {
             return;
         }
 
-
-        // TODO: Fill this in with an actual token processor 
-        //???? ^
-        // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
-        // TODO: If Valid Token -> Return user id 
-        
-        // TODO: If invalid Token -> Return false 
-        // TODO: Resolve with Reply 
         console.log("Auth Fail");
         resolve(false);
     })
