@@ -369,8 +369,8 @@ async function Archive ({email, archive}) {
 
 async function ForgotPassword ({email}) {
     return new Promise(async resolve => {
-        //CHANGE WHEN USING LIVE!!!
-        clientURL = "http://localhost:3000"
+        //CHANGE WHEN USING TESTING!!!
+        clientURL = "https://epots.azurewebsites.net"
         console.log("Email received: ")
         console.log(email)
         
@@ -402,7 +402,7 @@ async function ForgotPassword ({email}) {
             console.log("^ salted Token")
         } while (resetToken.includes("/"))
 
-        //TODO: store resettoken, and resetdate!!!!!!
+        //store token and date
         const now = new Date();
         console.log("Trying to change password and salt:");
 
