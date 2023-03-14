@@ -17,6 +17,8 @@ import UserPage from '../Pages/UserPage';
 import EditUser from '../Pages/EditUser';
 import Profile from '../Pages/Profile';
 import EditProfile from '../Pages/EditProfile';
+import ForgotPass from '../Pages/ForgotPassword';
+import PasswordReset from '../Pages/PasswordReset';
 
 export default class RouteController extends React.Component {
     render() {
@@ -44,6 +46,8 @@ export default class RouteController extends React.Component {
                     <Route path="/dashboard/profile/edit" element={<EditProfile getToken={this.props.getToken} api={this.props.api} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
+                <Route path="/resetpassword" element={<ForgotPass getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
+                <Route path="/resetpassword/:email/:token" element={<PasswordReset getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             </div>
