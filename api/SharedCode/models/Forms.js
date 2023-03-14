@@ -81,7 +81,6 @@ async function AddQuestion({ text, type }){
         const { resource: submission } = await Questions.items.create(newQuestion);
         if(!submission) { resolve(false); return false; } 
 
-        tb.sanitize(submission)
         resolve(tb.sanitize(submission));
         return tb.sanitize(submission)
     });

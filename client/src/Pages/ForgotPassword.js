@@ -19,8 +19,7 @@ export default function ForgotPass({ getToken, setToken, api}) {
     }
 
     if(!data.email) return false;
-    //Change the function to forgot password function!!!!
-    const {response} = await api({ func: 'ForgotPassword', data: {data} });
+    let response = await api({ func: 'ForgotPassword', data: {data} });
     if(!response.success) { 
       Swal.fire({title: "Reset Failed", text: 'Check Your Email', icon: 'error'});
       return false;
