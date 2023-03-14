@@ -676,9 +676,9 @@ async function Authorize (token, requirement) {
 
         console.log(search[0].user);
 
-        //check to see if token is older than 2 hours
+        //check to see if token is older than 12 hours
         const now = new Date();
-        const twoHour = 60 * 60 * 1000 * 2;
+        const twoHour = 60 * 60 * 1000 * 12;
         let time = new Date(search[0].created) - now;
         console.log("Time diff is:");
         console.log(time);
