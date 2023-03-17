@@ -51,3 +51,28 @@ Parameters
 - needle (`String`)
 
 Searches the `haystack` for the `needle` and returns `true` if found. Also converts all to lowercase, so this is **not case sensitive**.
+
+#### [generate ID](Helpers.js#genId)
+Return uuidv4 style unique id.
+
+#### [generate Salt](Helpers.js#genSalt)
+Generates a bcrypt salt of standard size. 
+
+#### [hashing](Helpers.js#hashing)
+Parameters
+- token (`string`)
+- salt (`string`)
+Returns
+- salted token (`string`)
+
+Uses bcrypt to salt the token and return the result. Usefully for breaking down any pre-salted information.
+
+#### [Sanitize](Helpers.js#sanitize)
+Parameters
+- data (`Object|Array`)
+Returns
+- data (`Object|Array`)
+
+Sanitizes either a single object or an array of objects from the server. Currently blocks all starting with "_" or containing the following words: ("token", "salt", "pass")
+
+Note: The private [Sanitize Object](Helpers.js#sanitizeObj) contains the list of flags, edit this list to prevent data from being sent foward.

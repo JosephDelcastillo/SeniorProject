@@ -60,7 +60,23 @@ function UserPage({ getToken, api }) {
         }
     }
 
-    //TODO:Connect the buttons to things
+    const handleReset = async e => {
+        console.log("Password reset was clicked");
+        e.preventDefault();
+        let data = {
+            "email": email
+        };
+
+        const { success } = await api({ func: 'ForgotPassword', data});
+        if(success) {
+            console.log(success);
+
+            Swal.fire({title: "Reset Email Sent Successfully!", icon: 'success'})
+        } else {
+            Swal.fire({title: "Could Not Send Reset Email", icon: 'error'})
+        }
+    }
+
     return (
         <div className="card m-2 mt-5 border-none">
             <div>
@@ -75,7 +91,7 @@ function UserPage({ getToken, api }) {
             {!user.archived ? <div className="text-center">
                     <a className='btn btn-outline-primary col-3 mt-5' href={`/dashboard/edituser/${email ? email : ""}`}> Edit </a>
                     <button className='btn btn-outline-primary col-3 mt-5' onClick={handleArchive}> Archive Account </button>
-                    <button className='btn btn-outline-primary col-3 mt-5'> Reset Password </button>
+                    <button className='btn btn-outline-primary col-3 mt-5' onClick={handleReset}> Reset Password </button>
             </div>
             : <div className="text-center">
             <button className='btn btn-outline-primary col-3 mt-5' onClick={handleUnArchive}> UnArchive Account </button>

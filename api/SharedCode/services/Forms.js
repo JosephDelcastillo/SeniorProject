@@ -58,11 +58,39 @@ async function ArchiveQuestion(input){
     }
 
 }
-
-async function AddSubmission (input) {
+async function AddQuestion (input) {
     try {
         const { token, data } = input;
         const authorized = await Authorize(token); 
+        if(!authorized) return new Reply({ point: 'Authorization' });
+        const { text, type } = data;
+
+        const success = await model.AddQuestion({ text, type});
+        if(success) return new Reply({ point: 'Add Question', success: true, data: success });
+        return new Reply({ point: 'Add Question' });
+    } catch (error) {
+        return new Reply({ point: 'Add Question Inquiry', success: true, data: output});
+    }
+}
+async function AddSubmission (input) {
+    try {
+        const { token, data } = input;
+        /**
+         *  TODO: Update to Add Admin Version
+         * 1. Add Authorize Admin
+         * 2. If Admin or Staff 
+         *      Failed at Authorization 
+         * 3. Create Output data variable
+         * 4. If Admin -> Look For user id in data
+         *      user id --> User who 'created' the submission
+         *      Store result in Output 
+         * 5. If Staff (or no user id)
+         *      user id --> Authorize.id
+         *      Store result in Output 
+         * 6. if output return success and output
+         * 7. return error at database end,  potentially return relevant error 
+        */
+        const authorized = await Authorize(token, AUTH_ROLES.Staff); 
         if(!authorized) return new Reply({ point: 'Authorization' });
         
         const success = await model.AddSubmission({ user: authorized.id, data });
@@ -77,5 +105,6 @@ module.exports = {
     ArchiveQuestion,
     EditQuestion,
     AddSubmission,
-    GetQuestion
+    GetQuestion,
+    AddQuestion
 }

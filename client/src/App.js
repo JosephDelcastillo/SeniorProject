@@ -28,7 +28,7 @@ function isAdmin () {
 async function api({ func, data, action }) {
   //********  Step 1: Initialize Data  ********
   // Prepare URL
-  const API_URL = `${API}/api`;
+  const API_URL = `${API}/api`
   // Get Post vs Get
   const IS_POST = action ? (action.toLowerCase() !== 'get') : true; // Default to POST 
 

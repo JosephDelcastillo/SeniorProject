@@ -53,6 +53,30 @@ async function GetResponsesFromSubmit(submissionId){
     })
 }
 
+async function Edit(id, response){
+    return new Promise( async resolve=> {
+        const query = `SELECT *
+        FROM r 
+        WHERE "${id}" = r.id`
+        const { resources } = await Responses.items.query(query).fetchAll();
+        console.log("Query Successful", resources);
+        if(!resources || resources.length<=0){  
+            return resolve ("Failed to find response");
+         }
+        const newResponse = {...resources[0], response: response};
+
+        const { resource: output } = await Responses.items.upsert(newResponse);
+        console.log("Successfully Updated", output);
+        return resolve({
+            id: output.id, 
+            submission: output.submission,
+            question: output.question,
+            response: output.response
+        });
+    })
+
+}
+
 async function Archive(id, status, userId){
     return new Promise( async resolve=> {
         const query = `SELECT *
@@ -79,5 +103,6 @@ module.exports = {
     GetAllSubmissions, 
     GetSubmission, 
     GetResponsesFromSubmit, 
-    Archive
+    Archive,
+    Edit
 }

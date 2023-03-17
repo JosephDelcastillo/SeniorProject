@@ -81,6 +81,44 @@ async function Login (input) {
     }
 }
 
+async function ForgotPassword (input) {
+    console.log("Made it to service!!");
+    const {email} = input.data;
+
+    console.log("email: " + email);
+    try {
+        console.log('Attempt Forgot Password')
+        const response = await model.ForgotPassword({ email });
+        console.log('Forgot Password Complete')
+        console.log(response)
+        if(response === false) return new Reply({point: 'Forgot Password' });
+
+        return new Reply({ point: 'Forgot Password', data: response, success: true });
+    } catch (error) {
+        console.log("Error in services triggered");
+        return new Reply({ point: 'Forgot Password Service' });
+    }
+}
+
+async function ResetPassword (input) {
+    console.log("Made it to service!!");
+    const {email, token, password, password2} = input.data;
+
+    console.log("email: " + email);
+    try {
+        console.log('Attempt Reset Password')
+        const response = await model.ResetPassword({ email, token, password, password2 });
+        console.log('Reset Password Complete')
+        console.log(response)
+        if(response === false) return new Reply({point: 'Reset Password' });
+
+        return new Reply({ point: 'Reset Password', data: response, success: true });
+    } catch (error) {
+        console.log("Error in services triggered");
+        return new Reply({ point: 'Reset Password Service' });
+    }
+}
+
 async function Edit (input) {
     const { token, data } = input;
     const { name, oldemail, email, type } = data;
@@ -95,6 +133,23 @@ async function Edit (input) {
     } catch(error) {
         //return new Reply({ point: 'error'});
         return new Reply({ point: 'Edit'});
+    }
+}
+
+async function EditCurrentUser (input) {
+    const { token, data } = input;
+    const { email, name, password, password2} = data;
+    try {
+        const authorized = await model.Authorize( token, model.AUTH_ROLES.Staff); 
+        if(!authorized) return new Reply({ point: 'Authorization'});
+
+        const res = await model.EditCurrentUser({name, email, password, password2, token});
+
+        if(res) return new Reply({ point: 'Edit Current User', success: true, data: res });
+        return new Reply({ point: 'Edit Current User' });
+    } catch(error) {
+        //return new Reply({ point: 'error'});
+        return new Reply({ point: 'Edit Edit Current user'});
     }
 }
 
@@ -122,5 +177,8 @@ module.exports = {
     Edit,
     GetUsers,
     Archive,
-    GetCurrentUser
+    GetCurrentUser,
+    EditCurrentUser,
+    ForgotPassword,
+    ResetPassword
 }

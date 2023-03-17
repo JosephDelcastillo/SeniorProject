@@ -29,7 +29,7 @@ function Profile({ getToken, api }) {
             </div>
 
             <div className="text-center">
-                    <label className='btn btn-outline-primary col-3 mt-5'> Edit Profile </label>
+                    <a href="/dashboard/profile/edit" type='button' className="btn btn-outline-primary col-3 mt-5"> Edit Profile </a>
             </div>
         </div>
     )

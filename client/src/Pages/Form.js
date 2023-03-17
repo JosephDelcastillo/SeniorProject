@@ -50,7 +50,6 @@ function Form({ api }) {
                         ))}
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
-                    <a className='btn btn-success' href="/dashboard/form-edit">Edit Form</a>
                 </div>
             </div>
         </div>

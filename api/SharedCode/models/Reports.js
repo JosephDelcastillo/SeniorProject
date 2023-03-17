@@ -49,8 +49,8 @@ async function Get (people, questions, dates) {
         const questionData = await Questions.items.query(query).fetchAll();
         
         //******** 6: Filter out the Note Questions ********
-        const notes = questionData.resources.filter(({ type }) => type.toLowerCase() === "note").map(({id}) => id);
-        const f_questions = questionData.resources.filter(({ type }) => type.toLowerCase() !== "note")
+        const notes = questionData.resources.filter(({ type }) => type && type.toLowerCase() === "note").map(({id}) => id);
+        const f_questions = questionData.resources.filter(({ type }) => type && type.toLowerCase() !== "note")
         const f_responses = responseData.resources.filter(({ question }) => !notes.includes(question) );
 
         //******** 7: Get the Users ********

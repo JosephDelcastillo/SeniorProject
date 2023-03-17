@@ -66,6 +66,25 @@ async function ArchiveQuestion(question, status){
         });
     })
 }
+async function AddQuestion({ text, type }){
+    return new Promise(async resolve => {
+        const now = new Date();
+        const newQuestion = {
+            id: await tb.genId(),
+            text,
+            type,
+            goal: 0,
+            archived: false,
+            created: now.toISOString() 
+        };
+        
+        const { resource: submission } = await Questions.items.create(newQuestion);
+        if(!submission) { resolve(false); return false; } 
+
+        resolve(tb.sanitize(submission));
+        return tb.sanitize(submission)
+    });
+}
 async function AddSubmission({ user, data }){
     return new Promise(async resolve => {
         /**
@@ -139,5 +158,6 @@ module.exports = {
     ArchiveQuestion,
     EditQuestion,
     AddSubmission,
-    GetQuestion
+    GetQuestion,
+    AddQuestion
 }

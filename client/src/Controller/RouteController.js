@@ -16,6 +16,9 @@ import Users from '../Pages/Users';
 import UserPage from '../Pages/UserPage';
 import EditUser from '../Pages/EditUser';
 import Profile from '../Pages/Profile';
+import EditProfile from '../Pages/EditProfile';
+import ForgotPass from '../Pages/ForgotPassword';
+import PasswordReset from '../Pages/PasswordReset';
 
 export default class RouteController extends React.Component {
     render() {
@@ -28,20 +31,23 @@ export default class RouteController extends React.Component {
                         <Route path="/dashboard/user" element={<Users getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/edituser/:email" element={<EditUser getToken={this.props.getToken} api={this.props.api} />} />
-                        <Route path="/dashboard/form-edit" element={<FormEdit getToken={this.props.getToken} api={this.props.api}/>}/>
+                        <Route path="/dashboard/form" element={<FormEdit getToken={this.props.getToken} api={this.props.api}/>}/>
+                        <Route path="/dashboard/addresponse" element={<Form getToken={this.props.getToken} api={this.props.api} />}/>
                         <Route path="/dashboard/user/:email" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                     </>):(<>
-                        
+                        <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} /> 
                     </>)}
-                    <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} /> 
                     <Route path="/logout" element={<Logout resetToken={this.props.resetToken} />} />
                     <Route path="/dashboard" element={<Dashboard getToken={this.props.getToken} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/response/:id" element={<Response getToken={this.props.getToken} api={this.props.api} />} />
                     <Route path="/dashboard/report" element={<Report isAdmin={this.props.isAdmin} api={this.props.api} />} />
                     <Route path="/dashboard/profile" element={<Profile getToken={this.props.getToken} api={this.props.api} />} />
+                    <Route path="/dashboard/profile/edit" element={<EditProfile getToken={this.props.getToken} api={this.props.api} />} />
                 </>):(<></>)}
                 <Route path="/login" element={<Login getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
+                <Route path="/resetpassword" element={<ForgotPass getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
+                <Route path="/resetpassword/:email/:token" element={<PasswordReset getToken={this.props.getToken} setToken={this.props.setToken} api={this.props.api} />} />
                 <Route path="*" element={<NotFound />} />
             </Routes>
             </div>
