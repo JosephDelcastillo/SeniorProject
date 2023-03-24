@@ -69,7 +69,8 @@ function Report({ api, isAdmin }) {
         
         // Then Query the Backend for Report Data 
         const { success, data } = await api({ func: 'GetReport', data: input });
-        if(success) { 
+        if (success && data.length <= 0) return Swal.fire({ icon: 'error', title: "Failed to Generate", text: "No submissions found in database" })
+        if (success) { 
             setGraphType(input.graphType)
             // Final Structure [{ question: Question #, data: [{ name: Employee Name, data: [{ name: Submission #, y: Submission Value }] }] }]
             // First Get Questions 
