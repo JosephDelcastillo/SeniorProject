@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 
 
 // Helper Functions 
 // Shorthand Every-Other
 const EO = (i, r = 2) => (i % r === 0);
+const strLike = (haystack, needle) => (haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0); 
 // Shorthand to close Search Dropdowns
 const closeDropDown = id => document.getElementById(id).classList.remove('show');
 const openDropDown = id => document.getElementById(id).classList.add('show');
@@ -53,11 +55,26 @@ function ReportStaff({ GRAPH_TYPES, api, questions }) {
   }
   // Update Question Options 
   const searchQuestion = async e => {
-      const { success, data } = await api({ func: 'GetQuestion', data: { search: e.target.value, "no_notes": true } });
-      if(success) {
-          setQuestionOptions(data.filter(d => (questionSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
-      }
+      const search = e.target.value.toLowerCase();
+      setQuestionOptions(
+          questionOptions.map(d => { 
+              return {
+                  ...d,
+                  visible: strLike(d.text, search)
+              }
+          })
+      );
   }
+  // Load Initial Options
+  useEffect(() => {
+      async function fetchData() {
+          const { success, data } = await api({ func: 'GetQuestion', data: { search: '', "no_notes": true } });
+          if(!success || data.length <= 0) return Swal.fire({ icon: 'error', title: 'Could Not Load Questions' });
+
+          setQuestionOptions( data.map(d => { return { visible: true, ...d }  }) );
+      }
+      fetchData()
+  }, [api, setQuestionOptions])
 
   return (<>
       <div className='mb-2' id='questionPills'> 
@@ -82,7 +99,8 @@ function ReportStaff({ GRAPH_TYPES, api, questions }) {
                                   </button>
                               </li>
                           )}
-                          {questionOptions.map(({ id, text }) => (questionSelected.findIndex((s) => s.id === id) >= 0)?(<></>):( 
+                          {questionOptions.map(({ id, text, visible }) => (questionSelected.findIndex((s) => s.id === id) >= 0 || !visible)?
+                          (<></>):( 
                               <li key={'questionOption'+id}>
                                   <button className="dropdown-item" type="button" onClickCapture={() => { addQuestion(id, text); }} 
                                       onMouseEnter={fixQuestion} onMouseLeave={unfixQuestion} onBlurCapture={closeQuestion}>
