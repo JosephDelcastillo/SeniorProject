@@ -115,7 +115,7 @@ function Report({ api, isAdmin }) {
                 {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
                     backendData.map(({ name, data, goal }, i) => (
                         <div key={uuid()} className='w-100 my-3 border'>
-                            <HighChart key={name??i} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
+                            <HighChart key={uuid()} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>
                     ))
                     // <p>{JSON.stringify(backendData[0].data)}</p>
