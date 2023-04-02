@@ -20,9 +20,9 @@ console.log(api)
             const columns = [
                 { cell: row => row.actions, width: '4rem' },
                 //{ name: 'id', selector: row=> row.id, sortable: true },
-                { name: 'User', selector: row => row.user, sortable: true }, 
+                { name: 'User', selector: row => row.user, sortable: true, searchable: true }, 
                 { name: 'Created', selector: row => row.created, sortable: true }, 
-                { name: 'Modified By', selector: row => row.modified_by, sortable: true }, 
+                { name: 'Modified By', selector: row => row.modified_by, sortable: true, searchable: true }, 
                 { name: 'Last Edit Date', selector: row => row.modified, sortable: true },
                 { name: 'Archived?', selector: row => row.archived, sortable: true }
             ];
@@ -112,7 +112,6 @@ console.log(api)
                 <h1> Responses </h1>
             </div>
             <div className='card-body'>
-                <hr />
                 {(!entryData || !entryData.tables || !entryData.tables.info || !entryData.tables.columns)?(<></>):(
                     <Table key={uuid()} columns={entryData.tables.columns} data={entryData.tables.info}  />
                 )}
