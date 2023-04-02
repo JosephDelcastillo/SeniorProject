@@ -6,19 +6,9 @@ import HighChart from '../Components/HighChart';
 import Swal from 'sweetalert2';
 import { v4 as uuid } from 'uuid';
 
+import ReportData from '../Components/ReportData';
 import ReportAdmin from '../Components/ReportAdmin';
 import ReportStaff from '../Components/ReportStaff';
-
-// Constants 
-const GRAPH_TYPES = [
-    { name: 'Bar (Horizontal)', value: 'bar'}, 
-    { name: 'Column (Vertical)', value: 'column'}, 
-    { name: 'Spline (Curved)', value: 'spline'}, 
-    { name: 'Area (Underarea)', value: 'area'}, 
-    { name: 'Line (Straight)', value: 'line'}, 
-    { name: 'Scatter', value: 'scatter'}, 
-    { name: 'Pie', value: 'pie'}, 
-];
 
 // Helper Functions 
 // Shorthand for Input Value gain  
@@ -72,27 +62,7 @@ function Report({ api, isAdmin }) {
         if (success && data.length <= 0) return Swal.fire({ icon: 'error', title: "Failed to Generate", text: "No submissions found in database" })
         if (success) { 
             setGraphType(input.graphType)
-            // Final Structure [{ question: Question #, data: [{ name: Employee Name, data: [{ name: Submission #, y: Submission Value }] }] }]
-            // First Get Questions 
-            let prep = data.questions.map(({ id, text }) => { return {name: text, question: id, goal: undefined} });
-            // Next Add Employees to each Question 
-            prep.map(e => e.data = data.people.map(({id, name}) => { return { name, person: id } }));
-            // Then Add Submission to Each Question/Employee 
-            prep.map(q => q.data.map(p => p.data = data.submissions.filter(s => s.user === p.person).map(s => {return { name: 'Submission ' + s.created, submission: s.id }})) )
-            // Then Add Responses to Each Submission
-            prep.map(q => q.data.map(p => p.data.forEach(s => {
-                let found = data.responses.find(r => (r.submission === s.submission && r.question === q.question));
-                s.y = (found && found.response) ? found.response : 0;
-            })));
-            // Finally Remove all the helper values from the object
-            let output = prep.map(({ name, data, goal }) => { 
-                return { name, goal, data: data.map(({ name, data }) => {
-                    return { name, data: data.map(({ name, y }) => { 
-                        return { name, y: parseInt(y) } 
-                    })}
-                })} 
-            }); 
-            setBackendData(output);
+            setBackendData(ReportData(data));
         } else {
             Swal.fire({title: "Data Retrieval Failed", icon: 'error'})
         }
@@ -106,14 +76,14 @@ function Report({ api, isAdmin }) {
             <div className='card-body'>
                 <form className='form' onSubmit={handleSubmit}>
                     {(isAdmin())?(
-                        <ReportAdmin key='AdminReportMenu' GRAPH_TYPES={GRAPH_TYPES} api={api} people={PeopleState} questions={QuestionsState} />
+                        <ReportAdmin key='AdminReportMenu' api={api} people={PeopleState} questions={QuestionsState} />
                     ):(
-                        <ReportStaff key='StaffReportMenu' GRAPH_TYPES={GRAPH_TYPES} api={api} questions={QuestionsState} />
+                        <ReportStaff key='StaffReportMenu' api={api} questions={QuestionsState} />
                     )}
                 </form>
                 <hr className='my-4' />
                 {(backendData.length > 0 && Object.keys(backendData[0]).length > 0) ? ( 
-                    backendData.map(({ name, data, goal }, i) => (
+                    backendData.map(({ name, data, goal }) => (
                         <div key={uuid()} className='w-100 my-3 border'>
                             <HighChart key={uuid()} data={data} type={graphType} yAxis="Response Value" title={name} axisMax={goal} />
                         </div>

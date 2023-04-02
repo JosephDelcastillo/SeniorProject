@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import HighChartTypes from './HighChartTypes';
 import Swal from 'sweetalert2';
 
 
@@ -12,7 +13,7 @@ const openDropDown = id => document.getElementById(id).classList.add('show');
 
 
 
-function ReportStaff({ GRAPH_TYPES, api, questions }) {
+function ReportStaff({ api, questions }) {
   const [ questionOptions, setQuestionOptions ] = useState([{}]);
   const [ questionSelected, setQuestionSelected ] = questions;
 
@@ -139,10 +140,7 @@ function ReportStaff({ GRAPH_TYPES, api, questions }) {
               </div>
           </div>
           <div className="col-xl-3 col-lg-4">
-              <select className='form-control text-center' id='graphType'>
-                  <option value="">Graph Type</option>
-                  {GRAPH_TYPES.map(({ name, value }) => <option value={value}>{name}</option>)}
-              </select>
+            <HighChartTypes />
           </div>
           <div className='col-lg-3 col-md-12'>
               <button className='btn btn-success w-100' type='submit'> Generate </button>

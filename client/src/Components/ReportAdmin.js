@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import HighChartTypes from './HighChartTypes';
 import Swal from 'sweetalert2';
 
 // Helper Functions 
@@ -10,7 +11,7 @@ const closeDropDown = id => document.getElementById(id).classList.remove('show')
 const openDropDown = id => document.getElementById(id).classList.add('show');
 
 
-function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
+function ReportAdmin({ api, people, questions }) {
     const [ peopleOptions, setPeopleOptions ] = useState([{}]);
     const [ peopleSelected, setPeopleSelected ] = people;
     const [ questionOptions, setQuestionOptions ] = useState([{}]);
@@ -191,10 +192,7 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
                 </div>
             </div>
             <div className="col-xl-2 col-lg-4">
-                <select className='form-control text-center' id='graphType'>
-                    <option value="">Graph Type</option>
-                    {GRAPH_TYPES.map(({ name, value }) => <option key={`GraphType-${value}`} value={value}>{name}</option>)}
-                </select>
+                <HighChartTypes />
             </div>
         </div>
         <div className='mb-2' id='questionPills'> 
