@@ -6,3 +6,11 @@ export function csv (data, name='download') {
     a.setAttribute('download', `${name}.csv`)
     a.click()
 }
+
+export function csvButton({ data, text='Export CSV', filename='download', className }) {
+    return (
+        <div className={`btn btn-outline-info ${className}`} onClick={e => csv(data, filename)}>
+            {text}
+        </div>
+    )
+}
