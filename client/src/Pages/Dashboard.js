@@ -18,8 +18,8 @@ function Dashboard({ isAdmin, getToken, api }) {
     useEffect(() => {
         async function fetchData() {
             const input = {
-                people: isAdmin() ? getToken() : -202,
-                question: -202,
+                people: -202,
+                question: [{}],
                 dates: { start: '01-01-1999', end: new Date().toISOString().slice(0, 10) }
             }
 
