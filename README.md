@@ -26,6 +26,3 @@ You need to setup each subset of the application differently, but as such you ca
 
 
 ## [Functions API](api/api.md)
-
-## [Express Server](server/server.md)
-**NOTE: This will be depreciated soon**
