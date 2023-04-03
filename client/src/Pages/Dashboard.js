@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import ReportGraph from '../Components/ReportGraph';
+import axios from 'axios';
 
 /**
  * Dashboard Page 

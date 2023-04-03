@@ -58,7 +58,7 @@ function ReportGraph({ api }) {
                             <select className='form-control' ref={questionReference}>
                                 <option value="">Selected Question</option>
                                 {reportData.questions.map(({ text }) => (
-                                    <option value={text} selected={activeQuestion && text === activeQuestion}>{text}</option>
+                                    <option key={uuid()} value={text} selected={activeQuestion && text === activeQuestion}>{text}</option>
                                 ))}
                             </select>
                         </div>

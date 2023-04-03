@@ -58,9 +58,9 @@ function Table({ columns, data }) {
         setResetPaginationToggle(!resetPaginationToggle);
         setFilterText('');
     };
-    function setText(e) {
-        if (e.target.value != null) {
-            setFilterText(e.target.value)
+    function setText({ target }) {
+        if (target.value != null) {
+            setFilterText(target.value)
             return;
         }
         const val = filterInputElement.current.value;
@@ -81,19 +81,24 @@ function Table({ columns, data }) {
         setResetPaginationToggle(!resetPaginationToggle)
         setColumnFilter(names)
     }
+    function handleEnter({ key, target }) {
+        if (key !== "Enter") return;
+        setText({ target })
+    }
     const header = () => {
         return (
             <div className='col-12 g-3 row'>
-                <div className='col-lg-3 col-md-5 col-sm-12 col-xs-12'>
+                <div className='col-lg-4 col-md-6 col-sm-12 col-xs-12'>
                     <div className='input-group'>
                         <div className='btn btn-outline-danger' onClick={handleClear}> Reset </div>
-                        <input type="text" id="table-filter" className="form-control" ref={filterInputElement} placeholder={filterText ? filterText : ''}/>
+                        <input type="text" id="table-filter" className="form-control" onKeyDown={handleEnter}
+                            ref={filterInputElement} placeholder={filterText ? filterText : ''}/>
                         <div className='btn btn-outline-success' onClick={setText}> Apply </div>
                     </div>
                 </div>
-                <div className='col-xl-2 col-lg-3 col-md-4 col-sm-6 col-xs-12 dropdown'>
+                <div className='col-xl-2 col-lg-3 col-md-3 col-sm-6 col-xs-12 dropdown'>
                     <button className="btn btn-outline-secondary dropdown-toggle col-12" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Column Filtering
+                        Filtering
                     </button>
                     <ul class="dropdown-menu col-11 text-center">
                         <li>
