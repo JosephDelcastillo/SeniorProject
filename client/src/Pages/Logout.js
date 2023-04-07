@@ -7,12 +7,17 @@ import React from 'react'
  *  Manages Logging Out  
  * @returns {React.Component} 
  */
-function Logout({ resetToken }) {
-    resetToken();
+function Logout({ resetToken, api }) {
+    async function logoutfunc() {
+         const {success}= await api({ func: 'Logout', data: {}});
+         resetToken();
+         window.location.pathname = "";
+        }
+    logoutfunc();
     return (
-        <div className='row' onLoad={window.location.pathname = ""}>
+        <div className='row'>
             <div className='col-12 text-center p-5'>
-                <h1> Logout </h1>
+                <h1> Logging out... </h1>
             </div>
         </div>
     )

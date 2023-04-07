@@ -81,6 +81,18 @@ async function Login (input) {
     }
 }
 
+async function Logout(input) {
+    const { token, data } = input;
+    console.log("Made it to the service!!");
+    try {
+        const res = await model.Logout(token);
+        if(user) return new Reply({ point: 'Logout', success: true, data: res });
+        return new Reply({ point: 'Logout' });
+    } catch(error) {
+        return new Reply({ point: 'Logout Service' });
+    }
+}
+
 async function ForgotPassword (input) {
     console.log("Made it to service!!");
     const {email} = input.data;
@@ -173,6 +185,7 @@ async function Archive (input) {
 module.exports = {
     GetStaff,
     Login,
+    Logout,
     Create,
     Edit,
     GetUsers,
