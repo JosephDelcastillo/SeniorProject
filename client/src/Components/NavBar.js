@@ -29,7 +29,7 @@ function NavBar({ getToken, isAdmin }) {
                                 </Link>
                                 <ul className="dropdown-menu dropdown-menu-end">
                                     <li><Link className='dropdown-item' to="dashboard/responses">Manage Responses</Link></li>
-                                    <li><Link className='dropdown-item' to="dashboard/addResponse">Add Response</Link></li>
+                                    <li><Link className='dropdown-item' to="dashboard/addresponse">Add Response</Link></li>
                                 </ul>
                             </div>
                         </>):(<>

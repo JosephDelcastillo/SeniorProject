@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReportGraph from '../Components/ReportGraph';
 import axios from 'axios';
 
 /**
@@ -6,8 +7,8 @@ import axios from 'axios';
  * @param {Function} parameters Get Logged In Token
  * @returns {React.Component} 
  */
-function Dashboard({ getToken }) {
-    const [quote, setQuote] = new useState({})
+function Dashboard({ api }) {
+    const [quote, setQuote] = new useState({});
     
     useEffect(() => {
         axios.get('https://seussology.info/api/quotes/random/1').then(response => setQuote({text: response.data[0].text, book: response.data[0].book.title}));
@@ -29,7 +30,7 @@ function Dashboard({ getToken }) {
                         </figcaption>
                     </figure>
                 )}
-                <img src='https://via.placeholder.com/500/8888FF?text=PlaceHolder' alt='PlaceHolder' />
+                <ReportGraph api={api} />
             </div>
         </div>
     )

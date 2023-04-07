@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
+import HighChartTypes from './HighChartTypes';
+import Swal from 'sweetalert2';
 
 // Helper Functions 
 // Shorthand Every-Other
 const EO = (i, r = 2) => (i % r === 0);
+const strLike = (haystack, needle) => (haystack.toLowerCase().indexOf(needle.toLowerCase()) >= 0); 
 // Shorthand to close Search Dropdowns
 const closeDropDown = id => document.getElementById(id).classList.remove('show');
 const openDropDown = id => document.getElementById(id).classList.add('show');
 
 
-function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
+function ReportAdmin({ api, people, questions }) {
     const [ peopleOptions, setPeopleOptions ] = useState([{}]);
     const [ peopleSelected, setPeopleSelected ] = people;
     const [ questionOptions, setQuestionOptions ] = useState([{}]);
@@ -60,11 +62,26 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
     }
     // Update People Options 
     const searchPeople = async e => {
-        const { success, data } = await api({ func: 'GetStaff', data: { search: e.target.value } });
-        if(success) {
-            setPeopleOptions(data.filter(d => (peopleSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
-        }
+        const search = e.target.value.toLowerCase();
+        setPeopleOptions(
+            peopleOptions.map(d => { 
+                return {
+                    ...d,
+                    visible: strLike(d.name, search) || strLike(d.email, search)
+                }
+            })
+        );
     }
+    // Load Initial Options
+    useEffect(() => {
+        async function fetchData() {
+            const { success, data } = await api({ func: 'GetUsers', data: { search: '' } });
+            if(!success || data.length <= 0) return Swal.fire({ icon: 'error', title: 'Could Not Load Users' });
+
+            setPeopleOptions( data.map(d => { return { visible: true, ...d }  }) );
+        }
+        fetchData()
+    }, [api, setPeopleOptions])
 
     // Question
     // Add Question to Selected 
@@ -93,11 +110,26 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
     }
     // Update Question Options 
     const searchQuestion = async e => {
-        const { success, data } = await api({ func: 'GetQuestion', data: { search: e.target.value, "no_notes": true } });
-        if(success) {
-            setQuestionOptions(data.filter(d => (questionSelected.findIndex(p => p.id === d.id) !== -1) ? false : true));
-        }
+        const search = e.target.value.toLowerCase();
+        setQuestionOptions(
+            questionOptions.map(d => { 
+                return {
+                    ...d,
+                    visible: strLike(d.text, search)
+                }
+            })
+        );
     }
+    // Load Initial Options
+    useEffect(() => {
+        async function fetchData() {
+            const { success, data } = await api({ func: 'GetQuestion', data: { search: '', "no_notes": true } });
+            if(!success || data.length <= 0) return Swal.fire({ icon: 'error', title: 'Could Not Load Questions' });
+
+            setQuestionOptions( data.map(d => { return { visible: true, ...d }  }) );
+        }
+        fetchData()
+    }, [api, setQuestionOptions])
 
     return (<>
         <div className='mb-2' id='peoplePills'> 
@@ -118,11 +150,12 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
                                 <li key="AllPeople">
                                     <button className="dropdown-item" type="button" onClickCapture={() => { addPerson(-202, 'All'); }} 
                                         onMouseEnter={fixPeople} onMouseLeave={unfixPeople} onBlurCapture={closePeople}>
-                                        All People 
+                                        All
                                     </button>
                                 </li>
                             )}
-                            {peopleOptions.map(({ id, name, email }) => (peopleSelected.findIndex((s) => s.id === id) >= 0)?(<></>):( 
+                            {peopleOptions.map(({ id, name, email, visible }) => peopleSelected.findIndex((s) => s.id === id) >= 0 || !visible ?
+                            (<></>):(
                                 <li key={'peopleOptions'+id}>
                                     <button className="dropdown-item" type="button" onClickCapture={() => { addPerson(id, name); }} 
                                         onMouseEnter={fixPeople} onMouseLeave={unfixPeople} onBlurCapture={closePeople}>
@@ -136,7 +169,7 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
                             <li>
                                 <button className="dropdown-item" type="button" onClickCapture={() => { addPerson(-202, 'All'); }} 
                                     onMouseEnter={fixPeople} onMouseLeave={unfixPeople} onBlurCapture={closePeople}>
-                                    All
+                                    All - {peopleOptions.length}
                                 </button>
                             </li>
                         </ul>
@@ -159,10 +192,7 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
                 </div>
             </div>
             <div className="col-xl-2 col-lg-4">
-                <select className='form-control text-center' id='graphType'>
-                    <option value="">Graph Type</option>
-                    {GRAPH_TYPES.map(({ name, value }) => <option key={`GraphType-${value}`} value={value}>{name}</option>)}
-                </select>
+                <HighChartTypes />
             </div>
         </div>
         <div className='mb-2' id='questionPills'> 
@@ -187,7 +217,7 @@ function ReportAdmin({ GRAPH_TYPES, api, people, questions }) {
                                     </button>
                                 </li>
                             )}
-                            {questionOptions.map(({ id, text }) => (questionSelected.findIndex((s) => s.id === id) >= 0)?(<></>):( 
+                            {questionOptions.map(({ id, text, visible }) => (questionSelected.findIndex((s) => s.id === id) >= 0 || !visible )?(<></>):( 
                                 <li key={'questionOption'+id}>
                                     <button className="dropdown-item" type="button" onClickCapture={() => { addQuestion(id, text); }} 
                                         onMouseEnter={fixQuestion} onMouseLeave={unfixQuestion} onBlurCapture={closeQuestion}>

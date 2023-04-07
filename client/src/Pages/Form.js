@@ -46,11 +46,10 @@ function Form({ api }) {
                     {(serverQuestionData && serverQuestionData.length > 0)?
                     (<form>
                         {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
-                            <Question key={id} number={i} id={id} type={type} text={text}/>
+                            <Question key={id} number={i} id={id} type={type} text={text} show_number={false}/>
                         ))}
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
-                    <a className='btn btn-success' href="/dashboard/form-edit">Edit Form</a>
                 </div>
             </div>
         </div>

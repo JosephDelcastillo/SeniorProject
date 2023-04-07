@@ -1,12 +1,12 @@
 import React from 'react'
 
 
-function Question({ id, type, text, number }) {
+function Question({ id, type, text, number, show_number=true }) {
     if (!(id && type && text)) return false;
     return (<>
         <div className="row mb-2">
             <div className="call-12">
-                <h4>{number + 1}) {text}</h4>
+                <h4>{show_number?(number + 1) + ") ":''}{text}</h4>
             </div>
             <div className="call-12">
                 {(type.toLowerCase() === "note")? (
