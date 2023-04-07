@@ -17,7 +17,6 @@ function Response({ api }) {
 			}
 		});
 	}, [api, params, setEntryData]);
-	console.log(params.id);
 
 	return (
 		<div className="card m-2 border-none">

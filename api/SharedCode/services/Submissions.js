@@ -99,7 +99,6 @@ async function EditResponse(input){
         const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
         const isStaff = await Authorize(token, AUTH_ROLES.Staff);
         const {id, response} = data;
-        console.log(input);
         if (isAdmin) {
             checkAuth = await model.Edit(data);
         } else if (isStaff) {
@@ -110,7 +109,7 @@ async function EditResponse(input){
         
         if(!response) return new Reply({point: 'No Response Available to Edit', data: {id, response}})
         const output = await model.Edit(id, response);
-        console.log("Output: ",output);
+
         if(!output) return new Reply({point: 'Failed to Update Response Content', data: id});
         
         return new Reply({point: 'Response Updated', success: true, data: output});
