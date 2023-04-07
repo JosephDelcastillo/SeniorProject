@@ -76,7 +76,7 @@ async function Create ({name, email, password, type}) {
                 id: userId,
                 archived: false,
                 name,
-                email,
+                email: email.toLowerCase(),
                 pass: saltPass,
                 salt: salt,
                 type: AUTH_ROLES.Admin,
@@ -89,7 +89,7 @@ async function Create ({name, email, password, type}) {
                 id: userId,
                 archived: false,
                 name,
-                email,
+                email: email.toLowerCase(),
                 pass: saltPass,
                 salt: salt,
                 type: AUTH_ROLES.Staff,
@@ -222,7 +222,7 @@ async function Edit ({name, oldemail, email, type}) {
         //Getting needed user id info
         let query = `SELECT *
         FROM u
-        WHERE u.email LIKE "${oldemail}"`
+        WHERE u.email LIKE "${oldemail.toLowerCase()}"`
 
         const { resources } = await Users.items.query(query).fetchAll(); 
 
@@ -247,7 +247,7 @@ async function Edit ({name, oldemail, email, type}) {
             //checks if email is already in use
             let queryusers = `SELECT u.email, u.name
             FROM u
-            WHERE u.email LIKE "${email}"`
+            WHERE u.email LIKE "${email.toLowerCase()}"`
         
             let resources2 = await Users.items.query(queryusers).fetchAll(); 
 
@@ -268,7 +268,7 @@ async function Edit ({name, oldemail, email, type}) {
 
             console.log("Trying to replace email:");
 
-            updated = {...resources[0], email};
+            updated = {...resources[0], email: email.toLowerCase()};
             console.log("made new user", updated);
             result = await Users.items.upsert(updated);
             console.log(result);
@@ -445,7 +445,7 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 
             console.log("Trying to replace email:");
 
-            updated = {...resources[0], email};
+            updated = {...resources[0], email: email.toLowerCase()};
             console.log("made new user", updated);
             result = await Users.items.upsert(updated);
             console.log(result);
@@ -507,6 +507,38 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 }
 
 
+async function Logout (token) {
+    return new Promise( async resolve => {
+        console.log("starting logout");
+
+        console.log("checking for token");
+        // Check for a token
+        if (!token) {
+            console.log("No token found");
+            resolve (true);
+            return;
+        }
+
+        console.log("token:");
+        console.log(token.token);
+
+        // Query for session with that token in session table
+        let query = `SELECT *
+        FROM u WHERE u.token = "${token.token}"`;
+        
+        console.log('session Query')
+        const { resources: search } = await Sessions.items.query(query).fetchAll();
+
+        // Make sure that we found the session
+        if (search.length == 0) {
+            console.log("No session found");
+            resolve (true);
+            return;
+        } 
+
+        console.log("deleting session");
+        const something = await Sessions.item(search[0].id , search[0].id).delete();
+
 async function ForgotPassword ({email}) {
     return new Promise(async resolve => {
         //CHANGE WHEN USING TESTING!!!
@@ -516,7 +548,7 @@ async function ForgotPassword ({email}) {
         
         //Query for user info
         let query = `SELECT * 
-        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Query to find user with that email')
         const { resources: search } = await Users.items.query(query).fetchAll();
@@ -569,7 +601,7 @@ async function ForgotPassword ({email}) {
           //create message
         var mailOptions = {
             from: 'testy.mctestyface.987@gmail.com',
-            to: `${email}`,
+            to: `${email.toLowerCase()}`,
             subject: 'EPOTS Password Reset',
             text: `Hello, 
             We received a reset password request for your EPOTS account. Please follow the link to reset your password:
@@ -599,7 +631,7 @@ async function ResetPassword ({email, token, password, password2}) {
         //Getting needed user id info
         let query = `SELECT *
         FROM u
-        WHERE u.email LIKE "${email}"`
+        WHERE u.email LIKE "${email.toLowerCase()}"`
 
         const { resources } = await Users.items.query(query).fetchAll(); 
 
@@ -688,7 +720,7 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
@@ -706,7 +738,27 @@ async function Login ({email, password}) {
         } else {
             
             /******** Step 3: Check Session ********/
-            // TODO: Fill this Out 
+            // Checks if user has more than 3 sessions (if yes, delete oldest sessions)
+
+            let query2 = `SELECT *
+            FROM u WHERE u.user = "${search[0].id}"
+            ORDER BY u.created`;
+        
+            console.log('Pre login sessions query')
+            const { resources: sessions } = await Sessions.items.query(query2).fetchAll();
+
+            if (sessions && (sessions.length > 3)) {
+                console.log("More than 3 sessions");
+                console.log("sessions:");
+                for (let i = 0 ; i < (sessions.length - 3) ; i++) {
+                    console.log(i);
+                    console.log(sessions[i].id);
+                    console.log(sessions[i].created);
+
+                    console.log("deleting session");
+                    const something = await Sessions.item(sessions[i].id , sessions[i].id).delete();
+                }
+            }
             
             /******** Step 4: Creation Session ********/
             const CurrentUser = search[0];
@@ -771,7 +823,7 @@ async function Authorize (token, requirement) {
         
 
         // Query for session with that token in session table
-        let query = `SELECT u.id, u.user, u.created
+        let query = `SELECT *
         FROM u WHERE u.token = "${token.token}"`;
         
         console.log('session Query')
@@ -786,7 +838,30 @@ async function Authorize (token, requirement) {
 
         console.log(search[0].user);
 
-        //TODO: Maybe add some sort of expiration check here????
+        //check to see if token is older than 12 hours
+        const now = new Date();
+        const twoHour = 60 * 60 * 1000 * 12;
+        let time = new Date(search[0].created) - now;
+        console.log("Time diff is:");
+        console.log(time);
+        if (now - (new Date(search[0].created)) > twoHour) {
+            //Delete session!!
+            //Maybe direct them to logout??
+
+            console.log("deleting session");
+            const something = await Sessions.item(search[0].id , search[0].id).delete();
+
+            resolve (false);
+            return;
+        } else {
+            //update created date of token
+            console.log("Trying to update created");
+
+            updated = {...search[0], created : now.toISOString()};
+            console.log("made new user", updated);
+            result = await Sessions.items.upsert(updated);
+            console.log(result);
+        }
 
         // Query users for a user matching that id
         let query2 = `SELECT u.type, u.archived
@@ -820,14 +895,6 @@ async function Authorize (token, requirement) {
             return;
         }
 
-
-        // TODO: Fill this in with an actual token processor 
-        //???? ^
-        // Note, use the Session table to create/manage the number of users session active at one time or even limit session duration 
-        // TODO: If Valid Token -> Return user id 
-        
-        // TODO: If invalid Token -> Return false 
-        // TODO: Resolve with Reply 
         console.log("Auth Fail");
         resolve(false);
     })
@@ -852,6 +919,7 @@ module.exports = {
     Authorize,
     GetStaff,
     Login,
+    Logout,
     Create,
     GetUsers,
     Edit,

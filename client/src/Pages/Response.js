@@ -17,7 +17,6 @@ function Response({ api }) {
 			}
 		});
 	}, [api, params, setEntryData]);
-	console.log(params.id);
 
 	return (
 		<div className="card m-2 border-none">
@@ -53,7 +52,8 @@ function Response({ api }) {
 						{entryData && entryData.questions && entryData.responses ? (
 							<>
 								{entryData.responses.map((response) => (
-									<ManageResponse key={response.id} api = {api} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} />
+									<ManageResponse key={response.id} api = {api} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} questionType={entryData.questions.find((q) => q.id === response.question).type}/>
+									
 								))}
 								
 							</>

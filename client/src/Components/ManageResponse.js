@@ -3,11 +3,11 @@ import Swal from 'sweetalert2';
 import { useParams } from 'react-router-dom';
 
 
-function ManageResponse({api, id, question, response}) {
+function ManageResponse({api, id, question, response, questionType}) {
     const params = useParams();
     const [entryData, setEntryData] = useState([{}]);
-    console.log("Entry Data: ", entryData);
-    useEffect(() => {
+
+      useEffect(() => {
       api({ func: "GetSubmission", data: params.id }).then(({ success, data }) => {
         if (success) {
           setEntryData(data);
@@ -15,7 +15,11 @@ function ManageResponse({api, id, question, response}) {
       });
     }, [api, params, setEntryData]);
 
-      async function Edit(id, response){
+      async function Edit(id, response, type){
+            (questionType === "number" ? type = "number" : type = "text");
+            if(questionType === "number"){
+              response = parseInt(response);
+            }
             Swal.fire({
                 title: 'Edit Response',
                 confirmButtonText:"Save Changes",
@@ -24,7 +28,8 @@ function ManageResponse({api, id, question, response}) {
                     <input id="editId" type = "hidden" value="${id}"></input>
                     <label>Response
                         <br/>
-                        <input id="editResponse" value="${response}"></input>
+                        <input id="editResponse" type= ${type} value="${response}"></input>
+                        
                     </label>
                 <br/>
                 `
@@ -38,8 +43,10 @@ function ManageResponse({api, id, question, response}) {
       }
 
     async function SaveContentEdit(id, response){
+
         const {success, message, data } = await api({ func: 'EditResponse', data: {id, response}});
-        console.log(data);
+       
+        
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
@@ -52,8 +59,7 @@ function ManageResponse({api, id, question, response}) {
 
         setEntryData(entryData);
 
-        Swal.fire({title: 'Question Content Updated', text: 'Question Content Updated!', icon: 'success' });
-        window.location.reload();
+        Swal.fire({title: 'Response Updated', text: 'Response Updated!', icon: 'success'}).then(()=>{window.location.reload()})
         return false;
     }
 

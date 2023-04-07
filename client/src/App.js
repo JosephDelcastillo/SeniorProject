@@ -14,7 +14,7 @@ function isAdmin () {
   const token = getToken();
   if(!token || !JSON.parse(token)) return false;
   const obj = JSON.parse(token)
-  return typeof obj.attr === "string" && obj.attr.toLowerCase() === "admin"
+  return typeof obj.attr === "string" && (obj.attr.toLowerCase() === "admin" || obj.attr.toLowerCase() === "Administrator")
 }
 
 /**
