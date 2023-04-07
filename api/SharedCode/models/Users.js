@@ -76,7 +76,7 @@ async function Create ({name, email, password, type}) {
                 id: userId,
                 archived: false,
                 name,
-                email,
+                email: email.toLowerCase(),
                 pass: saltPass,
                 salt: salt,
                 type: AUTH_ROLES.Admin,
@@ -89,7 +89,7 @@ async function Create ({name, email, password, type}) {
                 id: userId,
                 archived: false,
                 name,
-                email,
+                email: email.toLowerCase(),
                 pass: saltPass,
                 salt: salt,
                 type: AUTH_ROLES.Staff,
@@ -222,7 +222,7 @@ async function Edit ({name, oldemail, email, type}) {
         //Getting needed user id info
         let query = `SELECT *
         FROM u
-        WHERE u.email LIKE "${oldemail}"`
+        WHERE u.email LIKE "${oldemail.toLowerCase()}"`
 
         const { resources } = await Users.items.query(query).fetchAll(); 
 
@@ -247,7 +247,7 @@ async function Edit ({name, oldemail, email, type}) {
             //checks if email is already in use
             let queryusers = `SELECT u.email, u.name
             FROM u
-            WHERE u.email LIKE "${email}"`
+            WHERE u.email LIKE "${email.toLowerCase()}"`
         
             let resources2 = await Users.items.query(queryusers).fetchAll(); 
 
@@ -268,7 +268,7 @@ async function Edit ({name, oldemail, email, type}) {
 
             console.log("Trying to replace email:");
 
-            updated = {...resources[0], email};
+            updated = {...resources[0], email: email.toLowerCase()};
             console.log("made new user", updated);
             result = await Users.items.upsert(updated);
             console.log(result);
@@ -445,7 +445,7 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 
             console.log("Trying to replace email:");
 
-            updated = {...resources[0], email};
+            updated = {...resources[0], email: email.toLowerCase()};
             console.log("made new user", updated);
             result = await Users.items.upsert(updated);
             console.log(result);
@@ -516,7 +516,7 @@ async function ForgotPassword ({email}) {
         
         //Query for user info
         let query = `SELECT * 
-        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Query to find user with that email')
         const { resources: search } = await Users.items.query(query).fetchAll();
@@ -569,7 +569,7 @@ async function ForgotPassword ({email}) {
           //create message
         var mailOptions = {
             from: 'testy.mctestyface.987@gmail.com',
-            to: `${email}`,
+            to: `${email.toLowerCase()}`,
             subject: 'EPOTS Password Reset',
             text: `Hello, 
             We received a reset password request for your EPOTS account. Please follow the link to reset your password:
@@ -599,7 +599,7 @@ async function ResetPassword ({email, token, password, password2}) {
         //Getting needed user id info
         let query = `SELECT *
         FROM u
-        WHERE u.email LIKE "${email}"`
+        WHERE u.email LIKE "${email.toLowerCase()}"`
 
         const { resources } = await Users.items.query(query).fetchAll(); 
 
@@ -688,7 +688,7 @@ async function Login ({email, password}) {
          */
         /******** Step 1: Query for Matching Email ********/
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
-        FROM u WHERE u.email = "${email}" AND u.archived = false`;
+        FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
         console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
