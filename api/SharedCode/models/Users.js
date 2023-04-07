@@ -538,6 +538,9 @@ async function Logout (token) {
 
         console.log("deleting session");
         const something = await Sessions.item(search[0].id , search[0].id).delete();
+        resolve(true);
+    })
+}
 
 async function ForgotPassword ({email}) {
     return new Promise(async resolve => {
