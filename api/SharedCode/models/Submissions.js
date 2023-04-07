@@ -1,5 +1,5 @@
 // Import 
-const { Submits, Responses, Questions } = require('../lib/DBConnection');
+const { Submits, Responses } = require('../lib/DBConnection');
 const { Submissions } = require('../lib/DBDevelopment');
 const tb = require('../lib/Helpers');
 
@@ -53,26 +53,25 @@ async function GetResponsesFromSubmit(submissionId){
     })
 }
 
-async function Edit(id, response, question){
+async function Edit(id, response){
     return new Promise( async resolve=> {
         const query = `SELECT *
         FROM r 
         WHERE "${id}" = r.id`
         const { resources } = await Responses.items.query(query).fetchAll();
-        
         console.log("Query Successful", resources);
         if(!resources || resources.length<=0){  
             return resolve ("Failed to find response");
          }
         const newResponse = {...resources[0], response: response};
-        console.log(question);
+
         const { resource: output } = await Responses.items.upsert(newResponse);
         console.log("Successfully Updated", output);
         return resolve({
             id: output.id, 
             submission: output.submission,
-            response: output.response,
-            question: question
+            question: output.question,
+            response: output.response
         });
     })
 
