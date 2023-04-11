@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid'
 
 
 
+
 //TO DO: FILTER INCOMING DATA BY ENTRYID POSTED FROM RESPONSES
 //TO DO: SETUP A POST FUNCTION TO POST FORM CHANGES TO DATABASE
 //TO DO: ADD CSS AND STYLING
@@ -26,7 +27,7 @@ function FormEdit({api}) {
 
     },[setServerQuestionData,api]);
 
-    async function ToEdit(id, text, type){
+    async function ToEdit(id, text, type, goal){
         Swal.fire({
             title: 'Edit Question Content',
             confirmButtonText:"Save Changes",
@@ -36,6 +37,10 @@ function FormEdit({api}) {
                 <label>Question Text
                     <br/>
                     <input id="editText" value="${text}"></input>
+                </label>
+                <label>Goal
+                <br/>
+                <input id="editGoal" value="${goal}"></input>
                 </label>
                 <label>Response Type
                     <br/>
@@ -51,7 +56,8 @@ function FormEdit({api}) {
                 SaveContentEdit(
                     document.getElementById("editId").value,
                     document.getElementById("editText").value,
-                    document.getElementById("editType").value
+                    document.getElementById("editType").value,
+                    document.getElementById("editGoal").value
                 );
             } else {
                 Swal.fire('Changes are not saved') 
@@ -59,8 +65,8 @@ function FormEdit({api}) {
         })
     }
 
-    async function SaveContentEdit(id, text, type){
-        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type}});
+    async function SaveContentEdit(id, text, type, goal){
+        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type, goal}});
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
@@ -110,7 +116,8 @@ function FormEdit({api}) {
             title: "Add Question",
             showCancelButton: true,
             html: 
-                `<input id="AddQuestionText" class="swal2-input">` +
+                `<input id="AddQuestionText" class="swal2-input" value="Question Text">` +
+                `<input id="AddQuestionGoal" class="swal2-input" value="Goal #">` +
                 `<select id="AddQuestionType" class="swal2-input">` +
                     `<option value="number">Number</option>` +
                     `<option value="note">Note</option>` +
@@ -119,6 +126,7 @@ function FormEdit({api}) {
             preConfirm: () => {
                 return {
                     text: document.getElementById('AddQuestionText').value,
+                    goal: document.getElementById('AddQuestionGoal').value,
                     type: document.getElementById('AddQuestionType').value
                 }
             }
@@ -133,7 +141,7 @@ function FormEdit({api}) {
         const newQuestionData = [ data, ...serverQuestionData]
         setServerQuestionData(newQuestionData);
     }
-    const cols = [ "Question Text", "Type", "Archived" ];
+    const cols = [ "Question Text", "Type", "Archived","Goal" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -153,14 +161,15 @@ function FormEdit({api}) {
                                 serverQuestionData.map(({id, text, type, archived, goal}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
-                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
+                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type, goal )} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                         </td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
-                                            {archived ? "" : "Not "} Archived
+                                            {archived ? "" : "Not "} Archived                                           
                                         </td>
+                                        <td>{goal}</td>
                                     </tr>
                                 )
                             }
