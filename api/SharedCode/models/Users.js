@@ -123,7 +123,7 @@ async function Create ({name, email, type}) {
         console.log(result);
 
         //CHANGE WHEN USING TESTING!!!
-        clientURL = "http://localhost:3000"
+        clientURL = "https://epots.azurewebsites.net"
 
         //create reset link
         const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
