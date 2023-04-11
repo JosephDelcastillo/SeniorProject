@@ -27,7 +27,7 @@ function FormEdit({api}) {
 
     },[setServerQuestionData,api]);
 
-    async function ToEdit(id, text, type, goal){
+    async function ToEdit(id, text, type, goals){
         Swal.fire({
             title: 'Edit Question Content',
             confirmButtonText:"Save Changes",
@@ -38,9 +38,9 @@ function FormEdit({api}) {
                     <br/>
                     <input id="editText" value="${text}"></input>
                 </label>
-                <label>Goal
+                <label>Goals
                 <br/>
-                <input id="editGoal" value="${goal}"></input>
+                <input id="editGoals" value="${goals}"></input>
                 </label>
                 <label>Response Type
                     <br/>
@@ -57,7 +57,7 @@ function FormEdit({api}) {
                     document.getElementById("editId").value,
                     document.getElementById("editText").value,
                     document.getElementById("editType").value,
-                    document.getElementById("editGoal").value
+                    document.getElementById("editGoals").value
                 );
             } else {
                 Swal.fire('Changes are not saved') 
@@ -65,8 +65,8 @@ function FormEdit({api}) {
         })
     }
 
-    async function SaveContentEdit(id, text, type, goal){
-        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type, goal}});
+    async function SaveContentEdit(id, text, type, goals){
+        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type, goals}});
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
@@ -117,7 +117,7 @@ function FormEdit({api}) {
             showCancelButton: true,
             html: 
                 `<input id="AddQuestionText" class="swal2-input" value="Question Text">` +
-                `<input id="AddQuestionGoal" class="swal2-input" value="Goal #">` +
+                `<input id="AddQuestionGoals" class="swal2-input" value="Goals #">` +
                 `<select id="AddQuestionType" class="swal2-input">` +
                     `<option value="number">Number</option>` +
                     `<option value="note">Note</option>` +
@@ -126,7 +126,7 @@ function FormEdit({api}) {
             preConfirm: () => {
                 return {
                     text: document.getElementById('AddQuestionText').value,
-                    goal: document.getElementById('AddQuestionGoal').value,
+                    goals: document.getElementById('AddQuestionGoals').value,
                     type: document.getElementById('AddQuestionType').value
                 }
             }
@@ -141,7 +141,7 @@ function FormEdit({api}) {
         const newQuestionData = [ data, ...serverQuestionData]
         setServerQuestionData(newQuestionData);
     }
-    const cols = [ "Question Text", "Type", "Archived","Goal" ];
+    const cols = [ "priority","Question Text", "Type", "Archived","Goals" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -158,18 +158,19 @@ function FormEdit({api}) {
                         </thead>
                         <tbody>
                             {!serverQuestionData || serverQuestionData.length <= 0 ? (<tr><td colSpan={cols.length + 1}>No Questions Loaded</td></tr>) : 
-                                serverQuestionData.map(({id, text, type, archived, goal}) => 
+                                serverQuestionData.map(({priority, id, text, type, archived, goals}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
-                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type, goal )} />
+                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type, goals )} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                         </td>
+                                        <td>{priority}</td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
                                             {archived ? "" : "Not "} Archived                                           
                                         </td>
-                                        <td>{goal}</td>
+                                        <td>{goals}</td>
                                     </tr>
                                 )
                             }
