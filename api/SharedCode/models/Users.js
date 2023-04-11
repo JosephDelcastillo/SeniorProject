@@ -6,12 +6,12 @@ const nodemailer = require('nodemailer');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
-async function Create ({name, email, password, type}) {
+async function Create ({name, email, type}) {
     return new Promise(async resolve => {
-        console.log(name + email + password + type);
+        console.log(name + email + type);
 
         //checks to make sure all needed info is filled in
-        if (!name || !email || !password || !type){
+        if (!name || !email || !type){
             resolve(false);
             return;
         }
@@ -42,15 +42,19 @@ async function Create ({name, email, password, type}) {
             return;
         }
 
-        
+        //generate salt
         const salt = await tb.genSalt();
         console.log(salt);
         console.log("^ salt")
+
+        //generate id number to store as password
+        const password = await tb.genId();
 
         const saltPass = await tb.hashing(password, salt);
         console.log(saltPass);
         console.log("^ salted password")
 
+        //generate actual id
         const userId = await tb.genId();
         console.log(userId);
         console.log("^ userID")
@@ -67,7 +71,22 @@ async function Create ({name, email, password, type}) {
             console.log(userId);
         }
 
+        //generate reset token info
+        let resetToken = "";
+        let tsalt = "";
+
+        do {
+            //generates new salt
+            tsalt = await tb.genSalt();
+            console.log(tsalt);
+
+            //hashes new token
+            resetToken = await tb.hashing(email, tsalt);
+            console.log(resetToken);
+        } while (resetToken.includes("/"))
+
         console.log("Attempting to create user");
+        const now = new Date();
         let query = {};
 
         //puts everything into database based on user type
@@ -79,10 +98,10 @@ async function Create ({name, email, password, type}) {
                 email: email.toLowerCase(),
                 pass: saltPass,
                 salt: salt,
-                type: AUTH_ROLES.Admin,
-                f_token: "",
-                f_salt: "",
-                f_created: ""
+                type: "admin",
+                f_token: resetToken,
+                f_salt: tsalt,
+                f_created: now.toISOString()
             };
         } else {
             query = {
@@ -93,15 +112,53 @@ async function Create ({name, email, password, type}) {
                 pass: saltPass,
                 salt: salt,
                 type: AUTH_ROLES.Staff,
-                f_token: "",
-                f_salt: "",
-                f_created: ""
+                f_token: resetToken,
+                f_salt: tsalt,
+                f_created: now.toISOString()
             };
         }
 
-            console.log(query);
-            const result = await Users.items.create(query);
-            console.log(result);
+        console.log(query);
+        const result = await Users.items.create(query);
+        console.log(result);
+
+        //CHANGE WHEN USING TESTING!!!
+        clientURL = "https://epots.azurewebsites.net"
+
+        //create reset link
+        const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
+
+        //Send reset email
+        //Create transporter
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'testy.mctestyface.987@gmail.com',
+                pass: 'sfycxavaakmrzzwy'
+            }
+        });
+        
+          //create message
+        var mailOptions = {
+            from: 'testy.mctestyface.987@gmail.com',
+            to: `${email.toLowerCase()}`,
+            subject: 'EPOTS New User Password',
+            text: `Hello, 
+            An EPOTS account was created for the owner of this email address. Please follow the link to set your password:
+            ${link}
+            (This set password request will expire in 1 hour)`
+        };
+        
+          //send message
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+                resolve(false);
+                return;
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+        });
 
         resolve(true);
     });
@@ -282,7 +339,7 @@ async function Edit ({name, oldemail, email, type}) {
             if ( type == "admin") {
                 console.log("Trying to replace type:");
 
-                updated = {...resources[0], attr: AUTH_ROLES.Admin};
+                updated = {...resources[0], attr: "admin"};
                 console.log("made new user", updated);
                 result = await Users.items.upsert(updated);
                 console.log(result);
