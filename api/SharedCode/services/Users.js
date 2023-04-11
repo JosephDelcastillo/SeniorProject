@@ -3,12 +3,12 @@ const { Reply } = require('../lib/Reply');
 
 async function Create (input) {
     const { token, data } = input;
-    const { name, email, password, type } = data;
+    const { name, email, type } = data;
     try {
         const authorized = await model.Authorize( token, model.AUTH_ROLES.Admin); 
         if(!authorized) return new Reply({ point: 'Authorization'});
 
-        const res = await model.Create({name, email, password, type});
+        const res = await model.Create({name, email, type});
 
         if(res) return new Reply({ point: 'Create Generation', success: true, data: res });
         return new Reply({ point: 'Create Generation' });

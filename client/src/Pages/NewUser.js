@@ -15,7 +15,6 @@ function NewUser({ getToken, api }) {
         e.preventDefault();
         let data = {
             "name": inputByID("emplName"),
-            "password": inputByID("emplPass"),
             "type": inputByID("accType"),
             "email": inputByID("emplEmail")
         };
@@ -23,7 +22,7 @@ function NewUser({ getToken, api }) {
         //Sends info to database to create user
         const { success } = await api({ func: 'UserCreate', data});
         if(success) {
-            Swal.fire({title: "User Created Successfully!", icon: 'success'}).then(function() {
+            Swal.fire({title: "User Created Successfully!", text: "Set password email sent to new user's email." ,icon: 'success'}).then(function() {
                 window.location = "/dashboard/user";
             });
             console.log(success);
