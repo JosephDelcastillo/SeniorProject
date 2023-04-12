@@ -10,7 +10,7 @@ async function GetQuestion (search, no_notes = false) {
         const query = `SELECT q.id, q.archived, q.text, q.type
             FROM q 
             WHERE q.text LIKE "%${search}%" ${(no_notes)?'AND q.type != "note" ':''}
-            ORDER BY q.text`
+            ORDER BY q.priority`
 
         // Search DB For Matches  
         const { resources } = await Questions.items.query(query).fetchAll(); 
@@ -82,7 +82,7 @@ async function OrderChange(question, swapQuestion, direction, priority){
         return resolve({
             id: output.id, 
             priority: output.priority,
-            
+
         });
     })
 

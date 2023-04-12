@@ -63,7 +63,7 @@ function FormEdit({api}) {
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
-        }
+        }}
     async function SaveContentEdit(id, text, type){
         const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type}});
         if(!success) {
@@ -163,8 +163,9 @@ function FormEdit({api}) {
                                         </td>
                                         <td>
                                             {priority} 
-                                            <button className='btn btn-outline-primary w-100'onClick={OrderChange({id},{priority},'+')}>+</button>
-                                            <button className='btn btn-outline-primary w-100'onClick={OrderChange({id},{priority},'-')}>-</button></td>
+                                            <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority, '+')}>+</button>
+                                            <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority, '-')}>-</button>
+                                        </td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
