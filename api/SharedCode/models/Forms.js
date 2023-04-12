@@ -33,6 +33,20 @@ async function GetQuestionById (id) {
         resolve( resources );
     })
 }
+async function GetQuestionByPriority (number) {
+    return new Promise(async resolve => {
+        // Build Query 
+        const query = `SELECT *
+            FROM q 
+            WHERE q.priority = "${number}"`
+
+        // Search DB For Matches  
+        const { resources } = await Questions.items.query(query).fetchAll(); 
+        
+        // Return Result 
+        resolve( resources );
+    })
+}
 async function EditQuestion(question, text, type){
     return new Promise( async resolve=> {
         const today = new Date(); 
@@ -46,6 +60,29 @@ async function EditQuestion(question, text, type){
             created: output.created,
             modified: output.modified,
             goal: output.goal
+        });
+    })
+
+}
+async function OrderChange(question, swapQuestion, direction, priority){
+    return new Promise( async resolve=> {
+        if(direction = '+'){priority+=1;}
+        else if(direction = '-' && priority > 0){priority-=1;}
+
+        const today = new Date(); 
+        const firstQuestion = { ...question, priority:priority, modified: today.toISOString() };
+
+        if(direction = '-'){priority+=1;}
+        else if(direction = '+'){priority-=1;}
+
+        const secondQuestion = {...swapQuestion, priority:priority, modified: today.toISOString()}
+
+        const { resource: output } = await Questions.items.upsert(firstQuestion);
+        const {resource: second} = await Questions.items.upsert(secondQuestion)
+        return resolve({
+            id: output.id, 
+            priority: output.priority,
+            
         });
     })
 
@@ -159,5 +196,7 @@ module.exports = {
     EditQuestion,
     AddSubmission,
     GetQuestion,
-    AddQuestion
+    AddQuestion,
+    GetQuestionByPriority, 
+    OrderChange
 }

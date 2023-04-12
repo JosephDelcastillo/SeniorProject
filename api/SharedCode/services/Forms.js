@@ -46,7 +46,6 @@ async function ArchiveQuestion(input){
         if(!isAdmin) return new Reply({point: 'Archive Question Inquiry; Does Not Have Permissions'});
 
         const questions = await model.GetQuestionById(id);
-        //console.log(!questions, questions.length === 0, !questions[0].hasOwnProperty("archived"));
         if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("archived")) return new Reply({point: 'Failed to Retreive Question', data: {id,questions}});
         if(questions[0].archived === status) return new Reply({point:'Status Matching', success: true, data: questions[0]});
         
@@ -57,6 +56,30 @@ async function ArchiveQuestion(input){
         return new Reply({ point: 'Question Archive Inquiry' });
     }
 
+}
+async function OrderChange(input){
+    try{
+        const{token, data} = input;
+        const {id, priority, direction} = data;
+        const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
+
+        if(!isAdmin) return new Reply({point: 'Question Order Inquiry; Does Not Have Permissions'});
+
+        if(direction = '+'){priority+=1;}
+        else if(direction = '-' && priority > 0){priority-=1;}
+
+        const swap = await model.GetQuestionByPriority(priority);
+        const questions = await model.GetQuestionById(id);
+        
+
+        if(!questions || questions.length === 0 || !("text" in questions[0])) return new Reply({point: 'No Question Selected to Edit', data: {id,questions, swap}});
+
+        const output = await model.OrderChange(questions, swap, direction, priority);
+        if(!output || !output.id) return new Reply({point: 'Failed to Change Order Question Content', data: output.id});
+        return new Reply({point: 'Question Order Updated', success: true, data: output});
+    } catch (error) {
+        return new Reply({ point: 'Question Order Update Inquiry' });
+    }
 }
 async function AddQuestion (input) {
     try {
@@ -106,5 +129,6 @@ module.exports = {
     EditQuestion,
     AddSubmission,
     GetQuestion,
-    AddQuestion
+    AddQuestion,
+    OrderChange
 }

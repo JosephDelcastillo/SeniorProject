@@ -58,7 +58,12 @@ function FormEdit({api}) {
             }
         })
     }
-
+    async function OrderChange(id, priority, direction){
+        const {success, message, data } = await api({ func: 'OrderChange', data: {id, priority, direction}});
+        if(!success) {
+            Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
+            return false;
+        }
     async function SaveContentEdit(id, text, type){
         const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type}});
         if(!success) {
@@ -133,7 +138,7 @@ function FormEdit({api}) {
         const newQuestionData = [ data, ...serverQuestionData]
         setServerQuestionData(newQuestionData);
     }
-    const cols = [ "Question Text", "Type", "Archived" ];
+    const cols = ["Order","Question Text", "Type", "Archived", "Goal" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -150,17 +155,22 @@ function FormEdit({api}) {
                         </thead>
                         <tbody>
                             {!serverQuestionData || serverQuestionData.length <= 0 ? (<tr><td colSpan={cols.length + 1}>No Questions Loaded</td></tr>) : 
-                                serverQuestionData.map(({id, text, type, archived, goal}) => 
+                                serverQuestionData.map(({priority,id, text, type, archived, goal}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
                                             <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                         </td>
+                                        <td>
+                                            {priority} 
+                                            <button className='btn btn-outline-primary w-100'onClick={OrderChange({id},{priority},'+')}>+</button>
+                                            <button className='btn btn-outline-primary w-100'onClick={OrderChange({id},{priority},'-')}>-</button></td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
                                             {archived ? "" : "Not "} Archived
                                         </td>
+                                        <td>{goal}</td>
                                     </tr>
                                 )
                             }
