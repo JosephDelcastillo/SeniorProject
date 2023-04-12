@@ -66,7 +66,7 @@ async function OrderChange(input){
         if(!isAdmin) return new Reply({point: 'Question Order Inquiry; Does Not Have Permissions'});
 
         if(direction = '+'){priority+=1;}
-        else if(direction = '-' && priority > 0){priority-=1;}
+        else if(direction = '-' && priority > 1){priority-=1;}
 
         const swap = await model.GetQuestionByPriority(priority);
         const questions = await model.GetQuestionById(id);

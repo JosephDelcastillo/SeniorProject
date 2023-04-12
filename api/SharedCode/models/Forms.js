@@ -65,27 +65,32 @@ async function EditQuestion(question, text, type){
 
 }
 async function OrderChange(question, swapQuestion, direction, priority){
-    return new Promise( async resolve=> {
-        if(direction = '+'){priority+=1;}
-        else if(direction = '-' && priority > 0){priority-=1;}
+    return new Promise(async resolve => {
+        if(direction === '+') {
+            priority += 1;
+        } else if(direction === '-' && priority > 0) {
+            priority -= 1;
+        }
 
-        const today = new Date(); 
-        const firstQuestion = { ...question, priority:priority, modified: today.toISOString() };
+        const today = new Date();
+        const firstQuestion = { ...question, priority: priority, modified: today.toISOString() };
 
-        if(direction = '-'){priority+=1;}
-        else if(direction = '+'){priority-=1;}
+        if(direction === '-') {
+            priority -= 1;
+        } else if(direction === '+' && priority < swapQuestion.priority) {
+            priority += 1;
+        }
 
-        const secondQuestion = {...swapQuestion, priority:priority, modified: today.toISOString()}
+        const secondQuestion = {...swapQuestion, priority: priority, modified: today.toISOString()};
 
         const { resource: output } = await Questions.items.upsert(firstQuestion);
-        const {resource: second} = await Questions.items.upsert(secondQuestion)
+        const { resource: second } = await Questions.items.upsert(secondQuestion);
+
         return resolve({
             id: output.id, 
-            priority: output.priority,
-
+            priority: output.priority
         });
-    })
-
+    });
 }
 async function ArchiveQuestion(question, status){
     return new Promise( async resolve=> {
