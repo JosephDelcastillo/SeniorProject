@@ -3,6 +3,7 @@ import HighChartTypes from './HighChartTypes';
 import ReportData from './ReportData';
 import HighChart from './HighChart';
 import { v4 as uuid } from 'uuid';
+import Loading from './Loading';
 import Swal from 'sweetalert2';
 
 function ReportGraph({ api }) {
@@ -37,7 +38,7 @@ function ReportGraph({ api }) {
         if (questionReference.current.value) setActiveQuestion(questionReference.current.value)
     }
     if(!reportData || !reportData.submissions || reportData.submissions.length <= 0) 
-        return(<img src='https://via.placeholder.com/500/8888FF?text=PlaceHolder' alt='PlaceHolder' />)
+        return(<Loading blank={true} />)
     return (
         <div className='col-12 row'>
             <div className='card'>
