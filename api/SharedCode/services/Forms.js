@@ -37,6 +37,28 @@ async function EditQuestion(input){
     }
 
 }
+async function OrderChange(input){
+    try{
+        const{token, data} = input;
+        const {id, priority} = data;
+        const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
+
+        if(!isAdmin) return new Reply({point: 'Question Order Inquiry; Does Not Have Permissions'});
+
+        const questions = await model.GetQuestionById(id);
+
+        if(!questions || questions.length === 0 || !("text" in questions[0])) return new Reply({point: 'No Question Selected to Move', data: {id, questions}});
+        //if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
+        
+
+        const output = await model.OrderChange(questions[0], priority);
+        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Priority Content', data: output.id});
+        return new Reply({point: 'Question Priority Content Updated', success: true, data: output});
+    } catch (error) {
+        return new Reply({ point: 'Question Priority Content Update Inquiry' });
+    }
+
+}
 async function ArchiveQuestion(input){
     try{      
         const{token, data} = input;
@@ -106,5 +128,6 @@ module.exports = {
     EditQuestion,
     AddSubmission,
     GetQuestion,
-    AddQuestion
+    AddQuestion,
+    OrderChange
 }

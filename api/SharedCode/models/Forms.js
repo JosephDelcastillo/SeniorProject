@@ -10,7 +10,7 @@ async function GetQuestion (search, no_notes = false) {
         const query = `SELECT q.id, q.archived, q.text, q.type
             FROM q 
             WHERE q.text LIKE "%${search}%" ${(no_notes)?'AND q.type != "note" ':''}
-            ORDER BY q.text`
+            ORDER BY q.priority`
 
         // Search DB For Matches  
         const { resources } = await Questions.items.query(query).fetchAll(); 
@@ -56,6 +56,23 @@ async function ArchiveQuestion(question, status){
         const newQuestion = { ...question, archived: status, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
         return resolve({
+            id: output.id, 
+            text: output.text, 
+            type: output.type, 
+            archived: output.archived,
+            created: output.created,
+            modified: output.modified,
+            goal: output.goal
+        });
+    })
+}
+async function OrderChange(question, priority){
+    return new Promise( async resolve=> {
+        const today = new Date(); 
+        const newQuestion = { ...question, priority: priority, modified: today.toISOString() };
+        const { resource: output } = await Questions.items.upsert(newQuestion);
+        return resolve({
+            priority: output.priority,
             id: output.id, 
             text: output.text, 
             type: output.type, 
@@ -159,5 +176,6 @@ module.exports = {
     EditQuestion,
     AddSubmission,
     GetQuestion,
-    AddQuestion
+    AddQuestion,
+    OrderChange
 }
