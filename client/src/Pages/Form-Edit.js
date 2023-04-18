@@ -79,7 +79,21 @@ function FormEdit({api}) {
         Swal.fire({title: 'Question Content Updated', text: 'Question Content Updated!', icon: 'success' });
         return(true);
     }
+    async function OrderChange(id, priority, direction){
+        const {success, message, data } = await api({ func: 'OrderChange', data: {id, priority, direction}});
 
+        const index = serverQuestionData.findIndex(serverQuestion => serverQuestion.id === data.id);
+
+        if(!success) {
+            Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
+            return false;
+        }
+        
+        let copyQuestionData = [ ...serverQuestionData ];
+        copyQuestionData[index] = data;
+        setServerQuestionData(copyQuestionData);
+    
+    }
 
     async function ArchiveQuestion(id, status = true) {
         const { success, message, data } = await api({ func: 'ArchiveQuestion', data: { id, status }}); 
@@ -89,17 +103,17 @@ function FormEdit({api}) {
         }
 
         const index = serverQuestionData.findIndex(serverQuestion => serverQuestion.id === data.id);
-        console.log(index);
+    
         if(index < 0) {
             Swal.fire({ title: 'Submit Failed', text: "Question Id Not Found", icon: 'error' });
             return false;
         }
-        console.log(index);
+  
         let copyQuestionData = [ ...serverQuestionData ];
         copyQuestionData[index] = data;
-        console.log(serverQuestionData,copyQuestionData);
+   
         setServerQuestionData(copyQuestionData);
-        console.log(serverQuestionData);
+
         Swal.fire({title: 'Question Archive Status Updated', text: 'Question Archive Status Updated!', icon: 'success' });
         return(true);
     }
@@ -150,17 +164,21 @@ function FormEdit({api}) {
                         </thead>
                         <tbody>
                             {!serverQuestionData || serverQuestionData.length <= 0 ? (<tr><td colSpan={cols.length + 1}>No Questions Loaded</td></tr>) : 
-                                serverQuestionData.map(({id, text, type, archived, goal}) => 
+                                serverQuestionData.map(({id, text, type, archived, goals, priority}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
                                             <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
+                                            <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority+1, '+')}>+</button>
+                                            {priority > 1 && <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority-1, '-')}>-</button>}
                                         </td>
+                                        <td>{priority}</td>
                                         <td>{text}</td>
                                         <td>{type}</td>
                                         <td className={archived?'text-danger':'text-success'}>
                                             {archived ? "" : "Not "} Archived
                                         </td>
+                                        <td>{goals}</td>
                                     </tr>
                                 )
                             }

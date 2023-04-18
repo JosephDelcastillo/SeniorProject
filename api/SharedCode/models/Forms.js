@@ -7,7 +7,7 @@ const tb = require('../lib/Helpers');
 async function GetQuestion (search, no_notes = false) {
     return new Promise(async resolve => {
         // Build Query 
-        const query = `SELECT q.priority, q.id, q.archived, q.text, q.type, q.goal
+        const query = `SELECT q.priority, q.id, q.archived, q.text, q.type, q.goals
             FROM q 
             WHERE q.text LIKE "%${search}%" ${(no_notes)?'AND q.type != "note" ':''}
             ORDER BY q.priority`
