@@ -26,7 +26,7 @@ function FormEdit({api}) {
 
     },[setServerQuestionData,api]);
 
-    async function ToEdit(id, text, type){
+    async function ToEdit(id, text, type, goals){
         Swal.fire({
             title: 'Edit Question Content',
             confirmButtonText:"Save Changes",
@@ -37,6 +37,10 @@ function FormEdit({api}) {
                     <br/>
                     <input id="editText" value="${text}"></input>
                 </label>
+                <label>Goal
+                <br/>
+                <input id="editGoals" value="${goals}"></input>
+            </label>
                 <label>Response Type
                     <br/>
                     <select id="editType">
@@ -51,7 +55,8 @@ function FormEdit({api}) {
                 SaveContentEdit(
                     document.getElementById("editId").value,
                     document.getElementById("editText").value,
-                    document.getElementById("editType").value
+                    document.getElementById("editType").value,
+                    document.getElementById("editGoals").value
                 );
             } else {
                 Swal.fire('Changes are not saved') 
@@ -59,8 +64,8 @@ function FormEdit({api}) {
         })
     }
 
-    async function SaveContentEdit(id, text, type){
-        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type}});
+    async function SaveContentEdit(id, text, type, goals){
+        const {success, message, data } = await api({ func: 'EditQuestion', data: {id, text, type, goals}});
         if(!success) {
             Swal.fire({ title: 'Submit Failed', text: message, icon: 'error' });
             return false;
@@ -124,7 +129,8 @@ function FormEdit({api}) {
             title: "Add Question",
             showCancelButton: true,
             html: 
-                `<input id="AddQuestionText" class="swal2-input">` +
+                `<input id="AddQuestionText" class="swal2-input" value="Text">` +
+                `<input id="AddQuestionGoals" class="swal2-input" value="Goal">` +
                 `<select id="AddQuestionType" class="swal2-input">` +
                     `<option value="number">Number</option>` +
                     `<option value="note">Note</option>` +
@@ -147,7 +153,7 @@ function FormEdit({api}) {
         const newQuestionData = [ data, ...serverQuestionData]
         setServerQuestionData(newQuestionData);
     }
-    const cols = [ "Question Text", "Type", "Archived" ];
+    const cols = [ "Priority","Question Text", "Type", "Archived","Goals" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
@@ -167,7 +173,7 @@ function FormEdit({api}) {
                                 serverQuestionData.map(({id, text, type, archived, goals, priority}) => 
                                     <tr key={`EditQuestion-${id}`}>
                                         <td>
-                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type)} />
+                                            <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type, goals)} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
                                             <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority+1, '+')}>+</button>
                                             {priority > 1 && <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority-1, '-')}>-</button>}
