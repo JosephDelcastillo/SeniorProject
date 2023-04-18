@@ -33,10 +33,10 @@ async function GetQuestionById (id) {
         resolve( resources );
     })
 }
-async function EditQuestion(question, text, type){
+async function EditQuestion(question, text, type, goal){
     return new Promise( async resolve=> {
         const today = new Date(); 
-        const newQuestion = { ...question, text: text, type: type, modified: today.toISOString() };
+        const newQuestion = { ...question, text: text, type: type, goal:goal, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
         return resolve({
             id: output.id, 
@@ -87,6 +87,7 @@ async function AddQuestion({ text, type }){
     return new Promise(async resolve => {
         const now = new Date();
         const newQuestion = {
+            priority:50,
             id: await tb.genId(),
             text,
             type,
