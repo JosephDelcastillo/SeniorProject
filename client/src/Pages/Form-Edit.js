@@ -147,7 +147,7 @@ function FormEdit({api}) {
         const newQuestionData = [ data, ...serverQuestionData]
         setServerQuestionData(newQuestionData);
     }
-    const cols = [ "Question Text", "Type", "Archived" ];
+    const cols = ["Priority","Question Text", "Type", "Archived","Goals" ];
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
