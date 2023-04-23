@@ -3,8 +3,7 @@ import Swal from 'sweetalert2'
 import { v4 as uuid } from 'uuid'
 
 import Action, { ACTION_TYPES } from '../Components/Action'
-import Table from '../Components/Table';
-
+import Table from '../Components/Table'
 /**
  *  Responses Page
  * 
@@ -13,7 +12,6 @@ import Table from '../Components/Table';
  */
 function Responses({api}) {
     const [entryData, setEntryData] = useState([{}]);
-console.log(api)
     useEffect(() => {
         api({func: "GetAllSubmissions", data: "All"}).then(({success, data}) => {
             if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });
@@ -27,9 +25,6 @@ console.log(api)
                 { name: 'Archived?', selector: row => row.archived, sortable: true }
             ];
             let info = [];
-            console.log(data.submissions);
-            console.log(info);
-
             function createModified (status){
                 return (status && status.length > 1) ? status : 'Not Modified';
             }
@@ -43,18 +38,16 @@ console.log(api)
                             type={ACTION_TYPES.VIEW} 
                             action={() => {window.location.pathname = `/dashboard/response/${id}`}} />
                         <Action key={uuid()}
-                            type={(archived === "Yes" || archived === true) ? ACTION_TYPES.RES : ACTION_TYPES.DEL}
+                            type={(archived === "Archived" || archived === true) ? ACTION_TYPES.RES : ACTION_TYPES.DEL}
                             action={e => archiveHandler(id)} />
                     </>);
             }
 
             data.submissions.forEach(({ id, user, created, modified, modified_by, archived}, i) => {
                 let search = data.users.findIndex(u => u.id === user);
-                user = (search >= 0) ? data.users[search].name : user;
-                console.log("User: ", data.users[search]);
-                
+                user = (search >= 0) ? data.users[search].name : user;  
                 created = (created && created.length > 1) ? created : 'Unknown';
-                archived = (!archived) ? "No" : "Yes";
+                archived = (!archived) ? "Not Archived" : "Archived";
                 modified = createModified(modified);
                 modified_by = createModifiedBy(modified_by);
                 const actions = createActions({ id, archived });
@@ -69,16 +62,14 @@ console.log(api)
                 let newEntryData = { tables, ...data };
 
                 //Find index of selected submission in array
-                console.log(newEntryData.tables.info);
                 const dataIndex = newEntryData.tables.info.findIndex(submission => submission.id === id);
-                console.log("Data Index: ", dataIndex);
                 
                 //Check that requested submissions exists
                 if(dataIndex < 0) return Swal.fire({title: 'Failed to Archive Submission', text: `Can Not Find Submission Id: ${id}` , icon: 'error'});
                 
                 //Check to see if submission needs to be archived or unarchived and set new value to that value
                 const oldStatus = newEntryData.tables.info[dataIndex].archived;
-                const newStatus = (oldStatus === false || oldStatus === "No") ? true : false;
+                const newStatus = (oldStatus === false || oldStatus === "Not Archived") ? true : false;
                 
                 //Pass request to function in API
                 const apiOutput = await api({func: "ArchiveSubmissions", data: {submissionId: id, archiveStatus: newStatus}});
@@ -91,13 +82,12 @@ console.log(api)
                 
                 //If all events successful, then update the submission data and update page
                 newEntryData.tables.info[dataIndex].actions = createActions(apiOutput.data);
-                newEntryData.tables.info[dataIndex].archived = apiOutput.data.archived ? 'Yes' : 'No';
+                newEntryData.tables.info[dataIndex].archived = apiOutput.data.archived ? 'Archived' : 'Not Archived';
                 newEntryData.tables.info[dataIndex].modified = createModified(apiOutput.data.modified);
                 newEntryData.tables.info[dataIndex].modified_by = createModifiedBy(apiOutput.data.modified_by);
             
                 
-                Swal.fire({title: 'Submission Updated', text: `Submission Updated` , icon: 'success'}) //.then(function() {window.location.reload()});
-                console.log(newEntryData);
+                Swal.fire({title: 'Submission Updated', text: `Submission Updated` , icon: 'success'}) 
                 setEntryData(newEntryData);
             }
 

@@ -76,14 +76,12 @@ async function GetSubmission(input) {
         if(!users||users.length < 1) return new Reply({point: 'User Inquiry'})
         
         //********  Step 3: Get Response Data ********/
-        const responses = await model.GetResponsesFromSubmit(data);
-        console.log(responses);        
+        const responses = await model.GetResponsesFromSubmit(data);   
         if(!responses||responses.length < 1) return new Reply({point: 'Responses Inquiry'})
 
         //********  Step 4: Get Question Data ********/
         idFromSubmit = []; 
         responses.forEach(({question}) => idFromSubmit.push(question))
-        console.log(idFromSubmit);
         const questions = await GetQuestionFromArray(idFromSubmit)
         if(!questions||questions.length < 1) return new Reply({point: 'Question Inquiry'})
 
@@ -139,7 +137,6 @@ async function ArchiveSubmission(input) {
         if(!submission && submission.length <= 0 && (submission.user != isStaff.id || !isAdmin)) return new Reply({ point: 'Staff Not Authorized to Archive' });
         //Step 3
         const userId = isAdmin ? isAdmin.id : isStaff.id; 
-        console.log("User ID", userId);
         const output = await model.Archive(submissionId, archiveStatus, userId);
         //Step 4
         if(!output || typeof output === "string") return new Reply({ point: 'Cannot Update Database'});
