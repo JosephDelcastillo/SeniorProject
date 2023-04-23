@@ -59,14 +59,13 @@ async function Edit(id, response){
         FROM r 
         WHERE "${id}" = r.id`
         const { resources } = await Responses.items.query(query).fetchAll();
-        console.log("Query Successful", resources);
+       
         if(!resources || resources.length<=0){  
             return resolve ("Failed to find response");
          }
         const newResponse = {...resources[0], response: response};
 
         const { resource: output } = await Responses.items.upsert(newResponse);
-        console.log("Successfully Updated", output);
         return resolve({
             id: output.id, 
             submission: output.submission,
@@ -83,17 +82,17 @@ async function Archive(id, status, userId){
         FROM s 
         WHERE "${id}" = s.id`
         
-        console.log("Passed Status:", status);
+
         const { resources } = await Submits.items.query(query).fetchAll();
-        console.log("Success", resources);
+
         if(!resources || resources.length<=0){  
            return resolve ("Failed to find submission");
         }
         const today = new Date(); 
         const updated = { ...resources[0], archived: status, modified: today.toISOString(), modified_by: userId};
-        console.log("Successfully updated", updated);
+
         const { resource: output } = await Submits.items.upsert(updated);
-        console.log("Complete Success", output);
+
        return resolve( {id: output.id, modified: output.modified, modified_by: output.modified_by, archived: output.archived, user: output.user});
     })
 }
