@@ -26,7 +26,7 @@ function ManageResponse({api, id, question, response, questionType}) {
                 showCloseButton: true,
                 html:`        
                     <input id="editId" type = "hidden" value="${id}"></input>
-                    <label>Response
+                    <label>Response (${type === "number" ? "Number" : "Text"})
                         <br/>
                         <input id="editResponse" type= ${type} value="${response}"></input>
                         
@@ -68,10 +68,10 @@ function ManageResponse({api, id, question, response, questionType}) {
         <div className='col-11'>
           <div className='row'>
             <div className='col-12'>
-             <h5> Question: {question} </h5>
+             <h5>{question} </h5>
             </div>
             <div className='col-12'>
-              <h6> Answer: {response} </h6>
+              <h6>{response} </h6>
             </div>
           </div>
         </div>
