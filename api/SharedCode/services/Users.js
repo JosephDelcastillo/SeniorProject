@@ -1,6 +1,7 @@
 const model = require('../models/Users');
 const { Reply } = require('../lib/Reply');
 
+//Triggers create new user function
 async function Create (input) {
     const { token, data } = input;
     const { name, email, type } = data;
@@ -13,11 +14,11 @@ async function Create (input) {
         if(res) return new Reply({ point: 'Create Generation', success: true, data: res });
         return new Reply({ point: 'Create Generation' });
     } catch(error) {
-        //return new Reply({ point: 'error'});
         return new Reply({ point: 'Creation Inquiry'});
     }
 }
 
+//Triggers get staff function
 async function GetStaff(input) {
     const { token, data } = input;
     try {
@@ -32,6 +33,7 @@ async function GetStaff(input) {
     }
 }
 
+//Triggers get current user function
 async function GetCurrentUser(input) {
     const { token, data } = input;
     try {
@@ -46,6 +48,7 @@ async function GetCurrentUser(input) {
     }
 }
 
+//Triggers gets users function
 async function GetUsers(input) {
     const { token, data } = input;
     try {
@@ -60,30 +63,24 @@ async function GetUsers(input) {
     }
 }
 
-
+//Triggers login function
 async function Login (input) {
-    console.log("Made it to service!!");
     const { email, password } = input.data;
 
-    console.log("email: " + email);
-    console.log("password: " + password);
     try {
-        console.log('Attempt Login')
         const login = await model.Login({ email, password });
-        console.log('Login Complete')
-        console.log(login)
         if(login === false) return new Reply({point: 'Login' });
 
         return new Reply({ point: 'Login', data: login, success: true });
     } catch (error) {
-        console.log("Error in services triggered");
         return new Reply({ point: 'Login Inquiry' });
     }
 }
 
+//Triggers logout function
 async function Logout(input) {
     const { token, data } = input;
-    console.log("Made it to the service!!");
+
     try {
         const res = await model.Logout(token);
         if(user) return new Reply({ point: 'Logout', success: true, data: res });
@@ -93,44 +90,35 @@ async function Logout(input) {
     }
 }
 
+//Triggers forgot password function
 async function ForgotPassword (input) {
-    console.log("Made it to service!!");
     const {email} = input.data;
 
-    console.log("email: " + email);
     try {
-        console.log('Attempt Forgot Password')
         const response = await model.ForgotPassword({ email });
-        console.log('Forgot Password Complete')
-        console.log(response)
         if(response === false) return new Reply({point: 'Forgot Password' });
 
         return new Reply({ point: 'Forgot Password', data: response, success: true });
     } catch (error) {
-        console.log("Error in services triggered");
         return new Reply({ point: 'Forgot Password Service' });
     }
 }
 
+//Triggers reset password function
 async function ResetPassword (input) {
-    console.log("Made it to service!!");
     const {email, token, password, password2} = input.data;
 
-    console.log("email: " + email);
     try {
-        console.log('Attempt Reset Password')
         const response = await model.ResetPassword({ email, token, password, password2 });
-        console.log('Reset Password Complete')
-        console.log(response)
         if(response === false) return new Reply({point: 'Reset Password' });
 
         return new Reply({ point: 'Reset Password', data: response, success: true });
     } catch (error) {
-        console.log("Error in services triggered");
         return new Reply({ point: 'Reset Password Service' });
     }
 }
 
+//Triggers edit user function
 async function Edit (input) {
     const { token, data } = input;
     const { name, oldemail, email, type } = data;
@@ -143,11 +131,11 @@ async function Edit (input) {
         if(res) return new Reply({ point: 'Edit', success: true, data: res });
         return new Reply({ point: 'Edit' });
     } catch(error) {
-        //return new Reply({ point: 'error'});
         return new Reply({ point: 'Edit'});
     }
 }
 
+//Triggers edit current user function
 async function EditCurrentUser (input) {
     const { token, data } = input;
     const { email, name, password, password2} = data;
@@ -160,11 +148,11 @@ async function EditCurrentUser (input) {
         if(res) return new Reply({ point: 'Edit Current User', success: true, data: res });
         return new Reply({ point: 'Edit Current User' });
     } catch(error) {
-        //return new Reply({ point: 'error'});
         return new Reply({ point: 'Edit Edit Current user'});
     }
 }
 
+//Triggers archive user function
 async function Archive (input) {
     const { token, data } = input;
     const { email, archive } = data;
@@ -177,7 +165,6 @@ async function Archive (input) {
         if(res) return new Reply({ point: 'Archive', success: true, data: res });
         return new Reply({ point: 'Archive' });
     } catch(error) {
-        //return new Reply({ point: 'error'});
         return new Reply({ point: 'Archive'});
     }
 }
