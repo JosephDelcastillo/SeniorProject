@@ -14,14 +14,12 @@ function UserPage({ getToken, api }) {
     useEffect( () => {
         api({ func: 'GetUsers', data: {"search": email}}).then( ({success, data}) => {
             if (success) {
-                console.log(data[0]);
                 setUser(data[0]);
             }
         });
     }, [setUser, api, email] )
 
     const handleArchive = async e => {
-        console.log("Archive was clicked");
         e.preventDefault();
         let data = {
             "email": email,
@@ -30,7 +28,6 @@ function UserPage({ getToken, api }) {
 
         const { success } = await api({ func: 'ArchiveUser', data});
         if(success) {
-            console.log(success);
 
             Swal.fire({title: "User Archived Successfully!", icon: 'success'}).then(function() {
                 window.location = `/dashboard/user/${email}`;
@@ -41,7 +38,6 @@ function UserPage({ getToken, api }) {
     }
 
     const handleUnArchive = async e => {
-        console.log("Archive was clicked");
         e.preventDefault();
         let data = {
             "email": email,
@@ -50,7 +46,6 @@ function UserPage({ getToken, api }) {
 
         const { success } = await api({ func: 'ArchiveUser', data});
         if(success) {
-            console.log(success);
 
             Swal.fire({title: "User Unarchived Successfully!", icon: 'success'}).then(function() {
                 window.location = `/dashboard/user/${email}`;
@@ -61,7 +56,6 @@ function UserPage({ getToken, api }) {
     }
 
     const handleReset = async e => {
-        console.log("Password reset was clicked");
         e.preventDefault();
         let data = {
             "email": email
@@ -69,7 +63,6 @@ function UserPage({ getToken, api }) {
 
         const { success } = await api({ func: 'ForgotPassword', data});
         if(success) {
-            console.log(success);
 
             Swal.fire({title: "Reset Email Sent Successfully!", icon: 'success'})
         } else {

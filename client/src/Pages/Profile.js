@@ -11,7 +11,6 @@ function Profile({ getToken, api }) {
     useEffect( () => {
         api({ func: 'GetCurrentUser', data: ""}).then( ({success, data}) => {
             if (success) {
-                console.log(data[0]);
                 setUser(data[0]);
             }
         });
