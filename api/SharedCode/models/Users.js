@@ -6,17 +6,14 @@ const nodemailer = require('nodemailer');
 // Constants 
 const AUTH_ROLES = { Admin: 'Administrator', Staff: 'Staff' };
 
+//Creates a New User
 async function Create ({name, email, type}) {
     return new Promise(async resolve => {
-        console.log(name + email + type);
-
         //checks to make sure all needed info is filled in
         if (!name || !email || !type){
             resolve(false);
             return;
         }
-
-        console.log("Checking if user exists");
 
         //checks if user already exists
         let queryUsers = `SELECT u.email
@@ -25,15 +22,11 @@ async function Create ({name, email, type}) {
     
         const { resources } = await Users.items.query(queryUsers).fetchAll();
 
-        console.log(resources);
-
         //if email already in use, send back a false
         if (!resources.length == 0) {
             resolve(false);
             return;
         } 
-
-        console.log("Checking if email is valid");
 
         //check that email is an email
         let emailValid = /\S+@\S+\.\S+/;
@@ -44,20 +37,13 @@ async function Create ({name, email, type}) {
 
         //generate salt
         const salt = await tb.genSalt();
-        console.log(salt);
-        console.log("^ salt")
 
         //generate id number to store as password
         const password = await tb.genId();
-
         const saltPass = await tb.hashing(password, salt);
-        console.log(saltPass);
-        console.log("^ salted password")
 
         //generate actual id
         const userId = await tb.genId();
-        console.log(userId);
-        console.log("^ userID")
 
         //Check if the id is already in use
         const idQuery = `SELECT u.name
@@ -68,24 +54,21 @@ async function Create ({name, email, type}) {
         //generates new id if in use already
         if (!idCheck.length == 0) {
             const userId = await tb.genId();
-            console.log(userId);
         }
 
         //generate reset token info
         let resetToken = "";
         let tsalt = "";
 
+        //Generates token without a / (because it will mess up the link)
         do {
             //generates new salt
             tsalt = await tb.genSalt();
-            console.log(tsalt);
 
             //hashes new token
             resetToken = await tb.hashing(email, tsalt);
-            console.log(resetToken);
         } while (resetToken.includes("/"))
 
-        console.log("Attempting to create user");
         const now = new Date();
         let query = {};
 
@@ -118,9 +101,7 @@ async function Create ({name, email, type}) {
             };
         }
 
-        console.log(query);
         const result = await Users.items.create(query);
-        console.log(result);
 
         //CHANGE WHEN USING TESTING!!!
         clientURL = "https://epots.azurewebsites.net"
@@ -152,11 +133,8 @@ async function Create ({name, email, type}) {
           //send message
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
-                console.log(error);
                 resolve(false);
                 return;
-            } else {
-                console.log('Email sent: ' + info.response);
             }
         });
 
@@ -164,25 +142,20 @@ async function Create ({name, email, type}) {
     });
 }
 
+//Gets the user info of the currently active user
 async function GetCurrentUser (token) {
     return new Promise( async resolve => {
-        console.log("starting get current user");
-
         // Check for a token
         if (!token) {
             resolve (false);
             return;
         }
 
-        console.log("token:");
-        console.log(token.token);
-
         // Query for session with that token in session table
         // Get associated user id
         let query = `SELECT u.user
         FROM u WHERE u.token = "${token.token}"`;
         
-        console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
 
         // Make sure that we found the session
@@ -191,15 +164,10 @@ async function GetCurrentUser (token) {
             return;
         } 
 
-        console.log(search);
-
-        console.log(search[0].user);
-
         // Query users for a user matching that id
         let query2 = `SELECT u.type, u.name, u.email
         FROM u WHERE u.id = "${search[0].user}"`;
         
-        console.log('User Query')
         const { resources: search2 } = await Users.items.query(query2).fetchAll();
 
         //Make sure that we found the user
@@ -208,13 +176,11 @@ async function GetCurrentUser (token) {
             return;
         } 
 
-        console.log(search2);
-
-        console.log("Found Current User");
         resolve(search2);
     })
 }
 
+//Gets info of all staff matching a search term (or if no search term, all staff info)
 async function GetStaff (search) {
     return new Promise(async resolve => {
         // Build Query 
@@ -224,7 +190,6 @@ async function GetStaff (search) {
             ${(search && search.length > 0) && (`AND ( u.name LIKE "%${search}%" OR u.email LIKE "%${search}%" )`)}
             ORDER BY u.name`
 
-        console.log(query)
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
         
@@ -234,6 +199,7 @@ async function GetStaff (search) {
     })
 }
 
+//Gets info of all users
 async function GetAllUsers(){
     return new Promise(async resolve => {
         const query = `SELECT u.id, u.email, u.name
@@ -247,10 +213,9 @@ async function GetAllUsers(){
     })
 }
 
+//Gets info of all staff matching a search term (or if no search term, all staff info)
 async function GetUsers (search) {
     return new Promise(async resolve => {
-        console.log("Search");
-        console.log(search);
 
         // Build Query 
         let query = `SELECT u.id, u.archived, u.name, u.email, u.type
@@ -260,31 +225,22 @@ async function GetUsers (search) {
 
         // Search DB For Matches  
         const { resources } = await Users.items.query(query).fetchAll(); 
-
-        console.log("Getting Staff:");
-        console.log(resources);
-        console.log("Sending back...");
-
         
         // Return Result 
         resolve( resources );
     })
 }
 
+//Edits the info of a user
 async function Edit ({name, oldemail, email, type}) {
     return new Promise(async resolve => {
-        console.log("Info recieved:");
-        console.log(name + oldemail + email + type);
 
         //Getting needed user id info
         let query = `SELECT *
         FROM u
         WHERE u.email LIKE "${oldemail.toLowerCase()}"`
 
-        const { resources } = await Users.items.query(query).fetchAll(); 
-
-        console.log("Getting user info:");
-        console.log(resources);
+        let {resources} = await Users.items.query(query).fetchAll(); 
 
         //Make sure user was found
         if (resources.length == 0) {
@@ -296,19 +252,47 @@ async function Edit ({name, oldemail, email, type}) {
         let result = null;
         let updated = null;
 
+        //See if user type was updated
+        if (type && !(type == "0")) {
+
+            if ( type == "admin") {
+                updated = {...resources[0], type: "admin"};
+                result = await Users.items.upsert(updated);
+
+                //User info updated
+                if (result) {
+                    resources.resources = await Users.items.query(query).fetchAll(); 
+                }
+            } else {
+                updated = {...resources[0], type: "Staff"};
+                result = await Users.items.upsert(updated);
+
+                //User info updated
+                if (result) {
+                    resources.resources = await Users.items.query(query).fetchAll(); 
+                }
+            }
+        }
+
+        //See if name was updated
+        if (!name == "") {
+            updated = {...resources[0], name: name};
+            result = await Users.items.upsert(updated);
+
+            //Update stored user info
+            if (result) {
+                resources.resources = await Users.items.query(query).fetchAll(); 
+            }
+        }
+
         //See if email was updated
         if (!email == "") {
-            console.log(email);
-            console.log("checking email usage:");
-
             //checks if email is already in use
             let queryusers = `SELECT u.email, u.name
             FROM u
             WHERE u.email LIKE "${email.toLowerCase()}"`
         
             let resources2 = await Users.items.query(queryusers).fetchAll(); 
-
-            console.log(resources2.resources);
 
             //if email already in use, send back a false
             if (!resources2.resources.length == 0) {
@@ -323,49 +307,12 @@ async function Edit ({name, oldemail, email, type}) {
                 return;
             }
 
-            console.log("Trying to replace email:");
-
             updated = {...resources[0], email: email.toLowerCase()};
-            console.log("made new user", updated);
             result = await Users.items.upsert(updated);
-            console.log(result);
-
-        }
-
-        //See if user type was updated
-        if (type && !(type == "0")) {
-            console.log(type);
-
-            if ( type == "admin") {
-                console.log("Trying to replace type:");
-
-                updated = {...resources[0], attr: "admin"};
-                console.log("made new user", updated);
-                result = await Users.items.upsert(updated);
-                console.log(result);
-            } else {
-                console.log("Trying to replace type:");
-
-                updated = {...resources[0], attr: AUTH_ROLES.Staff};
-                console.log("made new user", updated);
-                result = await Users.items.upsert(updated);
-                console.log(result);
-            }
-        }
-
-        //See if name was updated
-        if (!name == "") {
-            console.log("Trying to replace name:");
-
-            updated = {...resources[0], name};
-            console.log("made new user", updated);
-            result = await Users.items.upsert(updated);
-            console.log(result);
         }
 
         //Seeing if we updated anything and got a result
         if (result) {
-            console.log(result);
             resolve(true);
             return;
         } else {
@@ -375,9 +322,9 @@ async function Edit ({name, oldemail, email, type}) {
     });
 }
 
+//Archives or Unarchives a user account
 async function Archive ({email, archive}) {
     return new Promise(async resolve => {
-        console.log(email + archive);
 
         //Getting needed user id info
         let query = `SELECT *
@@ -385,36 +332,19 @@ async function Archive ({email, archive}) {
         WHERE u.email LIKE "${email}"`
         const { resources } = await Users.items.query(query).fetchAll(); 
 
-        console.log("Getting user info:");
-        console.log(resources);
-        console.log(resources[0].id);
-
         //Make sure user was found
         if (resources.length == 0) {
-            console.log("No user found");
             resolve(false);
             return;
         }
 
         // Try to change archival status
         if (archive == false) {
-            console.log("Trying to archive:");
-
             const updated = {...resources[0], archived: true};
-            console.log("made new user", updated);
             const result = await Users.items.upsert(updated);
-            console.log(result);
-
-            console.log("Succeeded in change");
         } else {
-            console.log("Trying to unarchive:");
-
             const updated = {...resources[0], archived: false};
-            console.log("made new user", updated);
             const result = await Users.items.upsert(updated);
-            console.log(result);
-
-            console.log("Succeeded in change");
         }
 
         resolve (true);
@@ -422,10 +352,9 @@ async function Archive ({email, archive}) {
     });
 }
 
+//Edits the info of the currently active user
 async function EditCurrentUser ({email, name, password, password2, token}) {
     return new Promise(async resolve => {
-        console.log("Info recieved:");
-        console.log(name + email + password + password2 + token.token);
         
         // Check for a token
         if (!token) {
@@ -433,18 +362,12 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
             return;
         }
 
-        console.log("token:");
-        console.log(token.token);
-
         // Query for session with that token in session table
         // Get associated user id
         let query = `SELECT u.id, u.user, u.created
         FROM u WHERE u.token = "${token.token}"`;
         
-        console.log('session Query');
-        const { resources: search } = await Sessions.items.query(query).fetchAll();
-        console.log("Looking for sessions got:");
-        console.log(search[0]);
+        const { resources : search } = await Sessions.items.query(query).fetchAll();
 
         //Make sure we found a matching session
         if (search.length == 0) {
@@ -452,19 +375,14 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
             return;
         } 
 
-        console.log(search);
-
-        console.log(search[0].user);
-
         // Query users for a user matching that id
         let query2 = `SELECT *
         FROM u WHERE u.id = "${search[0].user}"`;
         
-        console.log('User Query')
-        const { resources } = await Users.items.query(query2).fetchAll();
+        let {resources: user} = await Users.items.query(query2).fetchAll();
 
         //Make sure that we found the user
-        if (resources.length == 0) {
+        if (user.length == 0) {
             resolve (false);
             return;
         } 
@@ -475,17 +393,14 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 
         //See if email was updated
         if (!email == "") {
-            console.log(email);
-            console.log("checking email usage:");
 
             //checks if email is already in use
             let queryusers = `SELECT u.email, u.name
             FROM u
             WHERE u.email LIKE "${email}"`
         
-            let resources2 = await Users.items.query(queryusers).fetchAll(); 
+            let resources2 = await Users.items.query(queryusers).fetchAll();
 
-            console.log(resources2.resources);
 
             //if email already in use, send back a false
             if (!resources2.resources.length == 0) {
@@ -500,18 +415,19 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
                 return;
             }
 
-            console.log("Trying to replace email:");
 
-            updated = {...resources[0], email: email.toLowerCase()};
-            console.log("made new user", updated);
+            updated = {...user[0], email: email.toLowerCase()};
             result = await Users.items.upsert(updated);
-            console.log(result);
+
+            //Get new info
+            if(result){
+                user[0] = updated;
+            }
 
         }
 
         //See if password was updated
         if (password && !(password == "")) {
-            console.log(password);
 
             //make sure confirm password was filled out
             if (password2 == "") {
@@ -520,21 +436,19 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
             }
 
             if (password == password2) {
-
+                //Generate new salt and hash for new password
                 const salt = await tb.genSalt();
-                console.log(salt);
-                console.log("^ salt")
-
                 const saltPass = await tb.hashing(password, salt);
-                console.log(saltPass);
-                console.log("^ salted password")
 
                 password = saltPass;
 
-                updated = {...resources[0], pass: password, salt};
-                console.log("made new user", updated);
+                updated = {...user[0], pass: password, salt: salt};
                 result = await Users.items.upsert(updated);
-                console.log(result);
+
+                //Get new info
+                if(result){
+                    user[0] = updated;
+                }
             } else {
                 resolve(false);
                 return;
@@ -543,17 +457,12 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
 
         //See if name was updated
         if (!name == "") {
-            console.log("Trying to replace name:");
-
-            updated = {...resources[0], name};
-            console.log("made new user", updated);
+            updated = {...user[0], name: name};
             result = await Users.items.upsert(updated);
-            console.log(result);
         }
 
         //Seeing if we updated anything and got a result
         if (result) {
-            console.log(result);
             resolve(true);
             return;
         } else {
@@ -563,58 +472,46 @@ async function EditCurrentUser ({email, name, password, password2, token}) {
     });
 }
 
-
+//Deletes user session and logs them out
 async function Logout (token) {
     return new Promise( async resolve => {
-        console.log("starting logout");
 
-        console.log("checking for token");
         // Check for a token
         if (!token) {
-            console.log("No token found");
             resolve (true);
             return;
         }
-
-        console.log("token:");
-        console.log(token.token);
 
         // Query for session with that token in session table
         let query = `SELECT *
         FROM u WHERE u.token = "${token.token}"`;
         
-        console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
 
         // Make sure that we found the session
         if (search.length == 0) {
-            console.log("No session found");
             resolve (true);
             return;
         } 
 
-        console.log("deleting session");
         const something = await Sessions.item(search[0].id , search[0].id).delete();
         resolve(true);
     })
 }
 
+//Creates reset token and sends reset password email
 async function ForgotPassword ({email}) {
     return new Promise(async resolve => {
         //CHANGE WHEN USING TESTING!!!
         clientURL = "https://epots.azurewebsites.net"
-        console.log("Email received: ")
-        console.log(email)
         
         //Query for user info
         let query = `SELECT * 
         FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
-        console.log('Query to find user with that email')
         const { resources: search } = await Users.items.query(query).fetchAll();
         //Make sure user was found
         if (!search || search.length <= 0) {
-            console.log(search)
             resolve(false);
             return;
         }
@@ -622,28 +519,20 @@ async function ForgotPassword ({email}) {
         let resetToken = "";
         let salt = "";
 
+        //Generates new token without / (because that will break the link)
         do {
             //generates new salt
             salt = await tb.genSalt();
-            console.log(salt);
-            console.log("^ salt")
 
             //hashes new password
             resetToken = await tb.hashing(email, salt);
-            console.log(resetToken);
-            console.log("^ salted Token")
         } while (resetToken.includes("/"))
 
         //store token and date
         const now = new Date();
-        console.log("Trying to change password and salt:");
 
         const updated = {...search[0], f_token: resetToken, f_salt: salt, f_created: now.toISOString() };
-        console.log("made new user", updated);
         const result = await Users.items.upsert(updated);
-        console.log(result);
-
-        console.log("Succeeded in change");
 
         //create reset link
         const link = `${clientURL}/resetpassword/${email}/${resetToken}`;
@@ -672,11 +561,8 @@ async function ForgotPassword ({email}) {
           //send message
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
-                console.log(error);
                 resolve(false);
                 return;
-            } else {
-                console.log('Email sent: ' + info.response);
             }
         });
         
@@ -684,9 +570,9 @@ async function ForgotPassword ({email}) {
     })
 }
 
+//Resets user password
 async function ResetPassword ({email, token, password, password2}) {
     return new Promise(async resolve => {
-        console.log(email + token + password + password2);
 
         //Getting needed user id info
         let query = `SELECT *
@@ -697,14 +583,12 @@ async function ResetPassword ({email, token, password, password2}) {
 
         //Make sure user was found
         if (!resources || resources.length == 0) {
-            console.log("No user found");
             resolve(false);
             return;
         }
 
         //Make sure reset token matches
         if (resources[0].f_token != token) {
-            console.log("Token incorrect");
             resolve(false);
             return;
         }
@@ -712,7 +596,6 @@ async function ResetPassword ({email, token, password, password2}) {
         //Make sure reset token is valid
         const isAuthorized = (token === await tb.hashing(email, resources[0].f_salt));
         if (!isAuthorized) {
-            console.log("token is fake");
             resolve(false);
             return;
         } 
@@ -721,46 +604,28 @@ async function ResetPassword ({email, token, password, password2}) {
         const now = new Date();
         let oneHour = 60 * 60 * 1000;
         if (now - (new Date(resources[0].f_created)) > oneHour ) {
-            console.log("Token expired");
-
-            console.log("Trying to clear out token:");
 
             const updated = {...resources[0], f_token: "", f_salt: "", f_created: ""};
-            console.log("made new user", updated);
             const result = await Users.items.upsert(updated);
-            console.log(result);
-
-            console.log("Succeeded in change");
             resolve(false);
             return;
         }
 
         //Make sure password and confirm password match
         if (password != password2) {
-            console.log("Passwords don't match");
             resolve(false);
             return;
         }
 
         //generates new salt
         const salt = await tb.genSalt();
-        console.log(salt);
-        console.log("^ salt")
 
         //hashes new password
         const saltPass = await tb.hashing(password, salt);
-        console.log(saltPass);
-        console.log("^ salted password")
 
         // Try to change salt and password. and clear out token data
-        console.log("Trying to change password and salt:");
-
         const updated = {...resources[0], salt, pass: saltPass, f_token: "", f_salt: "", f_created: ""};
-        console.log("made new user", updated);
         const result = await Users.items.upsert(updated);
-        console.log(result);
-
-        console.log("Succeeded in change");
 
         resolve (true);
     });
@@ -782,10 +647,8 @@ async function Login ({email, password}) {
         let query = `SELECT u.id, u.name, u.type, u.pass, u.salt
         FROM u WHERE u.email = "${email.toLowerCase()}" AND u.archived = false`;
         
-        console.log('Pre-query')
         const { resources: search } = await Users.items.query(query).fetchAll();
         if (search && search.length <= 0) {
-            console.log(search)
             resolve(false);
             return;
         }
@@ -804,18 +667,10 @@ async function Login ({email, password}) {
             FROM u WHERE u.user = "${search[0].id}"
             ORDER BY u.created`;
         
-            console.log('Pre login sessions query')
             const { resources: sessions } = await Sessions.items.query(query2).fetchAll();
 
             if (sessions && (sessions.length > 3)) {
-                console.log("More than 3 sessions");
-                console.log("sessions:");
                 for (let i = 0 ; i < (sessions.length - 3) ; i++) {
-                    console.log(i);
-                    console.log(sessions[i].id);
-                    console.log(sessions[i].created);
-
-                    console.log("deleting session");
                     const something = await Sessions.item(sessions[i].id , sessions[i].id).delete();
                 }
             }
@@ -836,9 +691,6 @@ async function Login ({email, password}) {
                 resolve(false);
                 return;
             }
-
-            console.log(newSession.token);
-            console.log("^ token");
 
             /******** Step 5: Return Token ********/
             resolve ({ token: newSession.token, attr: CurrentUser.type });
@@ -868,25 +720,17 @@ async function Authorize (token, requirement) {
          * 5) Return true and user id if all checks out  
          */
 
-        console.log("starting authorization check");
-        console.log(requirement);
-
-
         // Check for a token
         if (!token) {
             resolve (false);
             return;
         }
-
-        console.log("token:");
-        console.log(token.token)
         
 
         // Query for session with that token in session table
         let query = `SELECT *
         FROM u WHERE u.token = "${token.token}"`;
         
-        console.log('session Query')
         const { resources: search } = await Sessions.items.query(query).fetchAll();
 
         if (search.length == 0) {
@@ -894,48 +738,31 @@ async function Authorize (token, requirement) {
             return;
         } 
 
-        console.log(search);
-
-        console.log(search[0].user);
-
         //check to see if token is older than 12 hours
         const now = new Date();
         const twoHour = 60 * 60 * 1000 * 12;
-        let time = new Date(search[0].created) - now;
-        console.log("Time diff is:");
-        console.log(time);
         if (now - (new Date(search[0].created)) > twoHour) {
             //Delete session!!
-            //Maybe direct them to logout??
-
-            console.log("deleting session");
             const something = await Sessions.item(search[0].id , search[0].id).delete();
-
             resolve (false);
             return;
         } else {
-            //update created date of token
-            console.log("Trying to update created");
-
+            //Update creation to keep it active
             updated = {...search[0], created : now.toISOString()};
-            console.log("made new user", updated);
             result = await Sessions.items.upsert(updated);
-            console.log(result);
         }
 
         // Query users for a user matching that id
         let query2 = `SELECT u.type, u.archived
         FROM u WHERE u.id = "${search[0].user}"`;
         
-        console.log('User Query')
         const { resources: search2 } = await Users.items.query(query2).fetchAll();
 
+        //Make sure we found user
         if (search2.length == 0) {
             resolve (false);
             return;
         } 
-
-        console.log(search2);
 
         //check to make sure user isn't archived
         if (search2[0].archived == true) {
@@ -945,20 +772,19 @@ async function Authorize (token, requirement) {
 
         // Compare user types
         if ((search2[0].type == "staff" || search2[0].type == "Staff") && requirement == "Staff") {
-            console.log("Auth success");
             resolve({id: search[0].user});
             return;
         }
         if (search2[0].type == "admin" || search2[0].type == "Administrator") {
-            console.log("Auth success");
             resolve({id: search[0].user});
             return;
         }
 
-        console.log("Auth Fail");
         resolve(false);
     })
 }
+
+//Gets users from array
 async function GetUsersFromArray(array = []){
     return new Promise(async resolve => {
         if(array.length < 1) { resolve(false); return false; }
@@ -974,6 +800,7 @@ async function GetUsersFromArray(array = []){
         return resources;
     })
 }
+
 module.exports = {
     AUTH_ROLES,
     Authorize,
