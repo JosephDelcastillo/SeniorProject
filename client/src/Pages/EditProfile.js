@@ -21,11 +21,8 @@ function EditProfile({ getToken, api }) {
         //Sends info to database to create user
         const { success } = await api({ func: 'EditCurrentUser', data});
         if(success) {
-            console.log(success);
 
             Swal.fire({title: "Profile Updated Successfully!", icon: 'success'}).then(function() {
-                //TODO: check if email was valid and was successfully updated (if yes, send new email)
-                //If not, keep old email
                 window.location = "/dashboard/profile";
             });
         } else {
