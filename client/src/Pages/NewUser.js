@@ -25,7 +25,7 @@ function NewUser({ getToken, api }) {
             Swal.fire({title: "User Created Successfully!", text: "Set password email sent to new user's email." ,icon: 'success'}).then(function() {
                 window.location = "/dashboard/user";
             });
-            console.log(success);
+
         } else {
             Swal.fire({title: "Could Not Create User", icon: 'error'})
         }
