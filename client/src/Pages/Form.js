@@ -18,16 +18,18 @@ const inputByID = (id) => document.getElementById(id).value;
  */
 function Form({ api }) {
     const [serverQuestionData, setServerQuestionData] = useState([{}]);
-
+    const [employeeData, setEmployeeData] = useState([{}]);
     useEffect(() => {
         api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
+        api({func: "GetUsers", data: {"search": ""}}).then(({success, data}) => setEmployeeData(data))
     },[setServerQuestionData,api]);
 
 
     const formSubmit = e => {
         let input = [];
-        serverQuestionData.forEach(({id, archived}) => { if (!archived) input.push({ id, value: inputByID(id) }) });
-        
+        serverQuestionData.forEach(({id, archived}) => { if (!archived) input.push({ id, value: inputByID(id) }) });  
+        const someoneElseId = inputByID("someoneElseId");
+        input.push({ id: "someoneElseId", value: someoneElseId });
         api({ func: 'AddSubmission', data: input }).then(({ success, message, data }) => {
             console.log(success);
             console.log(data); 
@@ -35,6 +37,7 @@ function Form({ api }) {
             if(success) Swal.fire({ title: 'Successfull Submitted', icon: 'success'}).then(e => window.location.pathname = '/dashboard/response/' + data)
         })
     }
+    
 
     return (
         <div className="card m-2 border-none">
@@ -48,6 +51,17 @@ function Form({ api }) {
                         {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
                             <Question key={id} number={i} id={id} type={type} text={text} show_number={false}/>
                         ))}
+                        <label> <strong>Submit on Behalf Of:</strong>
+                            <select className='btn btn-outline-primary w-100' id="someoneElseId" defaultValue="default"> 
+                            <option id="default">Nobody</option>
+                            {employeeData.map(({ id, name }, i) => (
+                                <option key={i} value={id}>
+                                {name}
+                                </option>
+                            ))}
+                            </select>
+                        </label>
+                        <br/><br/>
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
                 </div>
