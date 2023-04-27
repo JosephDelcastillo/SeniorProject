@@ -72,34 +72,40 @@ async function AddQuestion (input) {
         return new Reply({ point: 'Add Question Inquiry', success: true, data: output});
     }
 }
-async function AddSubmission (input) {
+async function AddSubmission(input) {
     try {
-        const { token, data } = input;
-        /**
-         *  TODO: Update to Add Admin Version
-         * 1. Add Authorize Admin
-         * 2. If Admin or Staff 
-         *      Failed at Authorization 
-         * 3. Create Output data variable
-         * 4. If Admin -> Look For user id in data
-         *      user id --> User who 'created' the submission
-         *      Store result in Output 
-         * 5. If Staff (or no user id)
-         *      user id --> Authorize.id
-         *      Store result in Output 
-         * 6. if output return success and output
-         * 7. return error at database end,  potentially return relevant error 
-        */
-        const authorized = await Authorize(token, AUTH_ROLES.Staff); 
-        if(!authorized) return new Reply({ point: 'Authorization' });
-        
-        const success = await model.AddSubmission({ user: authorized.id, data });
-        if(success) return new Reply({ point: 'Add Submission', success: true, data: success });
-        return new Reply({ point: 'Add Submission' });
+      const { token, data } = input;
+  
+      const otherIdIndex = data.length - 1;
+
+      let success;
+  
+      const authorized = await Authorize(token, AUTH_ROLES.Staff);
+      if (!authorized) {
+        return new Reply({ point: "Authorization" });
+      }
+      if(data[otherIdIndex].value !="Myself"){
+                newID = data[otherIdIndex].value
+                delete data[otherIdIndex]//Remove the inserted extra identifier to make sure it causes no problems in Model
+                success = await model.AddSubmission({
+                user: newID,
+                data,
+            });
+        }
+    else{
+        delete data[otherIdIndex]//Remove the inserted extra identifier to make sure it causes no problems in Model
+        success = await model.AddSubmission({ user: authorized.id, data });
+        }
+    
+      if (success) {
+        return new Reply({ point: "Add Submission", success: true, data: success });
+      } else {
+        return new Reply({ point: "Add Submission" });
+      }
     } catch (error) {
-        return new Reply({ point: 'Add Submission Inquiry' });
+      return new Reply({ point: "Add Submission Inquiry", error });
     }
-}
+  }
 
 module.exports = {
     ArchiveQuestion,
