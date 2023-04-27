@@ -261,7 +261,7 @@ async function Edit ({name, oldemail, email, type}) {
 
                 //User info updated
                 if (result) {
-                    resources.resources = await Users.items.query(query).fetchAll(); 
+                    resources[0]=updated; 
                 }
             } else {
                 updated = {...resources[0], type: "Staff"};
@@ -269,7 +269,7 @@ async function Edit ({name, oldemail, email, type}) {
 
                 //User info updated
                 if (result) {
-                    resources.resources = await Users.items.query(query).fetchAll(); 
+                    resources[0]=updated; 
                 }
             }
         }
@@ -281,7 +281,7 @@ async function Edit ({name, oldemail, email, type}) {
 
             //Update stored user info
             if (result) {
-                resources.resources = await Users.items.query(query).fetchAll(); 
+                resources[0]=updated;  
             }
         }
 
