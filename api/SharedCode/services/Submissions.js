@@ -96,19 +96,13 @@ async function EditResponse(input){
         const { token, data } = input;
         const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
         const isStaff = await Authorize(token, AUTH_ROLES.Staff);
-        const {id, response} = data;
-        if (isAdmin) {
-            checkAuth = await model.Edit(data);
-        } else if (isStaff) {
-            checkAuth = await model.Edit(data);
-        } else if (checkAuth === false) {
-            return new Reply({ point: 'Authorization' });
-        }
-        
-        if(!response) return new Reply({point: 'No Response Available to Edit', data: {id, response}})
-        const output = await model.Edit(id, response);
+        if (!isAdmin || !isStaff) return new Reply({ point: 'Authorization' });
 
-        if(!output) return new Reply({point: 'Failed to Update Response Content', data: id});
+        const {id, response} = data;
+        if(!id || !response) return new Reply({point: 'Edit Response - Missing Id or Response', data })
+        
+        const output = isAdmin ? await model.Edit(id, response, isAdmin.id) : await model.Edit(id, response, isStaff.id);
+        if(!output) return new Reply({point: 'Failed to Update Response Content', data});
         
         return new Reply({point: 'Response Updated', success: true, data: output});
     } catch (error) {

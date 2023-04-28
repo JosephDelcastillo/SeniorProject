@@ -703,6 +703,8 @@ async function Login ({email, password}) {
  * @param {string} token Authorization Token
  * @param {Function} sendFunc To Return Data
  * @param {Function} successAction Action to do if authorized
+ * @returns {boolean|object} Returns FALSE or Object { ID: User ID }
+ * 
  */
 async function Authorize (token, requirement) {
     return new Promise( async resolve => {
