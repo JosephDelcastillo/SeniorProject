@@ -96,7 +96,7 @@ async function EditResponse(input){
         const { token, data } = input;
         const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
         const isStaff = await Authorize(token, AUTH_ROLES.Staff);
-        if (!isAdmin || !isStaff) return new Reply({ point: 'Authorization' });
+        if (!isAdmin && !isStaff) return new Reply({ point: 'Authorization' });
 
         const {id, response} = data;
         if(!id || !response) return new Reply({point: 'Edit Response - Missing Id or Response', data })
@@ -108,7 +108,6 @@ async function EditResponse(input){
     } catch (error) {
         return new Reply({ point: 'Response Content Update Inquiry' });
     }
-
 }
 
 async function ArchiveSubmission(input) {
