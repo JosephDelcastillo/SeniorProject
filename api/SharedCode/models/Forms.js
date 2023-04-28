@@ -52,11 +52,12 @@ async function EditQuestion(question, text, type, goals){
 
 }
 async function ArchiveQuestion(question, status){
-    return new Promise( async resolve=> {
+    return new Promise(async resolve => {
         const today = new Date(); 
         const newQuestion = { ...question, archived: status, modified: today.toISOString() };
+        
         const { resource: output } = await Questions.items.upsert(newQuestion);
-        return sanitize(output);
+        return resolve(sanitize(output));
     })
 }
 async function OrderChange(question, priority){

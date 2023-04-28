@@ -39,14 +39,13 @@ async function EditQuestion(input){
 }
 async function ArchiveQuestion(input){
     try{      
-        const{token, data} = input;
-        const {id, status} = data;
+        const { token, data } = input;
+        const { id, status } = data;
         const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
 
-        if(!isAdmin) return new Reply({point: 'Archive Question Inquiry; Does Not Have Permissions'});
+        if(!isAdmin) return new Reply({point: 'Authorization'});
 
         const questions = await model.GetQuestionById(id);
-        //console.log(!questions, questions.length === 0, !questions[0].hasOwnProperty("archived"));
         if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("archived")) return new Reply({point: 'Failed to Retreive Question', data: {id,questions}});
         if(questions[0].archived === status) return new Reply({point:'Status Matching', success: true, data: questions[0]});
         
