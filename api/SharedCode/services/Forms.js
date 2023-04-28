@@ -45,12 +45,11 @@ async function ArchiveQuestion(input){
 
         if(!isAdmin) return new Reply({point: 'Authorization'});
 
-        const questions = await model.GetQuestionById(id);
-        if(!questions || questions.length === 0 || !questions[0].hasOwnProperty("archived")) return new Reply({point: 'Failed to Retreive Question', data: {id,questions}});
-        if(questions[0].archived === status) return new Reply({point:'Status Matching', success: true, data: questions[0]});
-        
-        const output = await model.ArchiveQuestion(questions[0], status);
+        // Attempt Archive 
+        const output = await model.ArchiveQuestion(id, status, isAdmin.id);
         if(!output || !output.id) return new Reply({point: 'Failed to Update Question Archive Status', data: id});
+        
+        // Publish 
         return new Reply({point: 'Archiving the Question', success: true, data: output});
     } catch (error) {
         return new Reply({ point: 'Question Archive Inquiry' });
