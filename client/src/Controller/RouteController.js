@@ -32,12 +32,12 @@ export default class RouteController extends React.Component {
                         <Route path="/dashboard/newuser" element={<NewUser getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/edituser/:email" element={<EditUser getToken={this.props.getToken} api={this.props.api} />} />
                         <Route path="/dashboard/form" element={<FormEdit getToken={this.props.getToken} api={this.props.api}/>}/>
-                        <Route path="/dashboard/addresponse" element={<Form getToken={this.props.getToken} api={this.props.api} />}/>
+                        <Route path="/dashboard/addresponse" element={<Form isAdmin={this.props.isAdmin} api={this.props.api} />}/>
                         <Route path="/dashboard/user/:email" element={<UserPage getToken={this.props.getToken} api={this.props.api} />} />
                     </>):(<>
                         <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} /> 
                     </>)}
-                    <Route path="/dashboard/form" element={<Form getToken={this.props.getToken} api={this.props.api} />} /> 
+                    <Route path="/dashboard/form" element={<Form isAdmin={this.props.isAdmin} api={this.props.api} />} /> 
                     <Route path="/logout" element={<Logout resetToken={this.props.resetToken} api={this.props.api}/>} />
                     <Route path="/dashboard" element={<Dashboard getToken={this.props.getToken} isAdmin={this.props.isAdmin} api={this.props.api} />} />
                     <Route path="/dashboard/responses" element={<Responses getToken={this.props.getToken} api={this.props.api} />} />

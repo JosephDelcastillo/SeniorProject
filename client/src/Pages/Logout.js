@@ -9,9 +9,9 @@ import React from 'react'
  */
 function Logout({ resetToken, api }) {
     async function logoutfunc() {
-         const {success}= await api({ func: 'Logout', data: {}});
-         resetToken();
-         window.location.pathname = "";
+            api({ func: 'Logout', data: {}});
+            resetToken();
+            window.location.pathname = "";
         }
     logoutfunc();
     return (

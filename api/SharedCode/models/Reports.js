@@ -1,10 +1,11 @@
 // Import 
 const { Submits, Responses, Questions, Users } = require('../lib/DBConnection');
+const { sanitize } = require('../lib/Helpers');
 
 async function Get (people, questions, dates) {
     return new Promise(async resolve => {
         //******** 1: Build the Submission Query ********
-        let query = `SELECT s.id, s.user, s.created FROM s WHERE `;
+        let query = `SELECT * FROM s WHERE `;
         // Build People 
         if(!people.includes(-202)) {
             query += "("
@@ -22,7 +23,7 @@ async function Get (people, questions, dates) {
         if(submissionData.resources.length < 1) { resolve([]); return []; }
         console.log(submissionData)
         //******** 3: Build the Response Query ********
-        query = `SELECT r.id, r.submission, r.question, r.response FROM r WHERE `;
+        query = `SELECT * FROM r WHERE `;
         // Build Questions 
         if(!questions.includes(-202)) {
             query += "( "
@@ -40,7 +41,7 @@ async function Get (people, questions, dates) {
         const responseData = await Responses.items.query(query).fetchAll();
 
         //******** 5: Get the Questions ********
-        query = `SELECT q.id, q.text, q.created, q.goal, q.type FROM q `;
+        query = `SELECT * FROM q `;
         if(!questions.includes(-202)) {
             query += "WHERE "
             questions.forEach(q => query += `q.id LIKE "%${q}%" OR `);
@@ -64,10 +65,10 @@ async function Get (people, questions, dates) {
         
         // Finally Return Information 
         resolve({ 
-            submissions: submissionData.resources, 
-            responses: f_responses, 
-            questions: f_questions, 
-            people: userData.resources
+            submissions: sanitize(submissionData.resources), 
+            responses: sanitize(f_responses), 
+            questions: sanitize(f_questions), 
+            people: sanitize(userData.resources)
         });
     })
 }
