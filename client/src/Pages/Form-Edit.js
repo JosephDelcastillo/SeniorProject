@@ -96,7 +96,10 @@ function FormEdit({api}) {
         
         let copyQuestionData = [ ...serverQuestionData ];
         copyQuestionData[index] = data;
+       
         setServerQuestionData(copyQuestionData);
+        window.location.reload();
+        
     
     }
 

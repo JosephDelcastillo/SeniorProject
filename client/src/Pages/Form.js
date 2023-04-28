@@ -49,7 +49,7 @@ function Form({ api }) {
                     {(serverQuestionData && serverQuestionData.length > 0)?
                     (<form>
                         {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
-                            <Question key={id} number={i} id={id} type={type} text={text} show_number={false}/>
+                           <Question key={id} number={i} id={id} type={type} text={text} show_number={true} />
                         ))}
                         <label> <strong>Submit on Behalf Of:</strong>
                             <select className='btn btn-outline-primary w-100' id="someoneElseId" defaultValue="default"> 
