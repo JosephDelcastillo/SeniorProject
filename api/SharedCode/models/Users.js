@@ -114,14 +114,14 @@ async function Create ({name, email, type}) {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'testy.mctestyface.987@gmail.com',
-                pass: 'sfycxavaakmrzzwy'
+                user: 'noreplyepotts@gmail.com',
+                pass: 'aegtfvcsxdwhcvcj'
             }
         });
         
           //create message
         var mailOptions = {
-            from: 'testy.mctestyface.987@gmail.com',
+            from: 'noreplyepotts@gmail.com',
             to: `${email.toLowerCase()}`,
             subject: 'EPOTS New User Password',
             text: `Hello, 
@@ -542,14 +542,14 @@ async function ForgotPassword ({email}) {
         let transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: 'testy.mctestyface.987@gmail.com',
-                pass: 'sfycxavaakmrzzwy'
+                user: 'noreplyepotts@gmail.com',
+                pass: 'aegtfvcsxdwhcvcj'
             }
         });
         
           //create message
         var mailOptions = {
-            from: 'testy.mctestyface.987@gmail.com',
+            from: 'noreplyepotts@gmail.com',
             to: `${email.toLowerCase()}`,
             subject: 'EPOTS Password Reset',
             text: `Hello, 
