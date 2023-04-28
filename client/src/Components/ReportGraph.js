@@ -24,8 +24,9 @@ function ReportGraph({ api }) {
                     end: new Date().toISOString().slice(0, 10) 
                 }
             }
-            const { success, data } = await api({ func: 'GetReport', data: input });
+            let { success, data } = await api({ func: 'GetReport', data: input });
             if (!success) return Swal.fire({ icon: 'error', title: 'Error Retreiving Main Report' })
+            data.questions.sort((a, b) => a.priority - b.priority);
             setReportData({ ...data, output: ReportData(data) });
             setGraphType("spline")
             setActiveQuestion(data.questions[0].text)

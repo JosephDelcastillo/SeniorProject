@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Question from '../Components/Question'
+import { v4 as uuid } from 'uuid';
 import Swal from 'sweetalert2';
 
 //TO DO: FILTER INCOMING DATA BY ENTRYID POSTED FROM RESPONSES
@@ -16,12 +17,12 @@ const inputByID = (id) => document.getElementById(id).value;
  *  Manages Individual Response
  * @returns {React.Component} 
  */
-function Form({ api }) {
+function Form({ api, isAdmin }) {
     const [serverQuestionData, setServerQuestionData] = useState([{}]);
     const [employeeData, setEmployeeData] = useState([{}]);
     useEffect(() => {
         api({func: "GetQuestion", data: { search:"" } }).then(result => setServerQuestionData(result.data))
-        api({func: "GetUsers", data: {"search": ""}}).then(({success, data}) => setEmployeeData(data))
+        api({func: "GetUsers", data: {"search": ""}}).then(({data}) => setEmployeeData(data))
     },[setServerQuestionData,api]);
 
 
@@ -42,26 +43,25 @@ function Form({ api }) {
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
-                <h1> Form - Submit A Response</h1>
+                <h1> Submit Form </h1>
             </div>
             <div className='card-body'>
                 <div className="panel">
                     {(serverQuestionData && serverQuestionData.length > 0)?
-                    (<form>
+                    (<form className='form'>
+                        {(!isAdmin)?(<></>):(
+                            <div>
+                                <strong>On Behalf Of:</strong>
+                                <select className='form-select w-100' id="someoneElseId" defaultValue="default"> 
+                                    <option id="default" value="Myself"> Myself </option>
+                                    {employeeData.map(({ id, name }, i) => (<option key={uuid()} value={id}> {name} </option>))}
+                                </select>
+                                <br/><hr/>
+                            </div>
+                        )}
                         {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
-                           <Question key={id} number={i} id={id} type={type} text={text} show_number={true} />
+                            <Question key={id} number={i} id={id} type={type} text={text} show_number={true} />
                         ))}
-                        <label> <strong>Submit on Behalf Of:</strong>
-                            <select className='btn btn-outline-primary w-100' id="someoneElseId" defaultValue="default"> 
-                            <option id="default" value="Myself">Myself</option>
-                            {employeeData.map(({ id, name }, i) => (
-                                <option key={i} value={id}>
-                                {name}
-                                </option>
-                            ))}
-                            </select>
-                        </label>
-                        <br/><br/>
                         <button className='btn btn-success' type="button" onClick={formSubmit}>Submit</button>
                     </form>):(<></>)}
                 </div>

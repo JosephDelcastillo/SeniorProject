@@ -160,7 +160,7 @@ function FormEdit({api}) {
     return (
         <div className="card m-2 border-none">
             <div className="card-header bg-white text-center">
-                <h1> Form - Edit Contents</h1>
+                <h1> Edit Form </h1>
             </div>
             <div className='card-body'>
                 <div className="panel">
