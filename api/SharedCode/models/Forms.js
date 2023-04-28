@@ -1,6 +1,6 @@
 // Import 
 const { Questions, Submits, Responses } = require('../lib/DBConnection');
-const tb = require('../lib/Helpers');
+const { genId, sanitize } = require('../lib/Helpers');
 
 
 
@@ -24,13 +24,14 @@ async function GetQuestionById (id) {
         // Build Query 
         const query = `SELECT *
             FROM q 
-            WHERE q.id = "${id}"`
+            WHERE q.id = "${id}"`;
 
         // Search DB For Matches  
         const { resources } = await Questions.items.query(query).fetchAll(); 
-        
+        if (!resources || resources.length <= 0) return resolve(false);
+
         // Return Result 
-        resolve( resources );
+        return resolve( resources[0] );
     })
 }
 async function EditQuestion(question, text, type, goals){
@@ -67,10 +68,19 @@ async function ArchiveQuestion(id, status, user){
         return resolve(sanitize(output));
     })
 }
-async function OrderChange(question, priority){
+async function OrderChange(id, priority, modified_by){
     return new Promise( async resolve=> {
+        const question = await GetQuestionById(id);
+        if (question === false) return resolve(false);
+
         const today = new Date(); 
-        const newQuestion = { ...question, priority: priority, modified: today.toISOString() };
+        const newQuestion = { 
+            ...question, 
+            priority, 
+            modified_by, 
+            modified: today.toISOString() 
+        };
+
         const { resource: output } = await Questions.items.upsert(newQuestion);
         return resolve(sanitize(output));
     })
@@ -80,7 +90,7 @@ async function AddQuestion({ text, type }){
         const now = new Date();
         const newQuestion = {
             priority:20,
-            id: await tb.genId(),
+            id: await genId(),
             text,
             type,
             goals: 0,
@@ -112,7 +122,7 @@ async function AddSubmission({ user, data }){
         // Create Submit 
         const now = new Date();
         const submit = {
-            id: await tb.genId(),
+            id: await genId(),
             user, 
             created: now.toISOString(),
             modified_by: "",
@@ -129,7 +139,7 @@ async function AddSubmission({ user, data }){
         let fails = 0;
         data.forEach(async ({ id, value }) => {
             const response = {
-                id: await tb.genId(),
+                id: await genId(),
                 submission: submission.id,
                 question: id,
                 response: value
