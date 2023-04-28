@@ -39,6 +39,7 @@ async function EditQuestion(question, text, type, goals){
         const newQuestion = { ...question, text: text, type: type, goals:goals, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
         return resolve({
+            priority: output.priority,
             id: output.id, 
             text: output.text, 
             type: output.type, 
@@ -56,6 +57,7 @@ async function ArchiveQuestion(question, status){
         const newQuestion = { ...question, archived: status, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
         return resolve({
+            priority: output.priority,
             id: output.id, 
             text: output.text, 
             type: output.type, 
