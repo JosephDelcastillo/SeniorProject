@@ -107,7 +107,7 @@ async function AddSubmission(input) {
       if (!authorized) {
         return new Reply({ point: "Authorization" });
       }
-      if(data[otherIdIndex].value !="Myself" && adminCheck === true){//If the admin check fails, even if they are trying to submit for someone else, it will default to submitting for themselves.
+      if(data[otherIdIndex].value !="Myself" && adminCheck != false){//If the admin check fails, even if they are trying to submit for someone else, it will default to submitting for themselves.
                 newID = data[otherIdIndex].value
                 delete data[otherIdIndex]//Remove the inserted extra identifier to make sure it causes no problems in Model
                 success = await model.AddSubmission({
