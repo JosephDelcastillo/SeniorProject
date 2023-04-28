@@ -96,7 +96,10 @@ function FormEdit({api}) {
         
         let copyQuestionData = [ ...serverQuestionData ];
         copyQuestionData[index] = data;
+       
         setServerQuestionData(copyQuestionData);
+        window.location.reload();
+        
     
     }
 
@@ -175,8 +178,8 @@ function FormEdit({api}) {
                                         <td>
                                             <Action type={ACTION_TYPES.EDIT} action={() => ToEdit(id, text, type, goals)} />
                                             <Action type={archived?ACTION_TYPES.RES:ACTION_TYPES.DEL} action={() => ArchiveQuestion(id, !archived)} />
-                                            <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority+1, '+')}>+</button>
-                                            {priority > 1 && <button className='btn btn-outline-primary w-100' onClick={() => OrderChange(id, priority-1, '-')}>-</button>}
+                                            <button className='btn btn-outline-primary w-15' onClick={() => OrderChange(id, priority+1, '+')}>+</button>
+                                            {priority > 1 && <button className='btn btn-outline-primary w-15' onClick={() => OrderChange(id, priority-1, '-')}>-</button>}
                                         </td>
                                         <td>{priority}</td>
                                         <td>{text}</td>
