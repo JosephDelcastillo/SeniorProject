@@ -34,7 +34,7 @@ async function GetQuestionById (id) {
     })
 }
 async function EditQuestion(question, text, type, goals){
-    return new Promise( async resolve=> {
+    return new Promise( async resolve => {
         const today = new Date(); 
         const newQuestion = { ...question, text: text, type: type, goals:goals, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
@@ -51,12 +51,19 @@ async function EditQuestion(question, text, type, goals){
     })
 
 }
-async function ArchiveQuestion(question, status){
+async function ArchiveQuestion(id, status, user){
     return new Promise(async resolve => {
+        // Get Question
+        const query = `SELECT * FROM q WHERE q.id = "${id}"`;
+        const { resources } = await Questions.items.query(query);
+        if(!resources || resources.length <= 0) return resolve(false);
+
+        // Update 
         const today = new Date(); 
-        const newQuestion = { ...question, archived: status, modified: today.toISOString() };
-        
+        const newQuestion = { ...resources[0], archived: status, modified_by: user, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
+        
+        // Return Result 
         return resolve(sanitize(output));
     })
 }
@@ -65,16 +72,7 @@ async function OrderChange(question, priority){
         const today = new Date(); 
         const newQuestion = { ...question, priority: priority, modified: today.toISOString() };
         const { resource: output } = await Questions.items.upsert(newQuestion);
-        return resolve({
-            priority: output.priority,
-            id: output.id, 
-            text: output.text, 
-            type: output.type, 
-            archived: output.archived,
-            created: output.created,
-            modified: output.modified,
-            goals: output.goals
-        });
+        return resolve(sanitize(output));
     })
 }
 async function AddQuestion({ text, type }){
@@ -93,8 +91,8 @@ async function AddQuestion({ text, type }){
         const { resource: submission } = await Questions.items.create(newQuestion);
         if(!submission) { resolve(false); return false; } 
 
-        resolve(tb.sanitize(submission));
-        return tb.sanitize(submission)
+        resolve(sanitize(submission));
+        return sanitize(submission)
     });
 }
 async function AddSubmission({ user, data }){
