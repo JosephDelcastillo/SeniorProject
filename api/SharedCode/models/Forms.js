@@ -87,7 +87,7 @@ async function AddQuestion({ text, type }){
     return new Promise(async resolve => {
         const now = new Date();
         const newQuestion = {
-            priority:50,
+            priority:20,
             id: await tb.genId(),
             text,
             type,
