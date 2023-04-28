@@ -47,7 +47,7 @@ async function ArchiveQuestion(input){
 
         // Attempt Archive 
         const output = await model.ArchiveQuestion(id, status, isAdmin.id);
-        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Archive Status', data: id});
+        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Archive Status', data: { data, id, status }});
         
         // Publish 
         return new Reply({point: 'Archiving the Question', success: true, data: output});
