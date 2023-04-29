@@ -30,7 +30,7 @@ async function EditQuestion(input){
         // Return Based on Success
         return new Reply({
             point: 'Update Question Content', 
-            success: (!output || !output.id), 
+            success: (output != false), 
             data: output});
     } catch (error) {
         return new Reply({ point: 'Question Content Update Inquiry' });
