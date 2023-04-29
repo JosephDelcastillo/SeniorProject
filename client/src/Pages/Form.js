@@ -49,16 +49,14 @@ function Form({ api, isAdmin }) {
                 <div className="panel">
                     {(serverQuestionData && serverQuestionData.length > 0)?
                     (<form className='form'>
-                        {(!isAdmin)?(<></>):(
-                            <div>
-                                <strong>On Behalf Of:</strong>
-                                <select className='form-select w-100' id="someoneElseId" defaultValue="default"> 
-                                    <option id="default" value="Myself"> Myself </option>
-                                    {employeeData.map(({ id, name }, i) => (<option key={uuid()} value={id}> {name} </option>))}
-                                </select>
-                                <br/><hr/>
-                            </div>
-                        )}
+                        <div className={`${isAdmin?'':'d-none'}`}>
+                            <label><strong>On Behalf Of:</strong></label>
+                            <select className='form-select w-100' id="someoneElseId" defaultValue="default"> 
+                                <option id="default" value="Myself"> Myself </option>
+                                {employeeData.map(({ id, name }, i) => (<option key={uuid()} value={id}> {name} </option>))}
+                            </select>
+                            <br/><hr/>
+                        </div>
                         {serverQuestionData.filter(Question => Question.archived===false).map(({id, type, text}, i) => (
                             <Question key={id} number={i} id={id} type={type} text={text} show_number={true} />
                         ))}
