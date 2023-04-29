@@ -34,21 +34,26 @@ async function GetQuestionById (id) {
         return resolve( resources[0] );
     })
 }
-async function EditQuestion(question, text, type, goals){
+async function EditQuestion(id, text, type, goals, modified_by){
     return new Promise( async resolve => {
+        // First Get Question
+        const question = await GetQuestionById(id);
+        if (question === false) return resolve(false);
+
+        // Clean Inputs
+        if (typeof goals === 'string') goals = parseInt(goals);
+
         const today = new Date(); 
-        const newQuestion = { ...question, text: text, type: type, goals:goals, modified: today.toISOString() };
-        const { resource: output } = await Questions.items.upsert(newQuestion);
-        return resolve({
-            priority: output.priority,
-            id: output.id, 
-            text: output.text, 
-            type: output.type, 
-            archived: output.archived,
-            created: output.created,
-            modified: output.modified,
-            goals: output.goals
-        });
+        const newQuestion = { 
+            ...question, 
+            text, 
+            type, 
+            goals, 
+            modified_by, 
+            modified: today.toISOString() 
+        };
+        const { resource } = await Questions.items.upsert(newQuestion);
+        return resolve(sanitize(resource));
     })
 
 }

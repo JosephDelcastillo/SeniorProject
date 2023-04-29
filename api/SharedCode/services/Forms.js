@@ -17,21 +17,21 @@ async function GetQuestion(input) {
     }
 }
 async function EditQuestion(input){
-    try{
-        const{token, data} = input;
-        const {id, text, type, goals} = data;
+    try {
+        const { token, data } = input;
+        const { id, text, type, goals } = data;
         const isAdmin = await Authorize(token, AUTH_ROLES.Admin);
+        console.log(isAdmin);
+        if(isAdmin === false) return new Reply({point: 'Authorization'});
 
-        if(!isAdmin) return new Reply({point: 'Update Question Inquiry; Does Not Have Permissions'});
+        // Attempt Edit Question
+        const output = await model.EditQuestion(id, text, type, goals, isAdmin.id);
 
-        const questions = await model.GetQuestionById(id);
-
-        if(!questions || questions.length === 0 || !("text" in questions[0])) return new Reply({point: 'No Question Selected to Edit', data: {id,questions}});
-        //if(questions[0].text !== text) return new Reply({point:'Text Matching', data: questions[0]});
-
-        const output = await model.EditQuestion(questions[0], text, type, goals);
-        if(!output || !output.id) return new Reply({point: 'Failed to Update Question Content', data: output.id});
-        return new Reply({point: 'Question Content Updated', success: true, data: output});
+        // Return Based on Success
+        return new Reply({
+            point: 'Update Question Content', 
+            success: (!output || !output.id), 
+            data: output});
     } catch (error) {
         return new Reply({ point: 'Question Content Update Inquiry' });
     }
