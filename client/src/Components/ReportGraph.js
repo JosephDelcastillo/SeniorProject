@@ -28,7 +28,7 @@ function ReportGraph({ api, isAdmin }) {
             if (!success) return Swal.fire({ icon: 'error', title: 'Error Retreiving Main Report' })
             data.questions.sort((a, b) => a.priority - b.priority);
             setReportData({ ...data, output: ReportData(data) });
-            setGraphType("spline")
+            setGraphType("column")
             setActiveQuestion(data.questions[0].text)
         }
         fetchData();
