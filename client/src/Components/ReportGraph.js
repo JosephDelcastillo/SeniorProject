@@ -6,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 import Loading from './Loading';
 import Swal from 'sweetalert2';
 
-function ReportGraph({ api }) {
+function ReportGraph({ api, isAdmin }) {
     const [activeQuestion, setActiveQuestion] = useState('');
     const [graphType, setGraphType] = useState('');
     const [reportData, setReportData] = useState([{}]);
@@ -16,7 +16,7 @@ function ReportGraph({ api }) {
     useEffect(() => {
         async function fetchData() {
             const input = {
-                people: -202,       // Current User
+                people: isAdmin ? [-202] : -202,    // Current User or All Users
                 questions: [-202],  // All  Questions
                 graphType: "spline",
                 dates: {            // All Responses
