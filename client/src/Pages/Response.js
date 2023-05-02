@@ -9,8 +9,8 @@ const subDate = str => {
 
 function Response({ api }) {
 	const params = useParams();
-	const [entryData, setEntryData] = useState([{}]);
-	useEffect(() => {
+	const [entryData, setEntryData] = useState([{}]);									
+	useEffect(() => {														//Sets default state of page. Calls backend function GetSubmission and populates page with Submission Data
 		api({ func: "GetSubmission", data: params.id }).then(({ success, data }) => {
 			if (success) {
 				setEntryData(data);
@@ -52,6 +52,7 @@ function Response({ api }) {
 						{entryData && entryData.questions && entryData.responses ? (
 							<>
 								{entryData.responses.map((response) => (
+									//Pass information to ManageResponse compontent. ManageResponse component is where changes to a response are made and saved
 									<ManageResponse key={response.id} api = {api} id={response.id} response={response.response} question={entryData.questions.find((q) => q.id === response.question).text} questionType={entryData.questions.find((q) => q.id === response.question).type}/>
 									
 								))}
