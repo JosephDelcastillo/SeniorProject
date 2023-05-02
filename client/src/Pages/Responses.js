@@ -13,36 +13,37 @@ import Table from '../Components/Table'
 function Responses({api}) {
     const [entryData, setEntryData] = useState([{}]);
     useEffect(() => {
-        api({func: "GetAllSubmissions", data: "All"}).then(({success, data}) => {
-            if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });
+        api({func: "GetAllSubmissions", data: "All"}).then(({success, data}) => {                               //Default state set by calling GetAllSubmissions from backend
+            if(!success) return Swal.fire({ title: 'Get Responses Failed', icon: 'error' });                    //Fail condition
             const columns = [
                 { cell: row => row.actions, width: '4rem' },
                 //{ name: 'id', selector: row=> row.id, sortable: true },
-                { name: 'User', selector: row => row.user, sortable: true, searchable: true }, 
+                { name: 'User', selector: row => row.user, sortable: true, searchable: true },                 //Set up table with sortable rows
                 { name: 'Created', selector: row => row.created, sortable: true }, 
                 { name: 'Modified By', selector: row => row.modified_by, sortable: true, searchable: true }, 
                 { name: 'Last Edit Date', selector: row => row.modified, sortable: true },
                 { name: 'Archived?', selector: row => row.archived, sortable: true }
             ];
             let info = [];
-            function createModified (status){
+            function createModified (status){                                                                  //Checks for and returns the modified value of a response
                 return (status && status.length > 1) ? status : 'Not Modified';
             }
-            function createModifiedBy ( by ) {
+            function createModifiedBy ( by ) {                                                                 //Checks for and returns the modified_by value of a response
                 const search = data.users.findIndex(u => u.id === by);
                 return (search >= 0) ? data.users[search].name : 'Not Modified';
             }
-            function createActions ({ id, archived }) {
+            function createActions ({ id, archived }) {                                                       //Checks whether or not a submission is archived or not and determines which icon to display
                 return (<>
                         <Action key={uuid()} 
-                            type={ACTION_TYPES.VIEW} 
+                            type={ACTION_TYPES.VIEW}                                                          //Always provide option to view response
                             action={() => {window.location.pathname = `/dashboard/response/${id}`}} />
                         <Action key={uuid()}
-                            type={(archived === "Archived" || archived === true) ? ACTION_TYPES.RES : ACTION_TYPES.DEL}
-                            action={e => archiveHandler(id)} />
+                            type={(archived === "Archived" || archived === true) ? ACTION_TYPES.RES : ACTION_TYPES.DEL} //Checks archival status and displays proper icon.
+                            //Call archiveHandler function on button click
+                            action={e => archiveHandler(id)} />                                                         
                     </>);
             }
-
+            //Creates table for each submission. 
             data.submissions.forEach(({ id, user, created, modified, modified_by, archived}, i) => {
                 let search = data.users.findIndex(u => u.id === user);
                 user = (search >= 0) ? data.users[search].name : user;  
