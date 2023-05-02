@@ -7,7 +7,7 @@ import axios from 'axios';
  * @param {Function} parameters Get Logged In Token
  * @returns {React.Component} 
  */
-function Dashboard({ api }) {
+function Dashboard({ api, isAdmin }) {
     const [quote, setQuote] = new useState({});
     
     useEffect(() => {
@@ -30,7 +30,7 @@ function Dashboard({ api }) {
                         </figcaption>
                     </figure>
                 )}
-                <ReportGraph api={api} />
+                <ReportGraph api={api} isAdmin={isAdmin} />
             </div>
         </div>
     )

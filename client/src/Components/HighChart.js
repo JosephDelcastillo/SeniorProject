@@ -109,9 +109,7 @@ function HighChart({ data, title, yAxis, axisMax, type }) {
                     menuItems: [
                         "viewFullscreen", "printChart",
                         "separator",
-                        "downloadPNG", "downloadJPEG", "downloadSVG", "downloadPDF",
-                        "separator",
-                        "downloadCSV", "downloadXLS"
+                        "downloadPNG", "downloadJPEG", "downloadSVG", "downloadPDF"
                     ]
                 }
             }

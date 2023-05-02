@@ -150,7 +150,7 @@ function ReportAdmin({ api, people, questions }) {
                                 <li key="AllPeople">
                                     <button className="dropdown-item" type="button" onClickCapture={() => { addPerson(-202, 'All'); }} 
                                         onMouseEnter={fixPeople} onMouseLeave={unfixPeople} onBlurCapture={closePeople}>
-                                        All
+                                        All People
                                     </button>
                                 </li>
                             )}
